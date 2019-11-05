@@ -1,0 +1,11 @@
+# Intellij generated
+.idea/
+
+# App build, library and lock
+build/
+node_modules/
+
+# Go
+go.sum
+db/kadvisor.db
+kadvisor
