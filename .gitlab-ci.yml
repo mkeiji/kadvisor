@@ -1,0 +1,49 @@
+image: golang
+
+stages:
+    - build
+    - release
+
+#build-client:
+#    stage: build
+#    image: google/dart
+#    cache:
+#        key: pub-cache
+#        paths:
+#            - client/build
+#        policy: push
+#    script:
+#        - cd client/
+#        - pub get
+#        - pub run build_runner build
+#        - pub run webdev build
+
+build-server:
+    stage: build
+    image: mgkeiji/gogcc
+    cache:
+        key: app-cache
+        paths:
+#            - client/build
+            - .env
+            - kadvisor
+        policy: pull-push
+    script:
+        - go build
+
+#release:
+#    stage: release
+#    only:
+#        - master
+#    image: docker:stable
+#    cache:
+#        key: app-cache
+#        paths:
+#            - .env
+#            - app/build
+#            - todoApp
+#        policy: pull
+#    script:
+#        - echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin
+#        - docker build -t mgkeiji/kadvisor .
+#        - docker push mgkeiji/kadvisor
