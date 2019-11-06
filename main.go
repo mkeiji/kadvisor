@@ -35,11 +35,7 @@ func main() {
 		&UserController{},
 	}
 
-	//TODO:
-	// docker run --rm -d --name test -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
-
 	app.DbMigrate()
 	app.SetRouter()
 	app.Run()
 }
-

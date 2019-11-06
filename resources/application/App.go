@@ -25,6 +25,10 @@ type App struct {
 func init() {
 	once.Do(func() {
 		Db , _ = gorm.Open("mysql", getDbConnection())
+
+		if os.Getenv("APP_ENV") == os.Getenv("PROD_ENV") {
+			gin.SetMode(gin.ReleaseMode)
+		}
 		Router = gin.Default()
 	})
 }
@@ -44,7 +48,9 @@ func (a App) Run() {
 
 func (a App) DbMigrate() {
 	for _, entity := range a.EntityList {
-		Db.DropTableIfExists(entity)
+		if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
+			Db.DropTableIfExists(entity)
+		}
 		Db.AutoMigrate(entity)
 	}
 	a.loadConstraints()
