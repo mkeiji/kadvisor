@@ -4,6 +4,7 @@
 # App build, library and lock
 build/
 node_modules/
+.env
 
 # Go
 go.sum
