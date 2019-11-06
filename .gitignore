@@ -1,12 +1,17 @@
 # Intellij generated
 .idea/
 
-# App build, library and lock
-build/
-node_modules/
-.env
+# Client
+client/.dart_tool
+client/.packages
+client/.pub/
+client/build/
+client/pubspec.lock
+client/doc/api/
+client/test/**/*.g.dart
 
-# Go
+# Server
 go.sum
 db/*
 kadvisor
+.env

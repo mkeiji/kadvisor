@@ -34,7 +34,7 @@ func init() {
 }
 
 func (a App) SetRouter() {
-	Router.Use(static.Serve("/", static.LocalFile("./app/build", true)))
+	Router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
 	a.loadControllers()
 }
 

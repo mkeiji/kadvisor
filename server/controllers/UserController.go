@@ -13,13 +13,13 @@ type UserController struct {
 
 func (t *UserController) LoadEndpoints(router *gin.Engine) {
 	// getMany(/users)
-	router.GET("/users", func (context *gin.Context) {
+	router.GET("/api/users", func (context *gin.Context) {
 		users := t.userService.GetMany()
 		context.JSON(http.StatusOK, gin.H{"users": users})
 	})
 
 	// post(/user)
-	router.POST("/user", func (context *gin.Context) {
+	router.POST("/api/user", func (context *gin.Context) {
 		var user structs.User
 		context.BindJSON(&user)
 		t.userService.Post(user)

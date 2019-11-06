@@ -4,19 +4,19 @@ stages:
     - build
     - release
 
-#build-client:
-#    stage: build
-#    image: google/dart
-#    cache:
-#        key: pub-cache
-#        paths:
-#            - client/build
-#        policy: push
-#    script:
-#        - cd client/
-#        - pub get
-#        - pub run build_runner build
-#        - pub run webdev build
+build-client:
+    stage: build
+    image: google/dart
+    cache:
+        key: pub-cache
+        paths:
+            - client/build
+        policy: push
+    script:
+        - cd client/
+        - pub get
+        - pub run build_runner build
+        - pub run webdev build
 
 build-server:
     stage: build
@@ -24,7 +24,7 @@ build-server:
     cache:
         key: app-cache
         paths:
-#            - client/build
+            - client/build
             - .env
             - kadvisor
         policy: pull-push

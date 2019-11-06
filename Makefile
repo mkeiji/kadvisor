@@ -1,9 +1,10 @@
 run:
+	(cd client/ && pub run webdev build)
 	go build
 	go run kadvisor
 
 build:
-	# npm run build --prefix app/
+	(cd client/ && pub run webdev build)
 	go build
 
 dockerimg:
