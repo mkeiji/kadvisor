@@ -8,5 +8,5 @@ node_modules/
 
 # Go
 go.sum
-db/kadvisor.db
+db/*
 kadvisor

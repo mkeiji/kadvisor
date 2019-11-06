@@ -24,7 +24,7 @@ type App struct {
 
 func init() {
 	once.Do(func() {
-		Db , _ = gorm.Open("mysql", getDbConnection())
+		Db , _ = gorm.Open(os.Getenv("DB_TYPE"), getDbConnection())
 
 		if os.Getenv("APP_ENV") == os.Getenv("PROD_ENV") {
 			gin.SetMode(gin.ReleaseMode)
@@ -70,8 +70,14 @@ func (a App) loadControllers() {
 
 func getDbConnection() string {
 	var dbConnect bytes.Buffer
-	dbConnect.WriteString(os.Getenv("DB_USER") + ":")
-	dbConnect.WriteString(os.Getenv("DB_PASS"))
-	dbConnect.WriteString(os.Getenv("DB_ADDRESS"))
+
+	if os.Getenv("DB_TYPE") == os.Getenv("DB_MYSQL") {
+		dbConnect.WriteString(os.Getenv("DB_USER") + ":")
+		dbConnect.WriteString(os.Getenv("DB_PASS"))
+		dbConnect.WriteString(os.Getenv("DB_ADDRESS"))
+	} else if os.Getenv("DB_TYPE") == os.Getenv("DB_SQLITE") {
+		dbConnect.WriteString(os.Getenv("DB_SQLITE_PATH"))
+	}
+
 	return dbConnect.String()
 }
