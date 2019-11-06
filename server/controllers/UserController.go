@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"kadvisor/repository/structs"
-	"kadvisor/services"
+	"kadvisor/server/repository/structs"
+	"kadvisor/server/services"
 	"net/http"
 )
 

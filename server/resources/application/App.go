@@ -6,7 +6,7 @@ import (
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"kadvisor/repository/interfaces"
+	"kadvisor/server/repository/interfaces"
 	"os"
 	"sync"
 )

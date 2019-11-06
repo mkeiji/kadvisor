@@ -7,10 +7,10 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/joho/godotenv/autoload"
-	"kadvisor/controllers"
-	"kadvisor/repository/interfaces"
-	"kadvisor/repository/structs"
-	"kadvisor/resources/application"
+	"kadvisor/server/controllers"
+	"kadvisor/server/repository/interfaces"
+	"kadvisor/server/repository/structs"
+	"kadvisor/server/resources/application"
 	_ "time"
 )
 

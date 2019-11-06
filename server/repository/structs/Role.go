@@ -4,9 +4,9 @@ import "github.com/jinzhu/gorm"
 
 type Role struct {
 	Base
-	Name		string	`json:"name"`
-	Description	string	`json:"description"`
-	Login		[]Login `gorm:"ForeignKey:RoleID" json:"login"`
+	Name		string    `json:"name"`
+	Description	string `json:"description"`
+	Login		[]Login  `gorm:"ForeignKey:RoleID" json:"login"`
 }
 
 func (e Role) InitializeTable(db *gorm.DB) {
