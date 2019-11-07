@@ -4,7 +4,7 @@ run:
 	go run kadvisor
 
 build:
-	(cd client/ && pub run webdev build)
+	(cd client/ && pub run build_runner build && pub run webdev build)
 	go build
 
 dockerimg:
