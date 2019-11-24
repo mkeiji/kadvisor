@@ -3,6 +3,14 @@ run:
 	go build
 	go run kadvisor
 
+debug:
+	dlv debug --headless --listen=:2345 --api-version=2 --accept-multiclient
+
+runDebug:
+	(cd client/ && pub run webdev build)
+	go build -gcflags "-N -l"
+	dlv --listen=:2345 --headless=true --api-version=2 --accept-multiclient exec ./kadvisor
+
 build:
 	(cd client/ && pub run build_runner build && pub run webdev build)
 	go build

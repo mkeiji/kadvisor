@@ -1,5 +1,6 @@
-# Intellij generated
+# IDEs
 .idea/
+.vscode/
 
 # Client
 client/.dart_tool
@@ -15,3 +16,4 @@ go.sum
 db/*
 kadvisor
 .env
+__debug_bin
