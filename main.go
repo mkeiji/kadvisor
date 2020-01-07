@@ -7,35 +7,16 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/joho/godotenv/autoload"
-	"kadvisor/server/controllers"
-	"kadvisor/server/repository/interfaces"
-	"kadvisor/server/repository/structs"
 	"kadvisor/server/resources/application"
+	"kadvisor/server/resources/registration"
 	_ "time"
 )
-
-var dbErr error
-
-type Entity = interfaces.Entity
-type User = structs.User
-type Login = structs.Login
-type Role = structs.Role
-type Controller = interfaces.Controller
-type UserController = controllers.UserController
-type LoginController = controllers.LoginController
 
 var app application.App
 
 func main() {
-	app.EntityList = []Entity {
-		&Login{},
-		&User{},
-		&Role{},
-	}
-	app.Controllers = []Controller {
-		&UserController{},
-		&LoginController{},
-	}
+	app.EntityList = registration.EntityList
+	app.Controllers = registration.ControllerList
 
 	app.DbMigrate()
 	app.SetRouter()

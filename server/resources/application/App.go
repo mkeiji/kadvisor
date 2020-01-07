@@ -10,16 +10,14 @@ import (
 	"os"
 	"sync"
 )
-type Entity = interfaces.Entity
-type Controller = interfaces.Controller
 
 var Db 			*gorm.DB
 var Router 		*gin.Engine
 var once sync.Once
 
 type App struct {
-	EntityList  []Entity
-	Controllers []Controller
+	EntityList  []interfaces.Entity
+	Controllers []interfaces.Controller
 }
 
 func init() {
