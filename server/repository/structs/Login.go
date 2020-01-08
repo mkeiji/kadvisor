@@ -12,6 +12,7 @@ type Login struct {
 	Email		string		`json:"email"`
 	UserName	string		`json:"userName"`
 	Password	string		`json:"passoword"`
+	IsLoggedIn	bool		`json:"isLoggedIn" sql:"DEFAULT:FALSE" `
 	LastLogin	time.Time	`sql:"DEFAULT:current_timestamp"`
 }
 func (e Login) InitializeTable(db *gorm.DB) {

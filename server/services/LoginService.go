@@ -12,3 +12,7 @@ type LoginService struct {
 func (l *LoginService) GetOneByEmail(email string) structs.Login {
 	return l.loginRepository.FindOneByEmail(email)
 }
+
+func (l *LoginService) UpdateLoginStatus(login structs.Login, isLoggedIn bool) structs.Login {
+	return l.loginRepository.UpdateLoginStatus(login, isLoggedIn)
+}
