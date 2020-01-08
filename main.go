@@ -7,9 +7,9 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/joho/godotenv/autoload"
+	_ "time"
 	"kadvisor/server/resources/application"
 	"kadvisor/server/resources/registration"
-	_ "time"
 )
 
 var app application.App
