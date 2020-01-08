@@ -9,6 +9,7 @@ type Login struct {
 	Base
 	UserID 		uint 		`json:"userID"`
 	RoleID		uint 		`json:"roleID"`
+	Email		string		`json:"email"`
 	UserName	string		`json:"userName"`
 	Password	string		`json:"passoword"`
 	LastLogin	time.Time	`sql:"DEFAULT:current_timestamp"`

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"kadvisor/server/libs/KeiPassUtil"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/services"
 	"net/http"
@@ -22,7 +23,8 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 	router.POST("/api/user", func (context *gin.Context) {
 		var user structs.User
 		context.BindJSON(&user)
-		t.userService.Post(user)
-		context.JSON(http.StatusOK, gin.H{"user": user})
+		KeiPassUtil.HashAndSalt(&user)
+		savedUser := t.userService.Post(user)
+		context.JSON(http.StatusOK, gin.H{"user": savedUser})
 	})
 }

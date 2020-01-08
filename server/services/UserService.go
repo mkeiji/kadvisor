@@ -13,6 +13,10 @@ func (t *UserService) GetMany() []structs2.User {
 	return t.userRepository.FindAll()
 }
 
+func (t *UserService) GetOne(id int) structs2.User {
+	return t.userRepository.FindOne(id)
+}
+
 func (t *UserService) Post(user structs2.User) structs2.User {
 	return t.userRepository.Create(user)
 }

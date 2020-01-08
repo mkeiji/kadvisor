@@ -1,19 +1,25 @@
 package repository
 
 import (
-	structs2 "kadvisor/server/repository/structs"
-	application2 "kadvisor/server/resources/application"
+	"kadvisor/server/repository/structs"
+	"kadvisor/server/resources/application"
 )
 
 type UserRepository struct {}
 
-func (t *UserRepository) FindAll() []structs2.User {
-	var products []structs2.User
-	application2.Db.Find(&products)
-	return products
+func (t *UserRepository) FindAll() []structs.User {
+	var users []structs.User
+	application.Db.Preload("Login").Find(&users)
+	return users
 }
 
-func (t *UserRepository) Create(user structs2.User) structs2.User {
-	application2.Db.Create(&user)
+func (t *UserRepository) FindOne(id int) structs.User {
+	var user structs.User
+	application.Db.Preload("Login").Find(&user, id)
+	return user
+}
+
+func (t *UserRepository) Create(user structs.User) structs.User {
+	application.Db.Save(&user)
 	return user
 }

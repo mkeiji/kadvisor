@@ -22,6 +22,7 @@ type Login = structs.Login
 type Role = structs.Role
 type Controller = interfaces.Controller
 type UserController = controllers.UserController
+type LoginController = controllers.LoginController
 
 var app application.App
 
@@ -33,6 +34,7 @@ func main() {
 	}
 	app.Controllers = []Controller {
 		&UserController{},
+		&LoginController{},
 	}
 
 	app.DbMigrate()
