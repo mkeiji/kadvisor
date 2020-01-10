@@ -9,7 +9,7 @@ type Login struct {
 	Base
 	UserID 		uint 		`json:"userID"`
 	RoleID		uint 		`json:"roleID"`
-	Email		string		`json:"email"`
+	Email		string		`json:"email" gorm:"unique;not null"`
 	UserName	string		`json:"userName"`
 	Password	string		`json:"passoword"`
 	IsLoggedIn	bool		`json:"isLoggedIn" sql:"DEFAULT:FALSE" `

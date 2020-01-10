@@ -7,14 +7,23 @@ import (
 
 type LoginRepository struct {}
 
-func (l *LoginRepository) FindOneByEmail(email string) structs.Login {
+func (l *LoginRepository) FindOneByEmail(email string) (structs.Login, error) {
 	var login structs.Login
-	application.Db.Where("email=?", email).First(&login)
-	return login
+
+	err := application.Db.Where("email=?", email).First(&login).Error
+	if err != nil {
+		return login, err
+	}
+	return login, nil
 }
 
-func (l *LoginRepository) UpdateLoginStatus(login structs.Login, isLoggedIn bool) structs.Login {
+func (l *LoginRepository) UpdateLoginStatus(login structs.Login, isLoggedIn bool) (structs.Login, error) {
 	var storedLogin structs.Login
-	application.Db.Find(&storedLogin, login.ID).Update("IsLoggedIn", isLoggedIn)
-	return storedLogin
+
+	err := application.Db.Find(&storedLogin, login.ID).Update("IsLoggedIn", isLoggedIn).Error
+	if err != nil {
+		return storedLogin, err
+	}
+	
+	return storedLogin, nil
 }

@@ -7,19 +7,28 @@ import (
 
 type UserRepository struct {}
 
-func (t *UserRepository) FindAll() []structs.User {
+func (t *UserRepository) FindAll() ([]structs.User, error) {
 	var users []structs.User
-	application.Db.Preload("Login").Find(&users)
-	return users
+	err := application.Db.Preload("Login").Find(&users).Error
+	if err != nil {
+		return users, err
+	}
+	return users, nil
 }
 
-func (t *UserRepository) FindOne(id int) structs.User {
+func (t *UserRepository) FindOne(id int) (structs.User, error) {
 	var user structs.User
-	application.Db.Preload("Login").Find(&user, id)
-	return user
+	err := application.Db.Preload("Login").Find(&user, id).Error
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
 
-func (t *UserRepository) Create(user structs.User) structs.User {
-	application.Db.Save(&user)
-	return user
+func (t *UserRepository) Create(user structs.User) (structs.User, error) {
+	err := application.Db.Save(&user).Error
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }

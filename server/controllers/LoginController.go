@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"errors"
 	"kadvisor/server/libs/KeiPassUtil"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/services"
@@ -18,18 +19,20 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 		var enteredLogin structs.Login
 		context.BindJSON(&enteredLogin)
 
-		storedLogin := l.loginService.GetOneByEmail(enteredLogin.Email)
-
-		if storedLogin.ID != 0 {
-			isValidPassword := KeiPassUtil.IsValidPassword(storedLogin.Password, enteredLogin.Password)
-			if isValidPassword {
-				updatedLogin := l.loginService.UpdateLoginStatus(storedLogin, true)
-				context.JSON(http.StatusOK, gin.H{"login": updatedLogin})
-			} else {
-				context.JSON(http.StatusBadRequest, gin.H{"error": "ERROR: wrong password"})
-			}
+		storedLogin, err := l.loginService.GetOneByEmail(enteredLogin.Email)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			context.JSON(http.StatusBadRequest, gin.H{"error": "ERROR: email not found"})
+			if KeiPassUtil.IsValidPassword(storedLogin.Password, enteredLogin.Password) {
+				updatedLogin, err := l.loginService.UpdateLoginStatus(storedLogin, true)
+				if err != nil {
+					context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
+				} else {
+					context.JSON(http.StatusOK, gin.H{"login": updatedLogin})
+				}
+			} else {
+				context.JSON(http.StatusBadRequest, gin.H{"error": errors.New("wrong password").Error()})
+			}
 		}
 	})
 }

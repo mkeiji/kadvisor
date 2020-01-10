@@ -15,8 +15,12 @@ type UserController struct {
 func (t *UserController) LoadEndpoints(router *gin.Engine) {
 	// getMany(/users)
 	router.GET("/api/users", func (context *gin.Context) {
-		users := t.userService.GetMany()
-		context.JSON(http.StatusOK, gin.H{"users": users})
+		users, err := t.userService.GetMany()
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
+		} else {
+			context.JSON(http.StatusOK, gin.H{"users": users})
+		}
 	})
 
 	// post(/user)
@@ -24,7 +28,11 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 		var user structs.User
 		context.BindJSON(&user)
 		KeiPassUtil.HashAndSalt(&user)
-		savedUser := t.userService.Post(user)
-		context.JSON(http.StatusOK, gin.H{"user": savedUser})
+		savedUser, err := t.userService.Post(user)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
+		} else {
+			context.JSON(http.StatusOK, gin.H{"user": savedUser})
+		}
 	})
 }
