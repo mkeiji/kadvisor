@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"strconv"
 	"kadvisor/server/libs/KeiPassUtil"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/services"
@@ -13,6 +14,21 @@ type UserController struct {
 }
 
 func (t *UserController) LoadEndpoints(router *gin.Engine) {
+	// getOne(/user)
+	router.GET("/api/user/:id", func (context *gin.Context) {
+		userID, err := strconv.Atoi(context.Param("id"))
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		storedUser, err := t.userService.GetOne(int(userID))
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			context.JSON(http.StatusOK, gin.H{"user": storedUser})
+		}
+	})
+	
 	// getMany(/users)
 	router.GET("/api/users", func (context *gin.Context) {
 		users, err := t.userService.GetMany()
