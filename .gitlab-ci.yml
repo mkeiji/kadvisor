@@ -5,18 +5,18 @@ stages:
     - release
 
 build-client:
-    stage: build
-    image: google/dart
-    cache:
-        key: pub-cache
+   stage: build
+   image: node
+   cache:
+        key: app-cache
         paths:
             - client/build
         policy: push
-    script:
+   script:
         - cd client/
-        - pub get
-        - pub run build_runner build
-        - pub run webdev build
+        - npm install
+        - npm run build
+
 
 build-server:
     stage: build
