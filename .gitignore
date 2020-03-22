@@ -27,15 +27,9 @@ yarn-debug.log*
 yarn-error.log*
 
 ### Server
-# binnary
-kadvisor.exe
-kadvisor.sh
-kadvisor
-__debug_bin
-
-# generated
 go.sum
 db/*
-
-# env
+kadvisor
+kadvisor.exe
 .env
+__debug_bin
