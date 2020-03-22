@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/jinzhu/gorm"
 	"kadvisor/server/repository/interfaces"
 	"os"
@@ -33,6 +34,11 @@ func init() {
 
 func (a App) SetRouter() {
 	Router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
+	
+	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
+		Router.Use(cors.Default())
+	}
+
 	a.loadControllers()
 }
 
