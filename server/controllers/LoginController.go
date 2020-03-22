@@ -9,10 +9,12 @@ import (
 	"net/http"
 )
 
+// LoginController class
 type LoginController struct {
 	loginService services.LoginService
 }
 
+// LoadEndpoints enpoints list
 func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 	// login(/login)
 	router.POST("/api/login", func (context *gin.Context) {
@@ -32,6 +34,26 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 				}
 			} else {
 				context.JSON(http.StatusBadRequest, gin.H{"error": errors.New("wrong password").Error()})
+			}
+		}
+	})
+
+	//logout(/logout)
+	router.POST("/api/logout", func (context *gin.Context) {
+		var currentLogin structs.Login
+		context.BindJSON(&currentLogin)
+
+		storedLogin, err := l.loginService.GetOneByEmail(currentLogin.Email)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			if storedLogin.IsLoggedIn == true {
+				updatedLogin, err := l.loginService.UpdateLoginStatus(storedLogin, false)
+				if err != nil {
+					context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
+				} else {
+					context.JSON(http.StatusOK, gin.H{"login": updatedLogin})
+				}
 			}
 		}
 	})
