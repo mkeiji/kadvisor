@@ -1,21 +1,28 @@
 import React, { Component } from "react";
-import { Navbar, Nav, NavDropdown } from 'react-bootstrap';
+import {Navbar, Nav} from 'react-bootstrap';
 import KLogin from 'klibs/k-login/k-login.component';
+import {connect} from "react-redux";
+import PropTypes from 'prop-types';
+import MainNavBarStore from "./main-nav-bar.store";
 
 class MainNavBar extends Component {
-    user = {
-        "email"     : "email@test.com",
-        "passoword" : "secret"
-    };
+    state = {};
+    constructor(props) {
+        super(props);
+        if (this.props.getLoginStore) {
+            Object.entries(this.props.getLoginStore).map(([_,value]) =>
+                this.state = value);
+        }
+    }
 
-    processLogin = (event) => {
+    processLogin = (login) => {
         console.log("go to LOGIN");
-        console.log(event);
+        this.props.setLoginStore(login);
     };
 
-    processLogout = (event) => {
+    processLogout = (login) => {
         console.log("go to HOME");
-        console.log(event);
+        this.props.unsetLoginStore(login);
     };
 
     render() {
@@ -28,17 +35,10 @@ class MainNavBar extends Component {
                         <Nav className="mr-auto">
                             <Nav.Link href="/">Home</Nav.Link>
                             <Nav.Link href="/about">About</Nav.Link>
-                            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-                            </NavDropdown>
                         </Nav>
                         
-                        <KLogin user={this.user} 
-                                onLogin={this.processLogin} 
+                        <KLogin loginObj={this.state}
+                                onLogin={this.processLogin}
                                 onLogout={this.processLogout}/>
                     </Navbar.Collapse>
                 </Navbar>
@@ -47,4 +47,11 @@ class MainNavBar extends Component {
     }
 }
 
-export default MainNavBar;
+MainNavBar.propTypes = {
+    getLoginStore: PropTypes.object,
+    setLoginStore: PropTypes.func,
+    unsetLoginStore: PropTypes.func
+};
+
+const store = new MainNavBarStore();
+export default connect(store.mapStateToProps, store.mapDispatchToProps)(MainNavBar);

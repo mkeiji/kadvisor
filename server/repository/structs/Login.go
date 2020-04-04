@@ -11,7 +11,7 @@ type Login struct {
 	RoleID		uint 		`json:"roleID"`
 	Email		string		`json:"email" gorm:"unique;not null"`
 	UserName	string		`json:"userName"`
-	Password	string		`json:"passoword"`
+	Password	string		`json:"password"`
 	IsLoggedIn	bool		`json:"isLoggedIn" sql:"DEFAULT:FALSE" `
 	LastLogin	time.Time	`sql:"DEFAULT:current_timestamp"`
 }

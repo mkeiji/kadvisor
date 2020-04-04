@@ -10,7 +10,7 @@ class KLoginService {
     }
 
     login(user) {
-        return this.krxios.post(this.loginEndpoint, user);
+        return this.krxios.post(this.loginEndpoint, JSON.stringify(user));
     }
 
     loginUnsub() {
@@ -18,7 +18,7 @@ class KLoginService {
     }
 
     logout(user) {
-        return this.krxios.post(this.logoutEndpoint, user);
+        return this.krxios.post(this.logoutEndpoint, JSON.stringify(user));
     }
 
     logoutUnsub() {
