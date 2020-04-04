@@ -9,6 +9,7 @@
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
     "dotenv": "^8.2.0",
+    "formik": "^2.1.4",
     "prop-types": "latest",
     "react": "^16.13.0",
     "react-bootstrap": "^1.0.0-beta.16",
@@ -20,7 +21,8 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "rxjs": "^6.5.4",
-    "rxjs-compat": "^6.5.4"
+    "rxjs-compat": "^6.5.4",
+    "yup": "^0.28.3"
   },
   "scripts": {
     "start": "react-scripts start",

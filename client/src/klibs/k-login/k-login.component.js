@@ -2,14 +2,25 @@ import React, {Component} from 'react';
 import {Button, Form, FormControl, DropdownButton, Dropdown} from 'react-bootstrap';
 import KLoginService from 'klibs/k-login/k-login.service'
 import PropTypes from 'prop-types';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 class KLogin extends Component {
     /* @input */ loginObj = this.props.loginObj;
     /* @output */ onLoginEmitter = (event) => { this.props.onLogin(event); };
     /* @output */ onLogoutEmitter = (event) => { this.props.onLogout(event); };
 
-    service = new KLoginService();
     state = {};
+    service = new KLoginService();
+    formInitialValues = { email: "", password: "" };
+    formValidationSchema = Yup.object({
+            email: Yup.string()
+                .email('Invalid email address')
+                .required('Required'),
+            password: Yup.string()
+                .min(3, 'Must be more than 3 char')
+                .required('Required'),
+        });
 
     constructor(props) {
         super(props);
@@ -26,7 +37,15 @@ class KLogin extends Component {
         this.service.unsubscribe();
     }
 
-    login = () => {
+    login = (loginObj) => {
+        this.setState({
+            login: {
+                ...this.state.login,
+                email: loginObj.email,
+                password: loginObj.password
+            }
+        });
+
         this.service.login(this.state.login)
             .subscribe(
                 res => {
@@ -52,63 +71,59 @@ class KLogin extends Component {
             );
     };
 
-    getEmail = (event) => {
-        const email = event.currentTarget.value;
-        this.setState({
-            login: {
-                ...this.state.login,
-                email: email
-            }
-        });
-    };
-
-    getPassword = (event) => {
-        const password = event.currentTarget.value;
-        this.setState({
-            login: {
-                ...this.state.login,
-                password: password
-            }
-        });
-    };
-
-    setupLoginControl = () => {
+    setupLoginFormControl = () => {
         let loginControl;
         if (this.state.isLoggedIn) {
             loginControl = (
-                <DropdownButton variant="secondary"
-                                id="dropdown-variants-secondary"
-                                title={this.state.login.email}>
-                    <Dropdown.Item href="#/profilepage">Profile</Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item onClick={this.logout}>logout</Dropdown.Item>
-                </DropdownButton>
+                <Form inline>
+                    <DropdownButton variant="secondary"
+                                    id="dropdown-variants-secondary"
+                                    title={this.state.login.email}>
+                        <Dropdown.Item href="#/profilepage">Profile</Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item onClick={this.logout}>logout</Dropdown.Item>
+                    </DropdownButton>
+                </Form>
             );
         } else {
             loginControl = (
-                <div>
-                    <FormControl type="text"
-                                 placeholder="email"
-                                 className="mr-sm-2"
-                                 onChange={this.getEmail} />
-                    <FormControl type="password"
-                                 className="mr-sm-2"
-                                 placeholder="password"
-                                 onChange={this.getPassword}/>
-                    <Button variant="outline-success" onClick={this.login}>login</Button>
-                </div>
+                <Formik
+                    initialValues={this.formInitialValues}
+                    validationSchema={this.formValidationSchema}
+                    onSubmit={(loginObj) => this.login(loginObj)}
+                >
+                    {formik => (
+                        <Form inline onSubmit={formik.handleSubmit}>
+                            <FormControl type="text"
+                                         placeholder="email"
+                                         className="mr-sm-2"
+                                         {...formik.getFieldProps('email')} />
+                            <FormControl type="password"
+                                         className="mr-sm-2"
+                                         placeholder="password"
+                                         {...formik.getFieldProps('password')} />
+                            <Button variant={this.getButtonVariant(formik.errors)} type="submit">login</Button>
+                        </Form>
+                    )}
+                </Formik>
             );
         }
         return loginControl;
     };
 
+    getButtonVariant = (formikErrors) => {
+        const hasErrors = formikErrors.email || formikErrors.password;
+        if (hasErrors) {
+            return "outline-danger";
+        } else {
+            return "outline-success";
+        }
+    };
+
     render() {
-        const loginControl = this.setupLoginControl();
         return (
             <div>
-                <Form inline>
-                    {loginControl}
-                </Form>
+                {this.setupLoginFormControl()}
             </div>
         );
     }

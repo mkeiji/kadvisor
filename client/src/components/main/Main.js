@@ -14,7 +14,8 @@ const initialStoreState =
 const store = CreateStore(initialStoreState);
 const saveState = () => localStorage["kadvisor-store"] = JSON.stringify(store.getState());
 store.subscribe(saveState);
-window.store = store;
+
+window.store = store; // TODO: delete/comment (debug only)
 /* Store Setup -- END */
 
 class Main extends Component {
