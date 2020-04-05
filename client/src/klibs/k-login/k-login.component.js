@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Form, FormControl, DropdownButton, Dropdown} from 'react-bootstrap';
+import {Button, Form, FormControl, DropdownButton, Dropdown, Toast} from 'react-bootstrap';
 import KLoginService from 'klibs/k-login/k-login.service'
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
@@ -29,7 +29,8 @@ class KLogin extends Component {
                 email: this.loginObj.email,
                 password: this.loginObj.password
             },
-            isLoggedIn: this.loginObj.isLoggedIn
+            isLoggedIn: this.loginObj.isLoggedIn,
+            hasWarning: false
         };
     }
 
@@ -53,7 +54,9 @@ class KLogin extends Component {
                     this.onLoginEmitter(res);
                 },
                 err => {
-                    console.log(err);
+                    if (err.message.includes("status code 400")) {
+                        this.setState({hasWarning: true});
+                    }
                 }
             );
     };
@@ -120,10 +123,30 @@ class KLogin extends Component {
         }
     };
 
+    setupWarningToast = () => {
+        const toastStatus = this.state.hasWarning ? visibleWarningStyle : hiddenWarningStyle;
+        return (
+            <Toast autohide
+                   onClose={() => this.setState({hasWarning: false})}
+                   show={this.state.hasWarning}
+                   delay={5000}
+                   style={toastStatus}
+            >
+                <Toast.Header>
+                    <img src="holder.js/20x20?text=%20"
+                         className="rounded mr-2"
+                         alt="" />
+                    <strong className="mr-auto">Invalid username or password</strong>
+                </Toast.Header>
+            </Toast>
+        );
+    };
+
     render() {
         return (
             <div>
                 {this.setupLoginFormControl()}
+                {this.setupWarningToast()}
             </div>
         );
     }
@@ -134,5 +157,8 @@ KLogin.propTypes = {
     onLogin: PropTypes.func.isRequired,
     onLogout: PropTypes.func.isRequired
 };
+
+const hiddenWarningStyle = {visibility: 'hidden', position: 'fixed'};
+const visibleWarningStyle = {visibility: 'visible', position: 'fixed'};
 
 export default KLogin;
