@@ -1,4 +1,5 @@
-import KRxios from 'klibs/krxios';
+import KRxios from "klibs/k-rxios/krxios";
+
 
 class KLoginService {
     baseUrl = 'http://localhost:8081/api';
