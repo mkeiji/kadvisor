@@ -1,6 +1,6 @@
 import {combineReducers} from "redux";
 
-const TEST = (state='test', action) =>
+const TEST = (state='test', action: any) =>
     (action.type === 'SET_TEST') ?
         action.payload :
         state;

@@ -1,14 +1,14 @@
 import {setTestMessage} from "../../../store/actions/test/test-action";
 
 export default class ReactPlaceholderStore {
-    mapStateToProps = (state) =>
+    mapStateToProps = (state: any) =>
         ({
             test: state.test
         });
 
-    mapDispatchToProps = (dispatch) =>
+    mapDispatchToProps = (dispatch: any) =>
         ({
-            testStoreFunc(testMsg) {
+            testStoreFunc(testMsg: string) {
                 dispatch(
                     setTestMessage(testMsg)
                 )

@@ -1,11 +1,10 @@
 import React, {Component} from "react";
 import { Button } from 'react-bootstrap';
-import logo from 'components/main/logo.svg';
-import PropTypes from "prop-types";
 import ReactPlaceholderStore from "./react-placeholder.store";
 import {connect} from "react-redux";
+import logo from '../assets/logo.svg'
 
-class ReactPlaceholder extends Component {
+class ReactPlaceholder extends Component<ReactPlaceholderPropTypes> {
     render() {
         return (
             <div className="Main-header">
@@ -24,9 +23,9 @@ class ReactPlaceholder extends Component {
     }
 }
 
-ReactPlaceholder.propTypes = {
-    testStoreFunc: PropTypes.func
-};
+interface ReactPlaceholderPropTypes {
+    testStoreFunc: Function;
+}
 
 const store = new ReactPlaceholderStore();
 export default connect(store.mapStateToProps, store.mapDispatchToProps)(ReactPlaceholder);

@@ -1,7 +1,7 @@
-import {MAIN_NAV_BAR_ACTION_TYPE} from "../../actions/action-types";
 import {combineReducers} from "redux";
+import {MAIN_NAV_BAR_ACTION_TYPE} from "store/actions/action-types";
 
-const LOGIN = (state=null, action) => {
+const LOGIN = (state=null, action: any) => {
     switch (action.type) {
         case MAIN_NAV_BAR_ACTION_TYPE.SET_LOGIN:
             return action.payload;

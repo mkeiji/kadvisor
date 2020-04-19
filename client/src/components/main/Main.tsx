@@ -2,8 +2,8 @@ import React from 'react';
 import {Component} from 'react';
 import './app-routes/AppRoutes.css';
 import AppRoutes from "./app-routes/AppRoutes";
-import CreateStore from "../../store";
 import {Provider} from "react-redux";
+import CreateStore from "store/index";
 
 /* Store Setup
 * ------------*/
@@ -15,7 +15,7 @@ const store = CreateStore(initialStoreState);
 const saveState = () => localStorage["kadvisor-store"] = JSON.stringify(store.getState());
 store.subscribe(saveState);
 
-window.store = store; // TODO: delete/comment (debug only)
+//window.store = store; // TODO: delete/comment (debug only)
 /* Store Setup -- END */
 
 class Main extends Component {

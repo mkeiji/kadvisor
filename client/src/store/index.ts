@@ -6,7 +6,7 @@ export default function CreateStore(initialState={}) {
     return applyMiddleware(thunk, middlewareLogger)(createStore)(appReducer, initialState);
 }
 
-const middlewareLogger = (store) => (next) => (action) => {
+const middlewareLogger = (store: any) => (next: any) => (action: any) => {
     let result;
 
     console.groupCollapsed(`dispatched action => ${action.type}`);

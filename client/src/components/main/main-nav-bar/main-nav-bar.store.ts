@@ -1,20 +1,20 @@
 import {SET_LOGIN, UNSET_LOGIN} from "../../../store/actions/main-nav-bar/main-nav-bar-action";
 
 export default class MainNavBarStore {
-    mapStateToProps = (state) =>
+    mapStateToProps = (state: any) =>
         ({
             getLoginStore: state.MAIN_NAV_BAR.LOGIN
         });
 
-    mapDispatchToProps = (dispatch) =>
+    mapDispatchToProps = (dispatch: any) =>
         ({
-            setLoginStore(login) {
+            setLoginStore(login: any) {
                 dispatch(
                     SET_LOGIN(login)
                 )
             },
 
-            unsetLoginStore(login) {
+            unsetLoginStore(login: any) {
                 dispatch(
                     UNSET_LOGIN(login)
                 )

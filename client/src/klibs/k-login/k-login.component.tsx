@@ -1,28 +1,32 @@
-import React, {Component} from 'react';
-import {Button, Form, FormControl, DropdownButton, Dropdown, Toast} from 'react-bootstrap';
-import KLoginService from 'klibs/k-login/k-login.service'
-import PropTypes from 'prop-types';
-import { Formik } from 'formik';
+import React, {Component, CSSProperties} from "react";
+import {KLoginPropTypes, KLoginResponse, KLoginState, Login} from "./view-models";
 import * as Yup from 'yup';
+import {Toast, Form, DropdownButton, Dropdown, FormControl, Button} from "react-bootstrap";
+import {Formik, FormikErrors} from "formik";
+import {Subject} from "rxjs";
+import {takeUntil} from "rxjs/operators";
+import KLoginService from "./k-login.service";
+import {GernericErr} from "klibs/k-models/gerneric-models";
 
-class KLogin extends Component {
+class KLogin extends Component<KLoginPropTypes, KLoginState> {
     /* @input */ loginObj = this.props.loginObj;
-    /* @output */ onLoginEmitter = (event) => { this.props.onLogin(event); };
-    /* @output */ onLogoutEmitter = (event) => { this.props.onLogout(event); };
+    /* @output */ onLoginEmitter = (event: any) => { this.props.onLogin(event); };
+    /* @output */ onLogoutEmitter = (event: any) => { this.props.onLogout(event); };
 
-    state = {};
     service = new KLoginService();
+    unsubscribe$ = new Subject<void>();
+
     formInitialValues = { email: "", password: "" };
     formValidationSchema = Yup.object({
-            email: Yup.string()
-                .email('Invalid email address')
-                .required('Required'),
-            password: Yup.string()
-                .min(3, 'Must be more than 3 char')
-                .required('Required'),
-        });
+        email: Yup.string()
+            .email('Invalid email address')
+            .required('Required'),
+        password: Yup.string()
+            .min(3, 'Must be more than 3 char')
+            .required('Required'),
+    });
 
-    constructor(props) {
+    constructor(readonly props: KLoginPropTypes) {
         super(props);
         this.state = {
             login: {
@@ -31,14 +35,15 @@ class KLogin extends Component {
             },
             isLoggedIn: this.loginObj.isLoggedIn,
             hasWarning: false
-        };
+        } as KLoginState;
     }
 
-    componentWillUnmount() {
-        this.service.unsubscribe();
+    componentWillUnmount(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
     }
 
-    login = (loginObj) => {
+    login = (loginObj: Login) => {
         this.setState({
             login: {
                 ...this.state.login,
@@ -48,12 +53,13 @@ class KLogin extends Component {
         });
 
         this.service.login(this.state.login)
+            .pipe(takeUntil(this.unsubscribe$))
             .subscribe(
-                res => {
+                (res: KLoginResponse) => {
                     this.setState({isLoggedIn: res.login.isLoggedIn});
                     this.onLoginEmitter(res);
                 },
-                err => {
+                (err: GernericErr) => {
                     if (err.message.includes("status code 400")) {
                         this.setState({hasWarning: true});
                     }
@@ -61,18 +67,21 @@ class KLogin extends Component {
             );
     };
 
+
     logout = () => {
         this.service.logout(this.state.login)
-            .subscribe( 
-                res => {
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe(
+                (res: KLoginResponse) => {
                     this.setState({isLoggedIn: res.login.isLoggedIn});
                     this.onLogoutEmitter(res);
                 },
-                err => {
+                (err: GernericErr) => {
                     console.log(err);
                 }
             );
     };
+
 
     setupLoginFormControl = () => {
         let loginControl;
@@ -114,7 +123,7 @@ class KLogin extends Component {
         return loginControl;
     };
 
-    getButtonVariant = (formikErrors) => {
+    getButtonVariant = (formikErrors: FormikErrors<Login>) => {
         const hasErrors = formikErrors.email || formikErrors.password;
         if (hasErrors) {
             return "outline-danger";
@@ -123,13 +132,14 @@ class KLogin extends Component {
         }
     };
 
+
     setupWarningToast = () => {
         const toastStatus = this.state.hasWarning ? visibleWarningStyle : hiddenWarningStyle;
         return (
             <Toast autohide
                    onClose={() => this.setState({hasWarning: false})}
                    show={this.state.hasWarning}
-                   delay={5000}
+                   delay={2000}
                    style={toastStatus}
             >
                 <Toast.Header>
@@ -152,13 +162,7 @@ class KLogin extends Component {
     }
 }
 
-KLogin.propTypes = {
-    loginObj: PropTypes.object.isRequired,
-    onLogin: PropTypes.func.isRequired,
-    onLogout: PropTypes.func.isRequired
-};
-
-const hiddenWarningStyle = {visibility: 'hidden', position: 'fixed'};
-const visibleWarningStyle = {visibility: 'visible', position: 'fixed'};
+const hiddenWarningStyle = {visibility: 'hidden', position: 'fixed'} as CSSProperties;
+const visibleWarningStyle = {visibility: 'visible', position: 'fixed'} as CSSProperties;
 
 export default KLogin;
