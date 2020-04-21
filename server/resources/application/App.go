@@ -33,7 +33,7 @@ func init() {
 }
 
 func (a App) SetRouter() {
-	Router.Use(static.Serve("/", static.LocalFile("./client/build", true)))
+	Router.Use(static.Serve("/", static.LocalFile("./client/dist/apps/kadvisor", true)))
 	
 	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
 		Router.Use(cors.Default())

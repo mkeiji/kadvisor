@@ -1,6 +1,18 @@
 # IDEs
 .idea/
-.vscode/
+client/.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+client/.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 ### Client
 # dependencies
@@ -11,8 +23,10 @@ client/.pnp.js
 # testing
 client/coverage/
 
-# production
-client/build/
+# compiled output
+client/dist
+client/tmp
+client/out-tsc
 
 # misc
 client/.DS_Store
@@ -21,10 +35,21 @@ client/.env.development.local
 client/.env.test.local
 client/.env.production.local
 client/package-lock.json
+client/.sass-cache
+client/connect.lock
+client/coverage
+client/libpeerconnection.log
+client/npm-debug.log
+client/yarn-error.log
+client/testem.log
+client/typings
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+
+*.DS_Store
+*Thumbs.db
 
 ### Server
 go.sum
@@ -33,3 +58,5 @@ kadvisor
 kadvisor.exe
 .env
 __debug_bin
+/client/.idea/
+/client/.vscode/

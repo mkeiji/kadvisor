@@ -10,7 +10,7 @@ build-client:
    cache:
         key: app-cache
         paths:
-            - client/build
+            - client/dist
         policy: push
    script:
         - cd client/
@@ -24,7 +24,7 @@ build-server:
     cache:
         key: app-cache
         paths:
-            - client/build
+            - client/dist
             - .env
             - kadvisor
         policy: pull-push
