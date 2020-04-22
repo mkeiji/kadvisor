@@ -79,5 +79,9 @@ export const useStyles = makeStyles(theme => ({
     },
     fixedHeight: {
         height: 240
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        width: 120
     }
 }));

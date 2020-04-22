@@ -106,8 +106,8 @@ export default class KComposedChartComponent extends PureComponent {
                             yAxisId="left"
                             type="monotone"
                             dataKey="expense"
-                            fill="#f7d6b9"
-                            stroke="#f7d6b9"
+                            fill="#fcada1"
+                            stroke="#fcada1"
                         />
                         <Bar
                             yAxisId="right"

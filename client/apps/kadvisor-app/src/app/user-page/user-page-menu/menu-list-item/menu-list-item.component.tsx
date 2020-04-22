@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserPageMenuListObject, UserPageMenuListTypes } from './view-models';
+import { UserPageMenuListObject, UserPageMenuListTypes } from '../view-models';
 import { Link } from 'react-router-dom';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';

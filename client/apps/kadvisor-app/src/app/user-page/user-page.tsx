@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import UserPageMenu from './user-page-menu/user-page-menu.component';
 import { useStyles } from './user-page-menu/user-page-menu.style.hook';
 import Dashboard from './user-page-menu/dashboard/dashboard.component';
+import EntryTable from './user-page-menu/entry/entry.component';
 
 function UserPage(props: UserHomePropTypes) {
     const styleClasses = useStyles();
@@ -25,6 +26,9 @@ function UserPage(props: UserHomePropTypes) {
             switch (page) {
                 case 'dashboard':
                     return <Dashboard classes={styleClasses} />;
+
+                case 'entries':
+                    return <EntryTable classes={styleClasses} />;
 
                 default:
                     return (

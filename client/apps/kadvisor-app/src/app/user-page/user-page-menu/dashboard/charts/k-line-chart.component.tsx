@@ -8,7 +8,7 @@ import {
     Label,
     ResponsiveContainer
 } from 'recharts';
-import Title from '../Title/title.component';
+import Title from '../../Title/title.component';
 
 // Generate Data
 function createData(time: any, amount: any) {

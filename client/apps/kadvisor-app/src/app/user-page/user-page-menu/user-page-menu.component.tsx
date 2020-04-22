@@ -11,7 +11,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import PropTypes from 'prop-types';
-import MenuListItem from './menu-list-item.component';
+import MenuListItem from './menu-list-item/menu-list-item.component';
 
 export default function UserPageMenu(props: any) {
     const [open, setOpen] = React.useState(true);
