@@ -1,21 +1,30 @@
 package structs
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	"os"
+)
 
 type Role struct {
 	Base
-	Name		string    	`json:"name"`
-	Description	string 		`json:"description"`
-	Login		[]Login  	`gorm:"ForeignKey:RoleID" json:"login"`
+	RoleType	string    		`json:"roleType"`
+	Description	string 			`json:"description"`
+	Permission	[]Permission 	`gorm:"many2many:role_permissions;ForeignKey:ID" json:"permission"`
 }
 
-func (e Role) InitializeTable(db *gorm.DB) {
-	addUserRoles(db)
+func (e Role) IsInitializable() bool { return true }
+
+func (e Role) Migrate(db *gorm.DB) {
+	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
+		db.DropTableIfExists(&Permission{})
+		db.DropTableIfExists(&Role{})
+	}
+	db.AutoMigrate(&Role{})
 }
 
-func addUserRoles(db *gorm.DB) {
-	role1 := Role{Name: "Admin", Description: "Admin"}
-	role2 := Role{Name: "Regular", Description: "Regular"}
+func (e Role) Initialize(db *gorm.DB) {
+	role1 := Role{RoleType: "ADMIN"	, Description: "Admin"	, Permission: []Permission{{PermissionType: "VIEW"}, {PermissionType: "EDIT"}}}
+	role2 := Role{RoleType: "REGULAR"	, Description: "Regular", Permission: []Permission{{PermissionType: "VIEW22"}}}
 	db.Create(&role1)
 	db.Create(&role2)
 }

@@ -16,12 +16,15 @@ type UserController struct {
 func (t *UserController) LoadEndpoints(router *gin.Engine) {
 	// getOne(/user)
 	router.GET("/api/user/:id", func (context *gin.Context) {
+		isPreloaded, err := strconv.ParseBool(
+			context.DefaultQuery("preloaded", "false"))
+
 		userID, err := strconv.Atoi(context.Param("id"))
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 
-		storedUser, err := t.userService.GetOne(int(userID))
+		storedUser, err := t.userService.GetOne(userID, isPreloaded)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
@@ -31,7 +34,10 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 	
 	// getMany(/users)
 	router.GET("/api/users", func (context *gin.Context) {
-		users, err := t.userService.GetMany()
+		isPreloaded, err := strconv.ParseBool(
+			context.DefaultQuery("preloaded", "false"))
+
+		users, err := t.userService.GetMany(isPreloaded)
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
 		} else {

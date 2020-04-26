@@ -6,7 +6,11 @@ import (
 )
 
 var EntityList = []interfaces.Entity {
-	&structs.Login{},
 	&structs.User{},
+	&structs.Login{},
+	&structs.Entry{},
+	&structs.Class{},
+	&structs.SubClass{},
 	&structs.Role{},
+	&structs.Permission{},
 }

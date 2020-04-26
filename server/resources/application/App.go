@@ -14,7 +14,7 @@ import (
 
 var Db 			*gorm.DB
 var Router 		*gin.Engine
-var once sync.Once
+var once 		sync.Once
 
 type App struct {
 	EntityList  []interfaces.Entity
@@ -52,17 +52,12 @@ func (a App) Run() {
 
 func (a App) DbMigrate() {
 	for _, entity := range a.EntityList {
-		if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
-			Db.DropTableIfExists(entity)
-		}
-		Db.AutoMigrate(entity)
+		entity.Migrate(Db)
 	}
-	a.loadConstraints()
-}
-
-func (a App) loadConstraints() {
 	for _, entity := range a.EntityList {
-		entity.InitializeTable(Db)
+		if entity.IsInitializable() {
+			entity.Initialize(Db)
+		}
 	}
 }
 

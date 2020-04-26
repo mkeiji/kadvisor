@@ -15,7 +15,11 @@ type Login struct {
 	IsLoggedIn	bool		`json:"isLoggedIn" sql:"DEFAULT:FALSE" `
 	LastLogin	time.Time	`sql:"DEFAULT:current_timestamp"`
 }
-func (e Login) InitializeTable(db *gorm.DB) {
-	db.Model(&Login{}).AddForeignKey("user_id", "users(id)", "CASCADE", "CASCADE")
-	db.Model(&Login{}).AddForeignKey("role_id", "roles(id)", "CASCADE", "CASCADE")
+
+func (e Login) IsInitializable() bool { return false }
+
+func (e Login) Migrate(db *gorm.DB) {
+	db.AutoMigrate(&Login{})
 }
+
+func (e Login) Initialize(db *gorm.DB) {/* empty */}

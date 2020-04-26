@@ -3,6 +3,8 @@ package interfaces
 import "github.com/jinzhu/gorm"
 
 type Entity interface {
-	InitializeTable(db *gorm.DB)
+	Migrate(db *gorm.DB)
+	IsInitializable() bool
+	Initialize(db *gorm.DB)
 }
 
