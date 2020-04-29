@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"kadvisor/server/libs/KeiPassUtil"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/services"
@@ -17,9 +17,12 @@ type LoginController struct {
 // LoadEndpoints enpoints list
 func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 	// login(/login)
-	router.POST("/api/login", func (context *gin.Context) {
+	router.POST("/api/login",
+		func (context *gin.Context) {
+
 		var enteredLogin structs.Login
 		context.BindJSON(&enteredLogin)
+
 
 		storedLogin, err := l.loginService.GetOneByEmail(enteredLogin.Email)
 		if err != nil {

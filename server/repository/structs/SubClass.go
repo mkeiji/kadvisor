@@ -16,3 +16,9 @@ func (e SubClass) Migrate(db *gorm.DB) {
 }
 
 func (e SubClass) Initialize(db *gorm.DB) {}
+
+/* GORM HOOKS */
+func (e *SubClass) BeforeDelete(db *gorm.DB) (err error) {
+	db.Model(&e).Update("is_active", false)
+	return
+}

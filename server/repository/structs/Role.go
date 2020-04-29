@@ -28,3 +28,9 @@ func (e Role) Initialize(db *gorm.DB) {
 	db.Create(&role1)
 	db.Create(&role2)
 }
+
+/* GORM HOOKS */
+func (e *Role) BeforeDelete(db *gorm.DB) (err error) {
+	db.Model(&e).Update("is_active", false)
+	return
+}

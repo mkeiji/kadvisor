@@ -23,3 +23,9 @@ func (e Login) Migrate(db *gorm.DB) {
 }
 
 func (e Login) Initialize(db *gorm.DB) {/* empty */}
+
+/* GORM HOOKS */
+func (e *Login) BeforeDelete(db *gorm.DB) (err error) {
+	db.Model(&e).Update("is_active", false)
+	return
+}
