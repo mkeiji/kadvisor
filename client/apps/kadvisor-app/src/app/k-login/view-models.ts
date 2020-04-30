@@ -1,9 +1,4 @@
-import { BaseModel } from '@client/klibs';
-
-export interface Login {
-    email: string;
-    password: string;
-}
+import { Login } from '@client/klibs';
 
 export interface KLoginState {
     login: Login;
@@ -17,18 +12,4 @@ export interface KLoginPropTypes {
     loginObj: any;
     onLogin: Function;
     onLogout: Function;
-}
-
-export interface KLoginResponse {
-    login: LoginResponse;
-}
-
-interface LoginResponse extends BaseModel {
-    userID: number;
-    roleID: number;
-    email: string;
-    userName: string;
-    password: string;
-    isLoggedIn: boolean;
-    LastLogin: string;
 }

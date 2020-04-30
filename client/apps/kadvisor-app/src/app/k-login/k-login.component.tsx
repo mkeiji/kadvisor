@@ -1,10 +1,5 @@
 import React, { Component, CSSProperties } from 'react';
-import {
-    KLoginPropTypes,
-    KLoginResponse,
-    KLoginState,
-    Login
-} from './view-models';
+import { KLoginPropTypes, KLoginState } from './view-models';
 import * as Yup from 'yup';
 import {
     Toast,
@@ -18,7 +13,7 @@ import { Formik, FormikErrors } from 'formik';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import KLoginService from './k-login.service';
-import { GernericErr } from '@client/klibs';
+import { GernericErr, KLoginResponse, Login } from '@client/klibs';
 
 class KLogin extends Component<KLoginPropTypes, KLoginState> {
     /* @input */ loginObj = this.props.loginObj;
@@ -59,7 +54,7 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
         this.unsubscribe$.complete();
     }
 
-    login = (loginObj: Login) => {
+    login = (loginObj: Partial<Login>) => {
         this.setState({
             login: {
                 ...this.state.login,
