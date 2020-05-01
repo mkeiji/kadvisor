@@ -13,22 +13,20 @@ import {
 
 function MainNavBar(props: MainNavBarPropTypes) {
     const history = useHistory();
-    let state = {} as Partial<Login>;
+    let login = {} as Login;
 
     if (props.getLoginStore) {
-        Object.entries(props.getLoginStore).map(
-            ([_, value]) => (state = value)
-        );
+        login = props.getLoginStore;
     }
 
     function processLogin(login: KLoginResponse) {
-        props.setLoginStore(login);
+        props.setLoginStore(login.login);
         history.push(KRouterPathUtil.getUserPage(login.login.userID));
     }
 
     function processLogout(login: KLoginResponse) {
         history.push(APP_ROUTES.root);
-        props.unsetLoginStore(login);
+        props.unsetLoginStore(login.login);
     }
 
     return (
@@ -44,7 +42,7 @@ function MainNavBar(props: MainNavBarPropTypes) {
 
                     <KLogin
                         userPageUrl={APP_ROUTES.userPage}
-                        loginObj={state}
+                        loginObj={login}
                         onLogin={processLogin}
                         onLogout={processLogout}
                     />
@@ -55,7 +53,7 @@ function MainNavBar(props: MainNavBarPropTypes) {
 }
 
 interface MainNavBarPropTypes {
-    getLoginStore: Function;
+    getLoginStore: Login;
     setLoginStore: Function;
     unsetLoginStore: Function;
 }

@@ -32,6 +32,7 @@ class ReactPlaceholder extends Component<ReactPlaceholderPropTypes> {
 }
 
 interface ReactPlaceholderPropTypes {
+    getTestFromStore: string;
     testStoreFunc: Function;
 }
 

@@ -1,8 +1,0 @@
-export const TEST_ACTION_TYPE = {
-    SET_TEST: 'SET_TEST'
-};
-
-export const MAIN_NAV_BAR_ACTION_TYPE = {
-    SET_LOGIN: 'SET_LOGIN',
-    UNSET_LOGIN: 'UNSET_LOGIN'
-};

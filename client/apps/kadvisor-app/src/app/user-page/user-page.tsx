@@ -5,18 +5,19 @@ import UserPageMenu from './user-page-menu/user-page-menu.component';
 import { useStyles } from './user-page-menu/user-page-menu.style.hook';
 import Dashboard from './user-page-menu/dashboard/dashboard.component';
 import EntryTable from './user-page-menu/entry/entry.component';
+import { Login, Match } from '@client/klibs';
 
 function UserPage(props: UserHomePropTypes) {
     const styleClasses = useStyles();
     const paramID = Number(props.match.params.id);
     const paramPage = props.match.params.page;
-    const login = props.getLoginStore ? props.getLoginStore.login : {};
+    const login = props.getLoginStore ? props.getLoginStore : ({} as Login);
 
     const [idMatch, setIdMatch] = useState(false);
     useEffect(() => {
         handleIdChange(paramID);
 
-        function handleIdChange(newID: any) {
+        function handleIdChange(newID: number) {
             setIdMatch(newID === login.userID);
         }
     });
@@ -57,9 +58,13 @@ function UserPage(props: UserHomePropTypes) {
     );
 }
 
+interface UserPagePathParams {
+    id: number;
+    page: string;
+}
 interface UserHomePropTypes {
-    match: any;
-    getLoginStore: any;
+    match: Match<UserPagePathParams>;
+    getLoginStore: Login;
 }
 
 const store = new UserPageStore();

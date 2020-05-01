@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
-import { MAIN_NAV_BAR_ACTION_TYPE } from '../../actions/action-types';
+import { MAIN_NAV_BAR_ACTION_TYPE } from '../../actions/main-nav-bar/action-types';
+import { StoreAction } from '@client/klibs';
 
-const LOGIN = (state = null, action: any) => {
+const LOGIN = (state = null, action: StoreAction) => {
     switch (action.type) {
         case MAIN_NAV_BAR_ACTION_TYPE.SET_LOGIN:
             return action.payload;

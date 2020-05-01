@@ -9,7 +9,7 @@ export interface KLoginState {
 
 export interface KLoginPropTypes {
     userPageUrl: string;
-    loginObj: any;
+    loginObj: Partial<Login>;
     onLogin: Function;
     onLogout: Function;
 }

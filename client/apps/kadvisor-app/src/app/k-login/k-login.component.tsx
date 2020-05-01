@@ -17,10 +17,10 @@ import { GernericErr, KLoginResponse, Login } from '@client/klibs';
 
 class KLogin extends Component<KLoginPropTypes, KLoginState> {
     /* @input */ loginObj = this.props.loginObj;
-    /* @output */ onLoginEmitter = (event: any) => {
+    /* @output */ onLoginEmitter = (event: KLoginResponse) => {
         this.props.onLogin(event);
     };
-    /* @output */ onLogoutEmitter = (event: any) => {
+    /* @output */ onLogoutEmitter = (event: KLoginResponse) => {
         this.props.onLogout(event);
     };
 
