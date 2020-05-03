@@ -4,8 +4,8 @@ import "github.com/jinzhu/gorm"
 
 type Permission struct {
 	Base
-	PermissionType	string	`json:"permissionType"`
-	Description		string	`json:"description"`
+	PermissionType	string	`json:"permissionType,omitempty"`
+	Description		string	`json:"description,omitempty"`
 }
 
 func (e Permission) IsInitializable() bool { return false }

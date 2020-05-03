@@ -63,6 +63,24 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 		}
 	})
 
+	// put(/entry)
+	router.PUT("/api/kadvisor/:uid/entry", func (c *gin.Context) {
+		var entry structs.Entry
+
+		userID, _ := strconv.Atoi(c.Param("uid"))
+		uErr := KeiUserUtil.ValidUser(userID)
+
+		c.BindJSON(&entry)
+		updated, err := ctrl.service.Put(entry)
+		if uErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+		} else if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"entry": updated})
+		}
+	})
+
 	// delete(/entry?id)
 	router.DELETE("/api/kadvisor/:uid/entry", func (c *gin.Context) {
 		entryID	, _ := strconv.Atoi(c.Query("id"))

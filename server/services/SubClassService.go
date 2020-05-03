@@ -29,6 +29,11 @@ func (svc *SubClassService) Post(
 	return svc.repository.Create(subclass)
 }
 
+func (svc *SubClassService) Put(
+	subclass structs.SubClass) (structs.SubClass, error) {
+	return svc.repository.Update(subclass)
+}
+
 func (svc *SubClassService) Delete(
 	id int) (int, error) {
 	return svc.repository.Delete(id)

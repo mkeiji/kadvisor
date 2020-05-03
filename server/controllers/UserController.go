@@ -57,4 +57,17 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 			context.JSON(http.StatusOK, gin.H{"user": savedUser})
 		}
 	})
+
+	// put(/user)
+	router.PUT("/api/user", func (context *gin.Context) {
+		var user structs.User
+		context.BindJSON(&user)
+
+		updated, err := t.userService.Put(user)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			context.JSON(http.StatusOK, gin.H{"user": updated})
+		}
+	})
 }

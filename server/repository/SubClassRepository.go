@@ -37,6 +37,14 @@ func (rep *SubClassRepository) Create(
 	return subclass, err
 }
 
+func (rep *SubClassRepository) Update(
+	sclass structs.SubClass) (structs.SubClass, error) {
+
+	var stored structs.SubClass
+	err := application.Db.Find(&stored, sclass.ID).Updates(sclass).Error
+	return stored, err
+}
+
 func (rep *SubClassRepository) Delete(
 	id int) (int, error) {
 	toDelete := structs.SubClass{Base: structs.Base{ID: uint(id)}}

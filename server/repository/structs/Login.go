@@ -7,13 +7,13 @@ import (
 
 type Login struct {
 	Base
-	UserID 		uint 		`json:"userID"`
-	RoleID		uint 		`json:"roleID"`
-	Email		string		`json:"email" gorm:"unique;not null"`
-	UserName	string		`json:"userName"`
-	Password	string		`json:"password"`
-	IsLoggedIn	bool		`json:"isLoggedIn" sql:"DEFAULT:FALSE" `
-	LastLogin	time.Time	`sql:"DEFAULT:current_timestamp"`
+	UserID 		int 		`json:"userID,omitempty"`
+	RoleID		int 		`json:"roleID,omitempty"`
+	Email		string		`json:"email,omitempty" gorm:"unique;not null"`
+	UserName	string		`json:"userName,omitempty"`
+	Password	string		`json:"password,omitempty"`
+	IsLoggedIn	bool		`json:"isLoggedIn,omitempty"`
+	LastLogin	*time.Time	`json:"lastLogin,omitempty"`
 }
 
 func (e Login) IsInitializable() bool { return false }

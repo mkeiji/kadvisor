@@ -39,6 +39,11 @@ func (svc *EntryService) Post(
 	return svc.repository.Create(entry)
 }
 
+func (svc *EntryService) Put(
+	entry structs.Entry) (structs.Entry, error) {
+	return svc.repository.Update(entry)
+}
+
 func (svc *EntryService) Delete(
 	id int) (int, error) {
 	return svc.repository.Delete(id)

@@ -64,6 +64,24 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 		}
 	})
 
+	// put(/class)
+	router.PUT("/api/kadvisor/:uid/class", func (c *gin.Context) {
+		var class structs.Class
+
+		userID, _ := strconv.Atoi(c.Param("uid"))
+		uErr := KeiUserUtil.ValidUser(userID)
+
+		c.BindJSON(&class)
+		updated, err := ctrl.service.Put(class)
+		if uErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+		} else if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusOK, gin.H{"class": updated})
+		}
+	})
+
 	// delete(/class?id)
 	router.DELETE("/api/kadvisor/:uid/class", func (c *gin.Context) {
 		classID	, _ := strconv.Atoi(c.Query("id"))

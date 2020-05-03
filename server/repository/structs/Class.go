@@ -7,10 +7,10 @@ import (
 
 type Class struct {
 	Base
-	UserID 		int 		`json:"userID"`
-	Name 		string 		`json:"name"`
-	Description	string 		`json:"description"`
-	SubClasses	[]SubClass	`gorm:"ForeignKey:ClassID" json:"subClasses"`
+	UserID 		int 		`json:"userID,omitempty"`
+	Name 		string 		`json:"name,omitempty"`
+	Description	string 		`json:"description,omitempty"`
+	SubClasses	[]SubClass	`gorm:"ForeignKey:ClassID" json:"subClasses,omitempty"`
 }
 func (e Class) IsInitializable() bool {return false}
 

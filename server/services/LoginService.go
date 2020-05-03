@@ -13,6 +13,10 @@ func (l *LoginService) GetOneByEmail(email string) (structs.Login, error) {
 	return l.loginRepository.FindOneByEmail(email)
 }
 
+func (l *LoginService) Put(login structs.Login) (structs.Login, error) {
+	return l.loginRepository.Update(login)
+}
+
 func (l *LoginService) UpdateLoginStatus(login structs.Login, isLoggedIn bool) (structs.Login, error) {
 	return l.loginRepository.UpdateLoginStatus(login, isLoggedIn)
 }

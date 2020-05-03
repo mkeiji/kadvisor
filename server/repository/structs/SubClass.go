@@ -4,10 +4,10 @@ import "github.com/jinzhu/gorm"
 
 type SubClass struct {
 	Base
-	ClassID 	int		`json:"classID"`
-	UserID 		int		`json:"userID"`
-	Name 		string	`json:"name"`
-	Description	string	`json:"description"`
+	ClassID 	int		`json:"classID,omitempty"`
+	UserID 		int		`json:"userID,omitempty"`
+	Name 		string	`json:"name,omitempty"`
+	Description	string	`json:"description,omitempty"`
 }
 func (e SubClass) IsInitializable() bool {return false}
 

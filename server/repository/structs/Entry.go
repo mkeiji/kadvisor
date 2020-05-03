@@ -7,13 +7,13 @@ import (
 
 type Entry struct {
 	Base
-	UserID 			int 		`json:"userID"`
-	ClassID 		int			`json:"classID"`
-	SubClassID		int			`json:"subClassID"`
-	Date 			time.Time 	`json:"date"`
-	Amount			float64		`json:"amount"`
-	Description		string		`json:"description"`
-	Obs				string		`json:"obs"`
+	UserID 			int 		`json:"userID,omitempty"`
+	ClassID 		int			`json:"classID,omitempty"`
+	SubClassID		int			`json:"subClassID,omitempty"`
+	Date 			time.Time 	`json:"date,omitempty"`
+	Amount			float64		`json:"amount,omitempty"`
+	Description		string		`json:"description,omitempty"`
+	Obs				string		`json:"obs,omitempty"`
 }
 
 func (e Entry) IsInitializable() bool {return false}

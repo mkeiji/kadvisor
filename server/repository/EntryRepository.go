@@ -56,6 +56,14 @@ func (repo *EntryRepository) Create(
 	}
 }
 
+func (repo *EntryRepository) Update(
+	entry structs.Entry) (structs.Entry, error) {
+	var stored structs.Entry
+
+	err := application.Db.Find(&stored, entry.ID).Updates(entry).Error
+	return stored, err
+}
+
 func (repo *EntryRepository) Delete(id int) (int, error) {
 	entry := structs.Entry{Base: structs.Base{ID: uint(id)}}
 	err := application.Db.Delete(&entry).Error

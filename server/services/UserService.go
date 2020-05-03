@@ -20,3 +20,7 @@ func (t *UserService) GetOne(id int, preloaded bool) (structs.User, error) {
 func (t *UserService) Post(user structs.User) (structs.User, error) {
 	return t.userRepository.Create(user)
 }
+
+func (t *UserService) Put(user structs.User) (structs.User, error) {
+	return t.userRepository.Update(user)
+}

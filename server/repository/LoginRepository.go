@@ -17,6 +17,14 @@ func (l *LoginRepository) FindOneByEmail(email string) (structs.Login, error) {
 	return login, nil
 }
 
+func (l *LoginRepository) Update(
+	login structs.Login) (structs.Login, error) {
+	var storedLogin structs.Login
+
+	err := application.Db.Find(&storedLogin, login.ID).Updates(login).Error
+	return storedLogin, err
+}
+
 func (l *LoginRepository) UpdateLoginStatus(login structs.Login, isLoggedIn bool) (structs.Login, error) {
 	var storedLogin structs.Login
 

@@ -24,6 +24,11 @@ func (svc *ClassService) Post(
 	return svc.repository.Create(class)
 }
 
+func (svc *ClassService) Put(
+	class structs.Class) (structs.Class, error) {
+	return svc.repository.Update(class)
+}
+
 func (svc *ClassService) Delete(
 	id int) (int, error) {
 	return svc.repository.Delete(id)

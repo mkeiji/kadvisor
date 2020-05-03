@@ -7,13 +7,13 @@ import (
 
 type User struct {
 	Base
-	FirstName 	string 	`json:"firstName"`
-	LastName  	string 	`json:"lastName"`
-	Phone     	string 	`json:"phone"`
-	Address   	string 	`json:"address"`
-	Login     	Login  	`gorm:"ForeignKey:UserID" json:"login"`
-	Entries		[]Entry	`gorm:"ForeignKey:UserID" json:"entries"`
-	Classes		[]Class	`gorm:"ForeignKey:UserID" json:"classes"`
+	FirstName 	string 	`json:"firstName,omitempty"`
+	LastName  	string 	`json:"lastName,omitempty"`
+	Phone     	string 	`json:"phone,omitempty"`
+	Address   	string 	`json:"address,omitempty"`
+	Login     	Login  	`gorm:"ForeignKey:UserID" json:"login,omitempty"`
+	Entries		[]Entry	`gorm:"ForeignKey:UserID" json:"entries,omitempty"`
+	Classes		[]Class	`gorm:"ForeignKey:UserID" json:"classes,omitempty"`
 }
 func (e User) IsInitializable() bool { return false }
 

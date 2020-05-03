@@ -59,3 +59,13 @@ func (t *UserRepository) Create(user structs.User) (structs.User, error) {
 	}
 	return t.mapper.MapSubClassOnSave(user, application.Db), nil
 }
+
+func (t *UserRepository) Update(user structs.User) (structs.User, error) {
+	var stored 	structs.User
+	var err 	error
+
+	err = application.Db.Set(
+		"gorm:association_autocreate", false).Find(
+		&stored, user.ID).Updates(user).Error
+	return stored, err
+}

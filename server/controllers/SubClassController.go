@@ -72,6 +72,24 @@ func (ctrl *SubClassController) LoadEndpoints(router *gin.Engine) {
 		}
 	})
 
+	// post(/subclass)
+	router.PUT("/api/kadvisor/:uid/subclass", func (context *gin.Context) {
+		var sclass structs.SubClass
+
+		userID, _ := strconv.Atoi(context.Param("uid"))
+		uErr := KeiUserUtil.ValidUser(userID)
+
+		context.Bind(&sclass)
+		updated, err := ctrl.service.Put(sclass)
+		if uErr != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+		} else if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		} else {
+			context.JSON(http.StatusOK, gin.H{"subclass": updated})
+		}
+	})
+
 	// delete(/subclass?id)
 	router.DELETE("/api/kadvisor/:uid/subclass", func (context *gin.Context) {
 		userID		, _ := strconv.Atoi(context.Param("uid"))

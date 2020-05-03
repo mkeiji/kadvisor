@@ -7,9 +7,9 @@ import (
 
 type Role struct {
 	Base
-	RoleType	string    		`json:"roleType"`
-	Description	string 			`json:"description"`
-	Permission	[]Permission 	`gorm:"many2many:role_permissions;ForeignKey:ID" json:"permission"`
+	RoleType	string    		`json:"roleType,omitempty"`
+	Description	string 			`json:"description,omitempty"`
+	Permission	[]Permission 	`gorm:"many2many:role_permissions;ForeignKey:ID" json:"permission,omitempty"`
 }
 
 func (e Role) IsInitializable() bool { return true }

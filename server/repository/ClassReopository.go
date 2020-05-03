@@ -42,6 +42,13 @@ func (repo *ClassRepository) Create(
 	return class, err
 }
 
+func (repo *ClassRepository) Update(
+	class structs.Class) (structs.Class, error) {
+	var stored structs.Class
+	err := application.Db.Find(&stored, class.ID).Updates(class).Error
+	return stored, err
+}
+
 func (repo *ClassRepository) Delete(
 	classID int) (int, error) {
 	classToDelete := structs.Class{

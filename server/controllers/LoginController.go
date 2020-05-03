@@ -41,6 +41,21 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 		}
 	})
 
+	// login(/login)
+	router.PUT("/api/login",
+		func (context *gin.Context) {
+
+			var login structs.Login
+			context.BindJSON(&login)
+
+			updated, err := l.loginService.Put(login)
+			if err != nil {
+				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			} else {
+				context.JSON(http.StatusOK, gin.H{"login": updated})
+			}
+		})
+
 	//logout(/logout)
 	router.POST("/api/logout", func (context *gin.Context) {
 		var currentLogin structs.Login
