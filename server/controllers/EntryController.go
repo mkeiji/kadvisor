@@ -13,7 +13,7 @@ type EntryController struct {
 	service services.EntryService
 }
 func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
-	// getOne(/entry?id?classid?subclassid?)
+	// get(/entry?id?classid?subclassid?)
 	router.GET("/api/kadvisor/:uid/entry", func (c *gin.Context) {
 		userID		, _ := strconv.Atoi(c.Param("uid"))
 		id			, _ := strconv.Atoi(c.Query("id"))

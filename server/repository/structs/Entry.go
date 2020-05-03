@@ -2,16 +2,18 @@ package structs
 
 import (
 	"github.com/jinzhu/gorm"
+	"time"
 )
 
 type Entry struct {
 	Base
-	UserID 			int 	`json:"userID"`
-	ClassID 		int		`json:"classID"`
-	SubClassID		int		`json:"subClassID"`
-	Amount			float64	`json:"amount"`
-	Description		string	`json:"description"`
-	Obs				string	`json:"obs"`
+	UserID 			int 		`json:"userID"`
+	ClassID 		int			`json:"classID"`
+	SubClassID		int			`json:"subClassID"`
+	Date 			time.Time 	`json:"date"`
+	Amount			float64		`json:"amount"`
+	Description		string		`json:"description"`
+	Obs				string		`json:"obs"`
 }
 
 func (e Entry) IsInitializable() bool {return false}

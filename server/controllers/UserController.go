@@ -14,7 +14,7 @@ type UserController struct {
 }
 
 func (t *UserController) LoadEndpoints(router *gin.Engine) {
-	// getOne(/user)
+	// getOne(/user?preloaded)
 	router.GET("/api/user/:id", func (context *gin.Context) {
 		isPreloaded, err := strconv.ParseBool(
 			context.DefaultQuery("preloaded", "false"))
@@ -32,7 +32,7 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 		}
 	})
 	
-	// getMany(/users)
+	// getMany(/users?preloaded)
 	router.GET("/api/users", func (context *gin.Context) {
 		isPreloaded, err := strconv.ParseBool(
 			context.DefaultQuery("preloaded", "false"))

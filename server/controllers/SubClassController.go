@@ -14,7 +14,7 @@ type SubClassController struct {
 }
 
 func (ctrl *SubClassController) LoadEndpoints(router *gin.Engine) {
-	// getOne(/subclass?id?classid)
+	// get(/subclass?id?classid)
 	router.GET("/api/kadvisor/:uid/subclass", func (context *gin.Context) {
 		subClassID	, _ := strconv.Atoi(context.Query("id"))
 		classID		, _ := strconv.Atoi(context.Query("classid"))
