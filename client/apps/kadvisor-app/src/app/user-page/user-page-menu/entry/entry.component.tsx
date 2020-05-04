@@ -1,5 +1,5 @@
-import React, { CSSProperties, forwardRef, useState } from 'react';
-import MaterialTable, { Column, Icons } from 'material-table';
+import React, { CSSProperties, forwardRef, useEffect, useState } from 'react';
+import MaterialTable, { Icons } from 'material-table';
 import { RowData, TableState } from './view-model';
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
@@ -20,55 +20,45 @@ import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import PageSpacer from '../page-spacer/page-spacer.component';
+import EntryService from './entry.service';
+import EntryViewModelService from './view-model.service';
+import { combineLatest } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 export default function EntryTable(props: EntryComponentPropsType) {
-    const [state, setState] = useState<TableState>({
-        columns: [
-            { title: 'Description', field: 'description' },
-            { title: 'Date', field: 'date', type: 'date' },
-            {
-                title: 'Class',
-                field: 'class',
-                lookup: { 1: 'income', 2: 'expense' }
-            },
-            {
-                title: 'Sub-Class',
-                field: 'subClass',
-                lookup: { 1: 'food', 2: 'object' }
-            },
-            {
-                title: 'Amount',
-                field: 'amount',
-                type: 'currency',
-                cellStyle: { textAlign: 'left' }
-            }
-        ] as Column<RowData>[],
-        data: [
-            {
-                description: 'lunch',
-                date: new Date(1999, 1, 2).toISOString(),
-                class: '2',
-                subClass: '2',
-                amount: 63.31
-            },
-            {
-                date: new Date(1984, 1, 1).toISOString(),
-                description: 'Rbc',
-                class: '1',
-                subClass: '2',
-                amount: 34
-            }
-        ] as RowData[]
-    });
+    const service = new EntryService(props.userID);
+    const viewModelService = new EntryViewModelService();
+    const [state, setState] = useState<TableState>({} as TableState);
+
+    useEffect(() => {
+        combineLatest(service.getClasses(), service.getEntries())
+            .pipe(take(1))
+            .subscribe(([resClasses, resEntries]) => {
+                setState(
+                    viewModelService.formatTableState(
+                        resClasses.classes,
+                        resEntries.entries
+                    )
+                );
+            });
+    }, []);
+
+    // TODO: create a useEffect that has [entries, setEntries] as dependencies
 
     function onAdd(newData: RowData) {
+        service
+            .postEntry(viewModelService.rowDataToEntry(props.userID, newData))
+            .pipe(take(1))
+            .subscribe(res => {
+                setState((prevState: TableState) => {
+                    const data = [...prevState.data];
+                    const row = viewModelService.entryToRowData(res.entry);
+                    data.unshift(row);
+                    return { ...prevState, data };
+                });
+            });
         return new Promise(resolve => {
             resolve();
-            setState((prevState: TableState) => {
-                const data = [...prevState.data];
-                data.push(newData);
-                return { ...prevState, data };
-            });
         });
     }
 
@@ -79,6 +69,12 @@ export default function EntryTable(props: EntryComponentPropsType) {
                 setState((prevState: TableState) => {
                     const data = [...prevState.data];
                     data[data.indexOf(oldData)] = newData;
+                    service.putEntry(
+                        viewModelService.rowDataToEntry(
+                            props.userID,
+                            viewModelService.parseRowDataDate(newData)
+                        )
+                    );
                     return { ...prevState, data };
                 });
             }
@@ -91,6 +87,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
             setState((prevState: TableState) => {
                 const data = [...prevState.data];
                 data.splice(data.indexOf(oldData), 1);
+                service.deleteEntry(oldData.entryID);
                 return { ...prevState, data };
             });
         });
@@ -103,10 +100,12 @@ export default function EntryTable(props: EntryComponentPropsType) {
 
         // TODO: delete mock
         const mockData = {
-            date: new Date(1984, 1, 1).toISOString(),
+            createdAt: new Date(1984, 1, 1),
+            entryID: Math.floor(Math.random() * 30) + 3,
+            date: new Date(1984, 1, 1),
             description: 'Rbc',
-            class: '1',
-            subClass: '2',
+            class: 1,
+            subClass: 2,
             amount: 34
         };
 
@@ -127,6 +126,8 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     data.splice(data.indexOf(mockData), 1);
                     return { ...prevState, data };
                 });
+                break;
+
             default:
                 return;
         }
@@ -158,7 +159,11 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     icons={tableIcons}
                     columns={state.columns}
                     data={state.data}
-                    options={{ actionsColumnIndex: -1 }}
+                    options={{
+                        actionsColumnIndex: -1,
+                        pageSize: 10,
+                        addRowPosition: 'first'
+                    }}
                     editable={{
                         onRowAdd: (newData: RowData) => onAdd(newData),
                         onRowUpdate: (
@@ -174,6 +179,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
 }
 
 interface EntryComponentPropsType {
+    userID: number;
     classes: ClassNameMap<any>;
 }
 

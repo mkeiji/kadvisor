@@ -89,7 +89,7 @@ export class KRxios {
               )
             : this._makeRequest('PATCH', url, queryParams, body);
     }
-    delete(url: any, body?: any, queryParams?: any): Observable<any> {
+    delete(url: any, queryParams?: any): Observable<any> {
         return this.baseUrl !== ''
             ? this._makeRequest('DELETE', `${this.baseUrl}${url}`, queryParams)
             : this._makeRequest('DELETE', url, queryParams);

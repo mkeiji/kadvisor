@@ -4,6 +4,7 @@ import (
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/application"
+	"time"
 )
 
 type EntryRepository struct {
@@ -46,6 +47,9 @@ func (repo *EntryRepository) FindOne(id int) (structs.Entry, error) {
 
 func (repo *EntryRepository) Create(
 	entry structs.Entry) (structs.Entry, error) {
+
+	utc, _ := time.LoadLocation("UTC")
+	entry.Date = entry.Date.In(utc)
 
 	vErr := repo.validator.Validate(application.Db, entry)
 	if vErr != nil {

@@ -9,13 +9,13 @@ import { Login, Match } from '@client/klibs';
 
 function UserPage(props: UserHomePropTypes) {
     const styleClasses = useStyles();
-    const paramID = Number(props.match.params.id);
+    const userID = Number(props.match.params.id);
     const paramPage = props.match.params.page;
     const login = props.getLoginStore ? props.getLoginStore : ({} as Login);
 
     const [idMatch, setIdMatch] = useState(false);
     useEffect(() => {
-        handleIdChange(paramID);
+        handleIdChange(userID);
 
         function handleIdChange(newID: number) {
             setIdMatch(newID === login.userID);
@@ -29,7 +29,9 @@ function UserPage(props: UserHomePropTypes) {
                     return <Dashboard classes={styleClasses} />;
 
                 case 'entries':
-                    return <EntryTable classes={styleClasses} />;
+                    return (
+                        <EntryTable userID={userID} classes={styleClasses} />
+                    );
 
                 default:
                     return (
