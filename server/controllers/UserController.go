@@ -28,7 +28,7 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			context.JSON(http.StatusOK, gin.H{"user": storedUser})
+			context.JSON(http.StatusOK, storedUser)
 		}
 	})
 	
@@ -41,7 +41,7 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
 		} else {
-			context.JSON(http.StatusOK, gin.H{"users": users})
+			context.JSON(http.StatusOK, users)
 		}
 	})
 
@@ -54,7 +54,7 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
 		} else {
-			context.JSON(http.StatusOK, gin.H{"user": savedUser})
+			context.JSON(http.StatusOK, savedUser)
 		}
 	})
 
@@ -67,7 +67,7 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 		if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			context.JSON(http.StatusOK, gin.H{"user": updated})
+			context.JSON(http.StatusOK, updated)
 		}
 	})
 }

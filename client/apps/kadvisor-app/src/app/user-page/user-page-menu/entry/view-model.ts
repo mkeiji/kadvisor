@@ -16,10 +16,6 @@ export interface TableState {
     data: RowData[];
 }
 
-export interface KClassResponse {
-    classes: Class[];
-}
-
 export interface Class extends BaseModel {
     userID: number;
     name: string;
@@ -32,10 +28,6 @@ export interface SubClass extends BaseModel {
     userID: number;
     name: string;
     description: string;
-}
-
-export interface KEntryResponse {
-    entries: Entry[];
 }
 
 export interface Entry extends BaseModel {

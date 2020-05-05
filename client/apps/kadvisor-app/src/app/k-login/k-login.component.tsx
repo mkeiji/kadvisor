@@ -13,14 +13,14 @@ import { Formik, FormikErrors } from 'formik';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import KLoginService from './k-login.service';
-import { GernericErr, KLoginResponse, Login } from '@client/klibs';
+import { GernericErr, Login } from '@client/klibs';
 
 class KLogin extends Component<KLoginPropTypes, KLoginState> {
     /* @input */ loginObj = this.props.loginObj;
-    /* @output */ onLoginEmitter = (event: KLoginResponse) => {
+    /* @output */ onLoginEmitter = (event: Login) => {
         this.props.onLogin(event);
     };
-    /* @output */ onLogoutEmitter = (event: KLoginResponse) => {
+    /* @output */ onLogoutEmitter = (event: Login) => {
         this.props.onLogout(event);
     };
 
@@ -67,8 +67,8 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
             .login(this.state.login)
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(
-                (res: KLoginResponse) => {
-                    this.setState({ isLoggedIn: res.login.isLoggedIn });
+                (res: Login) => {
+                    this.setState({ isLoggedIn: res.isLoggedIn });
                     this.onLoginEmitter(res);
                 },
                 (err: GernericErr) => {
@@ -84,8 +84,8 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
             .logout(this.state.login)
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(
-                (res: KLoginResponse) => {
-                    this.setState({ isLoggedIn: res.login.isLoggedIn });
+                (res: Login) => {
+                    this.setState({ isLoggedIn: res.isLoggedIn });
                     this.onLogoutEmitter(res);
                 },
                 (err: GernericErr) => {

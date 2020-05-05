@@ -33,21 +33,21 @@ func (ctrl *SubClassController) LoadEndpoints(router *gin.Engine) {
 			if err != nil {
 				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
-				context.JSON(http.StatusOK, gin.H{"subClass": subclass})
+				context.JSON(http.StatusOK, subclass)
 			}
 		} else if getSubclassesByUid {
 			subclasses, err := ctrl.service.GetManyByUserId(userID)
 			if err != nil {
 				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
-				context.JSON(http.StatusOK, gin.H{"subClasses": subclasses})
+				context.JSON(http.StatusOK, subclasses)
 			}
 		} else if getSubclassesByClassid {
 			subclasses, err := ctrl.service.GetManyByClassId(classID)
 			if err != nil {
 				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
-				context.JSON(http.StatusOK, gin.H{"subClasses": subclasses})
+				context.JSON(http.StatusOK, subclasses)
 			}
 		} else {
 			context.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
@@ -68,7 +68,7 @@ func (ctrl *SubClassController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			context.JSON(http.StatusOK, gin.H{"subclass": saved})
+			context.JSON(http.StatusOK, saved)
 		}
 	})
 
@@ -86,7 +86,7 @@ func (ctrl *SubClassController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			context.JSON(http.StatusOK, gin.H{"subclass": updated})
+			context.JSON(http.StatusOK, updated)
 		}
 	})
 
@@ -103,7 +103,7 @@ func (ctrl *SubClassController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			context.JSON(http.StatusOK, gin.H{"deletedID": deletedID})
+			context.JSON(http.StatusOK, deletedID)
 		}
 	})
 }

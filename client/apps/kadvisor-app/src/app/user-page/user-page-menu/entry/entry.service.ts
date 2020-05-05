@@ -4,7 +4,7 @@ import {
     KEndpointUtil,
     KRxios
 } from '@client/klibs';
-import { KEntryResponse, KClassResponse, Entry } from './view-model';
+import { Class, Entry } from './view-model';
 import { Observable } from 'rxjs';
 
 class EntryService {
@@ -13,7 +13,7 @@ class EntryService {
         this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));
     }
 
-    getEntries(): Observable<KEntryResponse> {
+    getEntries(): Observable<Entry[]> {
         return this.krxios.get(APP_ENTRY_ENDPOINT);
     }
 
@@ -21,17 +21,17 @@ class EntryService {
         return this.krxios.post(APP_ENTRY_ENDPOINT, entry);
     }
 
-    putEntry(entry: Entry): Observable<KEntryResponse> {
+    putEntry(entry: Entry): Observable<Entry> {
         return this.krxios.put(APP_ENTRY_ENDPOINT, entry);
     }
 
-    deleteEntry(entryID: number): Observable<KEntryResponse> {
+    deleteEntry(entryID: number): Observable<Entry> {
         return this.krxios.delete(APP_ENTRY_ENDPOINT, {
             id: entryID
         });
     }
 
-    getClasses(): Observable<KClassResponse> {
+    getClasses(): Observable<Class[]> {
         return this.krxios.get(`${APP_CLASS_ENDPOINT}?preloaded=true`);
     }
 }

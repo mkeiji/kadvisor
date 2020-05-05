@@ -9,7 +9,3 @@ export interface Login extends BaseModel {
     isLoggedIn: boolean;
     lastLogin: string;
 }
-
-export interface KLoginResponse {
-    login: Login;
-}

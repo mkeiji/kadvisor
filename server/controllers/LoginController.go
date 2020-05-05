@@ -33,7 +33,7 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 				if err != nil {
 					context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
 				} else {
-					context.JSON(http.StatusOK, gin.H{"login": updatedLogin})
+					context.JSON(http.StatusOK, updatedLogin)
 				}
 			} else {
 				context.JSON(http.StatusBadRequest, gin.H{"error": errors.New("wrong password").Error()})
@@ -52,7 +52,7 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 			if err != nil {
 				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
-				context.JSON(http.StatusOK, gin.H{"login": updated})
+				context.JSON(http.StatusOK, updated)
 			}
 		})
 
@@ -70,7 +70,7 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 				if err != nil {
 					context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
 				} else {
-					context.JSON(http.StatusOK, gin.H{"login": updatedLogin})
+					context.JSON(http.StatusOK, updatedLogin)
 				}
 			}
 		}

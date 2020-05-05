@@ -4,12 +4,7 @@ import MainNavBarStore from './main-nav-bar.store';
 import { useHistory } from 'react-router';
 import { connect } from 'react-redux';
 import KLogin from '../k-login/k-login.component';
-import {
-    APP_ROUTES,
-    KLoginResponse,
-    KRouterPathUtil,
-    Login
-} from '@client/klibs';
+import { APP_ROUTES, KRouterPathUtil, Login } from '@client/klibs';
 
 function MainNavBar(props: MainNavBarPropTypes) {
     const history = useHistory();
@@ -19,14 +14,14 @@ function MainNavBar(props: MainNavBarPropTypes) {
         login = props.getLoginStore;
     }
 
-    function processLogin(login: KLoginResponse) {
-        props.setLoginStore(login.login);
-        history.push(KRouterPathUtil.getUserPage(login.login.userID));
+    function processLogin(login: Login) {
+        props.setLoginStore(login);
+        history.push(KRouterPathUtil.getUserPage(login.userID));
     }
 
-    function processLogout(login: KLoginResponse) {
+    function processLogout(login: Login) {
         history.push(APP_ROUTES.root);
-        props.unsetLoginStore(login.login);
+        props.unsetLoginStore(login);
     }
 
     return (

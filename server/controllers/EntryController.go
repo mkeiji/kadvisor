@@ -59,7 +59,7 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"entry": saved})
+			c.JSON(http.StatusOK, saved)
 		}
 	})
 
@@ -77,7 +77,7 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"entry": updated})
+			c.JSON(http.StatusOK, updated)
 		}
 	})
 
@@ -93,7 +93,7 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"deletedID": deletedID})
+			c.JSON(http.StatusOK, deletedID)
 		}
 	})
 }
@@ -103,7 +103,7 @@ func _getEntryById(s services.EntryService, c *gin.Context, entryID int) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"entry": entry})
+		c.JSON(http.StatusOK, entry)
 	}
 }
 
@@ -112,7 +112,7 @@ func _getEntriesByUserId(s services.EntryService, c *gin.Context, userID int) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"entries": entries})
+		c.JSON(http.StatusOK, entries)
 	}
 }
 
@@ -121,7 +121,7 @@ func _getEntriesByClassId(s services.EntryService, c *gin.Context, classID int) 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"entries": entries})
+		c.JSON(http.StatusOK, entries)
 	}
 }
 
@@ -130,7 +130,7 @@ func _getEntriesBySubclassId(s services.EntryService, c *gin.Context, subclassID
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"entries": entries})
+		c.JSON(http.StatusOK, entries)
 	}
 }
 
@@ -140,6 +140,6 @@ func _getEntriesByClassAndSubClass(
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, gin.H{"entries": entries})
+		c.JSON(http.StatusOK, entries)
 	}
 }

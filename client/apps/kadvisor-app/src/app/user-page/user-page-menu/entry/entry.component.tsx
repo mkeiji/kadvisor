@@ -1,6 +1,6 @@
 import React, { CSSProperties, forwardRef, useEffect, useState } from 'react';
 import MaterialTable, { Icons } from 'material-table';
-import { RowData, TableState } from './view-model';
+import { Entry, RowData, TableState } from './view-model';
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Check from '@material-ui/icons/Check';
@@ -33,13 +33,8 @@ export default function EntryTable(props: EntryComponentPropsType) {
     useEffect(() => {
         combineLatest(service.getClasses(), service.getEntries())
             .pipe(take(1))
-            .subscribe(([resClasses, resEntries]) => {
-                setState(
-                    viewModelService.formatTableState(
-                        resClasses.classes,
-                        resEntries.entries
-                    )
-                );
+            .subscribe(([classes, entries]) => {
+                setState(viewModelService.formatTableState(classes, entries));
             });
     }, []);
 
@@ -49,10 +44,10 @@ export default function EntryTable(props: EntryComponentPropsType) {
         service
             .postEntry(viewModelService.rowDataToEntry(props.userID, newData))
             .pipe(take(1))
-            .subscribe(res => {
+            .subscribe((entry: Entry) => {
                 setState((prevState: TableState) => {
                     const data = [...prevState.data];
-                    const row = viewModelService.entryToRowData(res.entry);
+                    const row = viewModelService.entryToRowData(entry);
                     data.unshift(row);
                     return { ...prevState, data };
                 });

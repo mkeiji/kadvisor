@@ -31,14 +31,14 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
-				c.JSON(http.StatusOK, gin.H{"class": class})
+				c.JSON(http.StatusOK, class)
 			}
 		} else if getClassesByUserId {
 			classes, err := ctrl.service.GetManyByUserId(userID, isPreloaded)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
-				c.JSON(http.StatusOK, gin.H{"classes": classes})
+				c.JSON(http.StatusOK, classes)
 			}
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
@@ -60,7 +60,7 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"class": saved})
+			c.JSON(http.StatusOK, saved)
 		}
 	})
 
@@ -78,7 +78,7 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"class": updated})
+			c.JSON(http.StatusOK, updated)
 		}
 	})
 
@@ -94,7 +94,7 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 		} else if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, gin.H{"deletedID": deletedID})
+			c.JSON(http.StatusOK, deletedID)
 		}
 	})
 }
