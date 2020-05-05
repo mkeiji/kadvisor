@@ -8,10 +8,11 @@ class EntryViewModelService {
             subClassLookups
         ] = this.createClassAndSubClassLookups(classes);
 
+        // use displayDate for the date column
         return {
             columns: [
                 { title: 'Description', field: 'description' },
-                { title: 'Date', field: 'date', type: 'date' },
+                { title: 'Date', field: 'displayDate', type: 'date' },
                 {
                     title: 'Class',
                     field: 'class',
@@ -60,15 +61,31 @@ class EntryViewModelService {
     }
 
     entryToRowData(entry: Entry): RowData {
+        const entryDate = new Date(entry.date);
         return {
             entryID: entry.id,
             createdAt: new Date(entry.createdAt),
-            date: new Date(entry.date),
+            date: entryDate,
+            displayDate: this.formatDate(entryDate),
             description: entry.description,
             class: entry.classID,
             subClass: entry.subClassID,
             amount: entry.amount
         } as RowData;
+    }
+
+    private formatDate(date: Date): string {
+        const ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(
+            date
+        );
+        const mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(
+            date
+        );
+        const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(
+            date
+        );
+
+        return `${da}-${mo}-${ye}`;
     }
 
     private createClassAndSubClassLookups(

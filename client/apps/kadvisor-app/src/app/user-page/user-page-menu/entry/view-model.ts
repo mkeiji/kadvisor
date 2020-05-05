@@ -6,6 +6,7 @@ export interface RowData {
     description: string;
     createdAt: Date;
     date: Date;
+    displayDate: string;
     class: number;
     subClass: number;
     amount: number;

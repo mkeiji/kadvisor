@@ -28,24 +28,25 @@ import { take } from 'rxjs/operators';
 export default function EntryTable(props: EntryComponentPropsType) {
     const service = new EntryService(props.userID);
     const viewModelService = new EntryViewModelService();
-    const [state, setState] = useState<TableState>({} as TableState);
+    const [table, setTable] = useState<TableState>({} as TableState);
+    const [nEntries, setNEntries] = React.useState(10);
 
     useEffect(() => {
-        combineLatest(service.getClasses(), service.getEntries())
+        combineLatest(service.getClasses(), service.getEntries(nEntries))
             .pipe(take(1))
-            .subscribe(([classes, entries]) => {
-                setState(viewModelService.formatTableState(classes, entries));
-            });
-    }, []);
-
-    // TODO: create a useEffect that has [entries, setEntries] as dependencies
+            .subscribe(([resClasses, resEntries]) =>
+                setTable(
+                    viewModelService.formatTableState(resClasses, resEntries)
+                )
+            );
+    }, [nEntries]);
 
     function onAdd(newData: RowData) {
         service
             .postEntry(viewModelService.rowDataToEntry(props.userID, newData))
             .pipe(take(1))
             .subscribe((entry: Entry) => {
-                setState((prevState: TableState) => {
+                setTable((prevState: TableState) => {
                     const data = [...prevState.data];
                     const row = viewModelService.entryToRowData(entry);
                     data.unshift(row);
@@ -61,7 +62,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
         return new Promise(resolve => {
             resolve();
             if (oldData) {
-                setState((prevState: TableState) => {
+                setTable((prevState: TableState) => {
                     const data = [...prevState.data];
                     data[data.indexOf(oldData)] = newData;
                     service.putEntry(
@@ -79,53 +80,13 @@ export default function EntryTable(props: EntryComponentPropsType) {
     function onDelete(oldData: RowData) {
         return new Promise(resolve => {
             resolve();
-            setState((prevState: TableState) => {
+            setTable((prevState: TableState) => {
                 const data = [...prevState.data];
                 data.splice(data.indexOf(oldData), 1);
                 service.deleteEntry(oldData.entryID);
                 return { ...prevState, data };
             });
         });
-    }
-
-    const [entries, setEntries] = React.useState('');
-    function fetchEntries(event: React.ChangeEvent<{ value: unknown }>) {
-        // handle select
-        setEntries(event.target.value as string);
-
-        // TODO: delete mock
-        const mockData = {
-            createdAt: new Date(1984, 1, 1),
-            entryID: Math.floor(Math.random() * 30) + 3,
-            date: new Date(1984, 1, 1),
-            description: 'Rbc',
-            class: 1,
-            subClass: 2,
-            amount: 34
-        };
-
-        // TODO: create a service
-        // should fetch data from server
-        switch (event.target.value as string) {
-            case '20':
-                setState((prevState: TableState) => {
-                    const data = [...prevState.data];
-                    data.push(mockData);
-                    return { ...prevState, data };
-                });
-                break;
-
-            case '10':
-                setState((prevState: TableState) => {
-                    const data = [...prevState.data];
-                    data.splice(data.indexOf(mockData), 1);
-                    return { ...prevState, data };
-                });
-                break;
-
-            default:
-                return;
-        }
     }
 
     return (
@@ -135,29 +96,31 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     className={props.classes.formControl}
                     style={selectStyle}
                 >
-                    <InputLabel id="demo-simple-select-label">
-                        # Entries
-                    </InputLabel>
+                    <InputLabel># Entries</InputLabel>
                     <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={entries}
-                        onChange={fetchEntries}
+                        value={nEntries}
+                        onChange={event =>
+                            setNEntries(event.target.value as number)
+                        }
                     >
-                        <MenuItem value="10">Ten</MenuItem>
-                        <MenuItem value="20">Twenty</MenuItem>
+                        <MenuItem value={10}>last 10</MenuItem>
+                        <MenuItem value={20}>last 20</MenuItem>
+                        <MenuItem value={50}>last 50</MenuItem>
+                        <MenuItem value={100}>last 100</MenuItem>
+                        <MenuItem value={0}>all entries</MenuItem>
                     </Select>
                 </FormControl>
 
                 <MaterialTable
                     title="Entries"
                     icons={tableIcons}
-                    columns={state.columns}
-                    data={state.data}
+                    columns={table.columns}
+                    data={table.data}
                     options={{
                         actionsColumnIndex: -1,
                         pageSize: 10,
-                        addRowPosition: 'first'
+                        addRowPosition: 'first',
+                        exportButton: true
                     }}
                     editable={{
                         onRowAdd: (newData: RowData) => onAdd(newData),

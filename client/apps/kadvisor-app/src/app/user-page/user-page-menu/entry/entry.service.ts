@@ -13,11 +13,11 @@ class EntryService {
         this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));
     }
 
-    getEntries(): Observable<Entry[]> {
-        return this.krxios.get(APP_ENTRY_ENDPOINT);
+    getEntries(nEntries?: number): Observable<Entry[]> {
+        return this.krxios.get(`${APP_ENTRY_ENDPOINT}?limit=${nEntries}`);
     }
 
-    postEntry(entry: Entry): any {
+    postEntry(entry: Entry): Observable<Entry> {
         return this.krxios.post(APP_ENTRY_ENDPOINT, entry);
     }
 
