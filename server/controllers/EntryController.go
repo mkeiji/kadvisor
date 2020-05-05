@@ -13,12 +13,13 @@ type EntryController struct {
 	service services.EntryService
 }
 func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
-	// get(/entry?id?classid?subclassid?)
+	// get(/entry?id?classid?subclassid?limit)
 	router.GET("/api/kadvisor/:uid/entry", func (c *gin.Context) {
 		userID		, _ := strconv.Atoi(c.Param("uid"))
 		id			, _ := strconv.Atoi(c.Query("id"))
 		classID		, _ := strconv.Atoi(c.Query("classid"))
 		subclassID	, _ := strconv.Atoi(c.Query("subclassid"))
+		limit		, _ := strconv.Atoi(c.Query("limit"))
 
 		uErr := KeiUserUtil.ValidUser(userID)
 
@@ -33,13 +34,14 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 		} else if getEntryById {
 			_getEntryById(ctrl.service, c, id)
 		} else if getEntriesByUserId {
-			_getEntriesByUserId(ctrl.service, c, userID)
+			_getEntriesByUserId(ctrl.service, c, userID, limit)
 		} else if getEntriesByClassId {
-			_getEntriesByClassId(ctrl.service, c, classID)
+			_getEntriesByClassId(ctrl.service, c, classID, limit)
 		} else if getEntriesBySubclassId {
-			_getEntriesBySubclassId(ctrl.service, c, subclassID)
+			_getEntriesBySubclassId(ctrl.service, c, subclassID, limit)
 		} else if getEntriesByClassAndSubClass {
-			_getEntriesByClassAndSubClass(ctrl.service, c, classID, subclassID)
+			_getEntriesByClassAndSubClass(
+				ctrl.service, c, classID, subclassID, limit)
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
 		}
@@ -107,8 +109,9 @@ func _getEntryById(s services.EntryService, c *gin.Context, entryID int) {
 	}
 }
 
-func _getEntriesByUserId(s services.EntryService, c *gin.Context, userID int) {
-	entries, err := s.GetManyByUserId(userID)
+func _getEntriesByUserId(
+	s services.EntryService, c *gin.Context, userID int, limit int) {
+	entries, err := s.GetManyByUserId(userID, limit)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
@@ -116,8 +119,9 @@ func _getEntriesByUserId(s services.EntryService, c *gin.Context, userID int) {
 	}
 }
 
-func _getEntriesByClassId(s services.EntryService, c *gin.Context, classID int) {
-	entries, err := s.GetManyByClassId(classID)
+func _getEntriesByClassId(
+	s services.EntryService, c *gin.Context, classID int, limit int) {
+	entries, err := s.GetManyByClassId(classID, limit)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
@@ -125,8 +129,9 @@ func _getEntriesByClassId(s services.EntryService, c *gin.Context, classID int) 
 	}
 }
 
-func _getEntriesBySubclassId(s services.EntryService, c *gin.Context, subclassID int) {
-	entries, err := s.GetManyByClassId(subclassID)
+func _getEntriesBySubclassId(
+	s services.EntryService, c *gin.Context, subclassID int, limit int) {
+	entries, err := s.GetManyByClassId(subclassID, limit)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
@@ -135,8 +140,13 @@ func _getEntriesBySubclassId(s services.EntryService, c *gin.Context, subclassID
 }
 
 func _getEntriesByClassAndSubClass(
-	s services.EntryService, c *gin.Context, classID int, subclassID int) {
-	entries, err := s.GetManyByClassAndSubClassId(classID, subclassID)
+	s services.EntryService,
+	c *gin.Context,
+	classID int,
+	subclassID int,
+	limit int) {
+	entries, err := s.GetManyByClassAndSubClassId(
+		classID, subclassID, limit)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {

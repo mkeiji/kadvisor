@@ -12,31 +12,31 @@ type EntryRepository struct {
 }
 
 func (repo *EntryRepository) FindAllByUserId(
-	userID int) ([]structs.Entry, error) {
+	userID int, limit int) ([]structs.Entry, error) {
 
 	queryStruct := structs.Entry{UserID: userID}
-	return getEntries(queryStruct)
+	return getEntries(queryStruct, limit)
 }
 
 func (repo *EntryRepository) FindAllByClassId(
-	classID int) ([]structs.Entry, error) {
+	classID int, limit int) ([]structs.Entry, error) {
 
 	queryStruct := structs.Entry{ClassID: classID}
-	return getEntries(queryStruct)
+	return getEntries(queryStruct, limit)
 }
 
 func (repo *EntryRepository) FindAllBySubClassId(
-	subclassID int) ([]structs.Entry, error) {
+	subclassID int, limit int) ([]structs.Entry, error) {
 
 	queryStruct := structs.Entry{SubClassID: subclassID}
-	return getEntries(queryStruct)
+	return getEntries(queryStruct, limit)
 }
 
 func (repo *EntryRepository) FindAllByClassIdAndSubClassId(
-	classID int, subclassID int) ([]structs.Entry, error) {
+	classID int, subclassID int, limit int) ([]structs.Entry, error) {
 
 	queryStruct := structs.Entry{ClassID: classID, SubClassID: subclassID}
-	return getEntries(queryStruct)
+	return getEntries(queryStruct, limit)
 }
 
 func (repo *EntryRepository) FindOne(id int) (structs.Entry, error) {
@@ -74,8 +74,17 @@ func (repo *EntryRepository) Delete(id int) (int, error) {
 	return int(entry.ID), err
 }
 
-func getEntries(query structs.Entry) ([]structs.Entry, error){
+func getEntries(query structs.Entry, limit int) ([]structs.Entry, error){
 	var entries []structs.Entry
-	err := application.Db.Where(query).Find(&entries).Error
+	var err error
+
+	dbQuery := application.Db.Order(
+		"created_at desc")
+	if limit > 0 {
+		err = dbQuery.Limit(limit).Where(query).Find(&entries).Error
+	} else {
+		err = dbQuery.Where(query).Find(&entries).Error
+	}
+
 	return entries, err
 }
