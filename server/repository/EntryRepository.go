@@ -25,20 +25,6 @@ func (repo *EntryRepository) FindAllByClassId(
 	return getEntries(queryStruct, limit)
 }
 
-func (repo *EntryRepository) FindAllBySubClassId(
-	subclassID int, limit int) ([]structs.Entry, error) {
-
-	queryStruct := structs.Entry{SubClassID: subclassID}
-	return getEntries(queryStruct, limit)
-}
-
-func (repo *EntryRepository) FindAllByClassIdAndSubClassId(
-	classID int, subclassID int, limit int) ([]structs.Entry, error) {
-
-	queryStruct := structs.Entry{ClassID: classID, SubClassID: subclassID}
-	return getEntries(queryStruct, limit)
-}
-
 func (repo *EntryRepository) FindOne(id int) (structs.Entry, error) {
 	var entry structs.Entry
 	err := application.Db.Find(&entry, id).Error
@@ -78,8 +64,7 @@ func getEntries(query structs.Entry, limit int) ([]structs.Entry, error){
 	var entries []structs.Entry
 	var err error
 
-	dbQuery := application.Db.Order(
-		"created_at desc")
+	dbQuery := application.Db.Order("created_at desc")
 	if limit > 0 {
 		err = dbQuery.Limit(limit).Where(query).Find(&entries).Error
 	} else {

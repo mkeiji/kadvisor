@@ -9,14 +9,12 @@ type ClassService struct {
 	repository 	repository.ClassRepository
 }
 
-func (svc *ClassService) GetManyByUserId(
-	userID int, preloaded bool) ([]structs.Class, error) {
-	return svc.repository.FindAllByUserId(userID, preloaded)
+func (svc *ClassService) GetManyByUserId(userID int) ([]structs.Class, error) {
+	return svc.repository.FindAllByUserId(userID)
 }
 
-func (svc *ClassService) GetOneById(
-	id int, preloaded bool) (structs.Class, error) {
-	return svc.repository.FindOne(id, preloaded)
+func (svc *ClassService) GetOneById(id int) (structs.Class, error) {
+	return svc.repository.FindOne(id)
 }
 
 func (svc *ClassService) Post(

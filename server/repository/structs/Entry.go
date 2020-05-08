@@ -9,7 +9,7 @@ type Entry struct {
 	Base
 	UserID 			int 		`json:"userID,omitempty"`
 	ClassID 		int			`json:"classID,omitempty"`
-	SubClassID		int			`json:"subClassID,omitempty"`
+	EntryTypeCodeID	string		`json:"entryTypeCodeID,omitempty"` // is lookup
 	Date 			time.Time 	`json:"date,omitempty"`
 	Amount			float64		`json:"amount,omitempty"`
 	Description		string		`json:"description,omitempty"`

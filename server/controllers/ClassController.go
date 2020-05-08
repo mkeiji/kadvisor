@@ -14,12 +14,10 @@ type ClassController struct {
 }
 
 func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
-	// getOne(/class?id?preloaded)
+	// getOne(/class?id)
 	router.GET("/api/kadvisor/:uid/class", func (c *gin.Context) {
 		userID		, _ := strconv.Atoi(c.Param("uid"))
 		classID		, _ := strconv.Atoi(c.Query("id"))
-		isPreloaded	, _ := strconv.ParseBool(
-			c.DefaultQuery("preloaded", "false"))
 
 		uErr := KeiUserUtil.ValidUser(userID)
 
@@ -27,14 +25,14 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 		if uErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
 		} else if classID != 0 {
-			class, err := ctrl.service.GetOneById(classID, isPreloaded)
+			class, err := ctrl.service.GetOneById(classID)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
 				c.JSON(http.StatusOK, class)
 			}
 		} else if getClassesByUserId {
-			classes, err := ctrl.service.GetManyByUserId(userID, isPreloaded)
+			classes, err := ctrl.service.GetManyByUserId(userID)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {

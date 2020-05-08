@@ -19,16 +19,6 @@ func (svc *EntryService) GetManyByClassId(
 	return svc.repository.FindAllByClassId(classID, limit)
 }
 
-func (svc *EntryService) GetManyBySubClassId(
-	subclassID int, limit int) ([]structs.Entry, error) {
-	return svc.repository.FindAllBySubClassId(subclassID, limit)
-}
-
-func (svc *EntryService) GetManyByClassAndSubClassId(
-	classID int, subclassID int, limit int) ([]structs.Entry, error) {
-	return svc.repository.FindAllByClassIdAndSubClassId(classID, subclassID, limit)
-}
-
 func (svc *EntryService) GetOneById(
 	id int) (structs.Entry, error) {
 	return svc.repository.FindOne(id)

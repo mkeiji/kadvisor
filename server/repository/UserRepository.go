@@ -1,14 +1,11 @@
 package repository
 
 import (
-	"kadvisor/server/repository/mappers"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/resources/application"
 )
 
-type UserRepository struct {
-	mapper mappers.UserMapper
-}
+type UserRepository struct {}
 
 func (t *UserRepository) FindAll(preloaded bool) ([]structs.User, error) {
 	var users []structs.User
@@ -28,7 +25,7 @@ func (t *UserRepository) FindAll(preloaded bool) ([]structs.User, error) {
 		}
 	}
 
-	return t.mapper.MapSubClassesOnLoad(users, application.Db), nil
+	return users, nil
 }
 
 func (t *UserRepository) FindOne(id int, preloaded bool) (structs.User, error) {
@@ -42,7 +39,7 @@ func (t *UserRepository) FindOne(id int, preloaded bool) (structs.User, error) {
 		if err != nil {
 			return user, err
 		}
-		return t.mapper.MapSubClassOnLoad(user, application.Db), nil
+		return user, nil
 	} else {
 		err := application.Db.Preload("Login").Find(&user, id).Error
 		if err != nil {
@@ -57,7 +54,7 @@ func (t *UserRepository) Create(user structs.User) (structs.User, error) {
 	if err != nil {
 		return user, err
 	}
-	return t.mapper.MapSubClassOnSave(user, application.Db), nil
+	return user, nil
 }
 
 func (t *UserRepository) Update(user structs.User) (structs.User, error) {

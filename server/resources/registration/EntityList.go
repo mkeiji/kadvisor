@@ -10,7 +10,8 @@ var EntityList = []interfaces.Entity {
 	&structs.Login{},
 	&structs.Entry{},
 	&structs.Class{},
-	&structs.SubClass{},
 	&structs.Role{},
 	&structs.Permission{},
+	&structs.Code{},
+	&structs.CodeText{},
 }

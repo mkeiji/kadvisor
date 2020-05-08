@@ -8,31 +8,21 @@ import (
 type ClassRepository struct {}
 
 func (repo *ClassRepository) FindAllByUserId(
-	userID int, preloaded bool) ([]structs.Class, error) {
+	userID int) ([]structs.Class, error) {
 
 	queryStruct := structs.Class{UserID: userID}
 	var classes []structs.Class
-	var err error
+	err := application.Db.Where(&queryStruct).Find(&classes).Error
 
-	if preloaded {
-		err = application.Db.Where(&queryStruct).Preload(
-			"SubClasses").Find(&classes).Error
-	} else {
-		err = application.Db.Where(&queryStruct).Find(&classes).Error
-	}
 	return classes, err
 }
 
-func (repo *ClassRepository) FindOne(classID int, preloaded bool) (structs.Class, error) {
-	var class structs.Class
-	var err error
+func (repo *ClassRepository) FindOne(
+	classID int) (structs.Class, error) {
 
-	if preloaded {
-		err = application.Db.Preload(
-			"SubClasses").Find(&class, classID).Error
-	} else {
-		err = application.Db.Find(&class, classID).Error
-	}
+	var class structs.Class
+	err := application.Db.Find(&class, classID).Error
+
 	return class, err
 }
 

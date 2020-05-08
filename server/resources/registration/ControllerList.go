@@ -9,6 +9,6 @@ var ControllerList = []interfaces.Controller {
 	&controllers.UserController{},
 	&controllers.LoginController{},
 	&controllers.ClassController{},
-	&controllers.SubClassController{},
 	&controllers.EntryController{},
+	&controllers.LookupController{},
 }
