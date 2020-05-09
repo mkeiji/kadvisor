@@ -29,11 +29,11 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 		if uErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
 		} else if getEntryByUserId {
-			_getEntriesByUserId(ctrl.service, c, userID, limit)
+			ctrl.getEntriesByUserId(c, userID, limit)
 		} else if getEntryById {
-			_getEntryById(ctrl.service, c, id)
+			ctrl.getEntryById(c, id)
 		} else if getEntriesByClassId {
-			_getEntriesByClassId(ctrl.service, c, classID, limit)
+			ctrl.getEntriesByClassId(c, classID, limit)
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
 		}
@@ -92,8 +92,8 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 	})
 }
 
-func _getEntryById(s services.EntryService, c *gin.Context, entryID int) {
-	entry, err := s.GetOneById(entryID)
+func (ctrl *EntryController) getEntryById(c *gin.Context, entryID int) {
+	entry, err := ctrl.service.GetOneById(entryID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
@@ -101,9 +101,9 @@ func _getEntryById(s services.EntryService, c *gin.Context, entryID int) {
 	}
 }
 
-func _getEntriesByUserId(
-	s services.EntryService, c *gin.Context, userID int, limit int) {
-	entries, err := s.GetManyByUserId(userID, limit)
+func (ctrl *EntryController) getEntriesByUserId(
+	c *gin.Context, userID int, limit int) {
+	entries, err := ctrl.service.GetManyByUserId(userID, limit)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {
@@ -111,9 +111,9 @@ func _getEntriesByUserId(
 	}
 }
 
-func _getEntriesByClassId(
-	s services.EntryService, c *gin.Context, classID int, limit int) {
-	entries, err := s.GetManyByClassId(classID, limit)
+func (ctrl *EntryController) getEntriesByClassId(
+	c *gin.Context, classID int, limit int) {
+	entries, err := ctrl.service.GetManyByClassId(classID, limit)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {

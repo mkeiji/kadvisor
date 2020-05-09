@@ -13,3 +13,8 @@ func (svc *ReportService) GetBalance(
 	userID int) (dtos.Balance, error) {
 	return svc.repository.FindBalance(userID)
 }
+
+func (svc *ReportService) GetYearToDateReport(
+	userID int) ([]dtos.MonthReport, error) {
+	return svc.repository.FindYearToDateReport(userID)
+}
