@@ -6,8 +6,8 @@ export interface RowData {
     description: string;
     createdAt: Date;
     date: Date;
+    codeTypeID: number;
     class: number;
-    subClass: number;
     amount: number;
 }
 
@@ -20,21 +20,13 @@ export interface Class extends BaseModel {
     userID: number;
     name: string;
     description: string;
-    subClasses: SubClass[];
-}
-
-export interface SubClass extends BaseModel {
-    classID: number;
-    userID: number;
-    name: string;
-    description: string;
 }
 
 export interface Entry extends BaseModel {
     id: number;
     userID: number;
+    entryTypeCodeID: string;
     classID: number;
-    subClassID: number;
     amount: number;
     date: string;
     description: string;

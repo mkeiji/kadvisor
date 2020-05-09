@@ -1,12 +1,17 @@
-import { Class, Entry, RowData, SubClass, TableState } from './view-model';
+import { Class, Entry, RowData, TableState } from './view-model';
 import { Column } from 'material-table';
+import { LookupEntry } from '@client/klibs';
 
 class EntryViewModelService {
-    formatTableState(classes: Class[], entries: Entry[]): TableState {
+    formatTableState(
+        lookups: LookupEntry[],
+        classes: Class[],
+        entries: Entry[]
+    ): TableState {
         const [
             classLookups,
-            subClassLookups
-        ] = this.createClassAndSubClassLookups(classes);
+            entryTypeLookups
+        ] = this.createClassAndEntryTypeLookups(classes, lookups);
 
         return {
             columns: [
@@ -18,14 +23,14 @@ class EntryViewModelService {
                     render: rowData => this.formatDate(rowData.date)
                 },
                 {
+                    title: 'Type',
+                    field: 'codeTypeID',
+                    lookup: entryTypeLookups
+                },
+                {
                     title: 'Class',
                     field: 'class',
                     lookup: classLookups
-                },
-                {
-                    title: 'Sub-Class',
-                    field: 'subClass',
-                    lookup: subClassLookups
                 },
                 {
                     title: 'Amount',
@@ -35,16 +40,22 @@ class EntryViewModelService {
                 }
             ] as Column<RowData>[],
 
-            data: this.entriesToRowDatas(entries)
+            data: this.entriesToRowDatas(entries, lookups)
         };
     }
 
-    rowDataToEntry(userID: number, rowData: RowData): Entry {
+    rowDataToEntry(
+        userID: number,
+        lookups: LookupEntry[],
+        rowData: RowData
+    ): Entry {
         return {
             id: rowData.entryID,
             userID: userID,
+            entryTypeCodeID: lookups.find(
+                l => l.id === Number(rowData.codeTypeID)
+            ).code,
             classID: Number(rowData.class),
-            subClassID: Number(rowData.subClass),
             date: rowData.date.toISOString(),
             amount: Number(rowData.amount),
             description: rowData.description
@@ -58,20 +69,20 @@ class EntryViewModelService {
         };
     }
 
-    entriesToRowDatas(entries: Entry[]): RowData[] {
+    entriesToRowDatas(entries: Entry[], lookups: LookupEntry[]): RowData[] {
         const result = [] as RowData[];
-        entries.forEach(e => result.push(this.entryToRowData(e)));
+        entries.forEach(e => result.push(this.entryToRowData(e, lookups)));
         return result.sort((n1, n2) => +n2.createdAt - +n1.createdAt);
     }
 
-    entryToRowData(entry: Entry): RowData {
+    entryToRowData(entry: Entry, lookups: LookupEntry[]): RowData {
         return {
             entryID: entry.id,
             createdAt: new Date(entry.createdAt),
             date: new Date(entry.date),
             description: entry.description,
             class: entry.classID,
-            subClass: entry.subClassID,
+            codeTypeID: lookups.find(l => l.code === entry.entryTypeCodeID).id,
             amount: entry.amount
         } as RowData;
     }
@@ -91,19 +102,17 @@ class EntryViewModelService {
         return `${da}-${mo}-${ye}`;
     }
 
-    private createClassAndSubClassLookups(
-        classes: Class[]
+    private createClassAndEntryTypeLookups(
+        classes: Class[],
+        typeLookups: LookupEntry[]
     ): Record<number, string>[] {
         const classLookups = {} as Record<number, string>;
-        const subClassLookups = {} as Record<number, string>;
+        const entryTypeLookups = {} as Record<number, string>;
 
-        classes.forEach((c: Class, i: number) => {
-            classLookups[i + 1] = c.name;
-            c.subClasses.forEach((sc: SubClass, sci: number) => {
-                subClassLookups[sci + 1] = sc.name;
-            });
-        });
-        return [classLookups, subClassLookups];
+        classes.map((c: Class, i: number) => (classLookups[i + 1] = c.name));
+        typeLookups.map((l: LookupEntry) => (entryTypeLookups[l.id] = l.text));
+
+        return [classLookups, entryTypeLookups];
     }
 }
 

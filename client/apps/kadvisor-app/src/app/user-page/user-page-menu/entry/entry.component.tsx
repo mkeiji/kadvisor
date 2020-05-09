@@ -24,31 +24,44 @@ import EntryService from './entry.service';
 import EntryViewModelService from './view-model.service';
 import { combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
+import { LookupEntry } from '@client/klibs';
 
 export default function EntryTable(props: EntryComponentPropsType) {
     const service = new EntryService(props.userID);
     const viewModelService = new EntryViewModelService();
     const [table, setTable] = useState<TableState>({} as TableState);
-    const [nEntries, setNEntries] = React.useState(10);
+    const [nEntries, setNEntries] = useState<number>(10);
+    const [lookups, setLookups] = useState<LookupEntry[]>([]);
 
     useEffect(() => {
-        combineLatest(service.getClasses(), service.getEntries(nEntries))
+        combineLatest(
+            service.getEntryLookups(),
+            service.getClasses(),
+            service.getEntries(nEntries)
+        )
             .pipe(take(1))
-            .subscribe(([resClasses, resEntries]) =>
+            .subscribe(([resLookups, resClasses, resEntries]) => {
+                setLookups(resLookups);
                 setTable(
-                    viewModelService.formatTableState(resClasses, resEntries)
-                )
-            );
+                    viewModelService.formatTableState(
+                        resLookups,
+                        resClasses,
+                        resEntries
+                    )
+                );
+            });
     }, [nEntries]);
 
     function onAdd(newData: RowData) {
         service
-            .postEntry(viewModelService.rowDataToEntry(props.userID, newData))
+            .postEntry(
+                viewModelService.rowDataToEntry(props.userID, lookups, newData)
+            )
             .pipe(take(1))
             .subscribe((entry: Entry) => {
                 setTable((prevState: TableState) => {
                     const data = [...prevState.data];
-                    const row = viewModelService.entryToRowData(entry);
+                    const row = viewModelService.entryToRowData(entry, lookups);
                     data.unshift(row);
                     return { ...prevState, data };
                 });
@@ -68,6 +81,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     service.putEntry(
                         viewModelService.rowDataToEntry(
                             props.userID,
+                            lookups,
                             viewModelService.parseRowDataDate(newData)
                         )
                     );

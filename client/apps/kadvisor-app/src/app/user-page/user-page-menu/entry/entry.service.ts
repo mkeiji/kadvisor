@@ -1,8 +1,10 @@
 import {
     APP_CLASS_ENDPOINT,
     APP_ENTRY_ENDPOINT,
+    APP_LOOKUP_ENDPOINT,
     KEndpointUtil,
-    KRxios
+    KRxios,
+    LookupEntry
 } from '@client/klibs';
 import { Class, Entry } from './view-model';
 import { Observable } from 'rxjs';
@@ -32,7 +34,13 @@ class EntryService {
     }
 
     getClasses(): Observable<Class[]> {
-        return this.krxios.get(`${APP_CLASS_ENDPOINT}?preloaded=true`);
+        return this.krxios.get(APP_CLASS_ENDPOINT);
+    }
+
+    getEntryLookups(): Observable<LookupEntry[]> {
+        return this.krxios.get(
+            `${APP_LOOKUP_ENDPOINT}?codeGroup=EntryTypeCodeID`
+        );
     }
 }
 
