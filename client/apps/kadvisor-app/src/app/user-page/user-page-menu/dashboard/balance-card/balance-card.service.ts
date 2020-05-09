@@ -13,7 +13,7 @@ class BalanceCardService {
     }
 
     getUserBalance(): Observable<UserBalance> {
-        return this.krxios.get(`${APP_REPORT_ENDPOINT}?type=balance`);
+        return this.krxios.get(`${APP_REPORT_ENDPOINT}?type=BALANCE`);
     }
 }
 
