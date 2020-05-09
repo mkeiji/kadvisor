@@ -3,6 +3,7 @@ export { KCopyright } from './lib/k-components/k-copyright/k-copyright.component
 export { BaseModel } from './lib/k-models/base-model';
 export { Class } from './lib/k-models/class-model';
 export { Entry } from './lib/k-models/entry-model';
+export { UserBalance } from './lib/k-models/user-balance.model';
 export { KRouterPathUtil } from './lib/k-utils/router/k-router-path.util';
 export { Login } from './lib/k-models/login';
 export * from './lib/k-models/gerneric-models';

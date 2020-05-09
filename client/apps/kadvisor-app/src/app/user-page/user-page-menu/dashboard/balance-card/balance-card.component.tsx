@@ -1,11 +1,48 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Title from '../../Title/title.component';
+import { KFormatUtil, UserBalance } from '@client/klibs';
+import BalanceCardService from './balance-card.service';
 
 function preventDefault(event: any) {
     event.preventDefault();
+}
+
+export default function BalanceCard(props: BalanceCardPropType) {
+    const service = new BalanceCardService(props.userID);
+    const classes = useStyles();
+    const [userBalance, setBalance] = useState<UserBalance>({} as UserBalance);
+
+    useEffect(() => {
+        service.getUserBalance().subscribe((u: UserBalance) => setBalance(u));
+    }, []);
+
+    return (
+        <React.Fragment>
+            <Title>Balance Card</Title>
+            <Typography
+                component="p"
+                variant="h4"
+                style={{ paddingTop: '30px' }}
+            >
+                {KFormatUtil.toCurrency(userBalance.balance)}
+            </Typography>
+            <Typography
+                color="textSecondary"
+                className={classes.depositContext}
+            >
+                on {KFormatUtil.dateDisplayFormat(new Date())}
+            </Typography>
+            <div>
+                {/*TODO: add reports page link when available*/}
+                <Link color="primary" href="#" onClick={preventDefault}>
+                    View reports
+                </Link>
+            </div>
+        </React.Fragment>
+    );
 }
 
 const useStyles = makeStyles({
@@ -14,25 +51,6 @@ const useStyles = makeStyles({
     }
 });
 
-export default function BalanceCard() {
-    const classes = useStyles();
-    return (
-        <React.Fragment>
-            <Title>Balance Card</Title>
-            <Typography component="p" variant="h4">
-                $3,024.00
-            </Typography>
-            <Typography
-                color="textSecondary"
-                className={classes.depositContext}
-            >
-                on 15 March, 2019
-            </Typography>
-            <div>
-                <Link color="primary" href="#" onClick={preventDefault}>
-                    View balance
-                </Link>
-            </div>
-        </React.Fragment>
-    );
+interface BalanceCardPropType {
+    userID: number;
 }

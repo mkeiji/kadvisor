@@ -26,7 +26,7 @@ export default function Dashboard(props: DashboardPropsType) {
                 {/* Recent BalanceCardComponent */}
                 <Grid item xs={12} md={4} lg={3}>
                     <Paper className={fixedHeightPaper}>
-                        <BalanceCard />
+                        <BalanceCard userID={props.userID} />
                     </Paper>
                 </Grid>
                 {/* Recent EntriesComponent */}
