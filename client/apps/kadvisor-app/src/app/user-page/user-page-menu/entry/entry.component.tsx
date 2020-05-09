@@ -1,6 +1,6 @@
 import React, { CSSProperties, forwardRef, useEffect, useState } from 'react';
 import MaterialTable, { Icons } from 'material-table';
-import { Entry, RowData, TableState } from './view-model';
+import { RowData, TableState } from './view-model';
 import AddBox from '@material-ui/icons/AddBox';
 import ArrowDownward from '@material-ui/icons/ArrowDownward';
 import Check from '@material-ui/icons/Check';
@@ -24,7 +24,7 @@ import EntryService from './entry.service';
 import EntryViewModelService from './view-model.service';
 import { combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { LookupEntry } from '@client/klibs';
+import { Entry, LookupEntry } from '@client/klibs';
 
 export default function EntryTable(props: EntryComponentPropsType) {
     const service = new EntryService(props.userID);

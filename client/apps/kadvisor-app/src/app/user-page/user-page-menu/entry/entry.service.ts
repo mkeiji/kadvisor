@@ -2,11 +2,12 @@ import {
     APP_CLASS_ENDPOINT,
     APP_ENTRY_ENDPOINT,
     APP_LOOKUP_ENDPOINT,
+    Class,
+    Entry,
     KEndpointUtil,
     KRxios,
     LookupEntry
 } from '@client/klibs';
-import { Class, Entry } from './view-model';
 import { Observable } from 'rxjs';
 
 class EntryService {

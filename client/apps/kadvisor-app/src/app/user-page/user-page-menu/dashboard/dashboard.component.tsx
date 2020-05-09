@@ -2,7 +2,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import KComposedChartComponent from './charts/k-composed-chart.component';
 import BalanceCard from './balance-card/balance-card.component';
-import Entries from './entries/entries.component';
+import DashboardEntries from './entries/dash-entries.component';
 import React from 'react';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import clsx from 'clsx';
@@ -32,7 +32,7 @@ export default function Dashboard(props: DashboardPropsType) {
                 {/* Recent EntriesComponent */}
                 <Grid item xs={12}>
                     <Paper className={props.classes.paper}>
-                        <Entries />
+                        <DashboardEntries userID={props.userID} />
                     </Paper>
                 </Grid>
             </Grid>
@@ -41,5 +41,6 @@ export default function Dashboard(props: DashboardPropsType) {
 }
 
 interface DashboardPropsType {
+    userID: number;
     classes: ClassNameMap<any>;
 }

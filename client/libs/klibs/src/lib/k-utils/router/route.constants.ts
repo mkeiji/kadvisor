@@ -5,6 +5,12 @@ export const APP_ROUTES = {
     userPage: '/user/:id/home/:page?'
 };
 
+export const APP_PAGES = {
+    home: 'home',
+    dashboard: 'dashboard',
+    entries: 'entries'
+};
+
 // SERVER
 export const APP_BACKEND_BASE = 'http://localhost:8081/api/kadvisor/:uid';
 export const APP_LOOKUP_ENDPOINT = '/lookup';

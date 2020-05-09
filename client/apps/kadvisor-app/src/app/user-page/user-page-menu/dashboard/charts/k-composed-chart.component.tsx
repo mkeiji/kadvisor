@@ -17,43 +17,37 @@ const data = [
         name: 'Jan',
         expense: 590,
         balance: 18000,
-        income: 1400,
-        cnt: 490
+        income: 1400
     },
     {
         name: 'Feb',
         expense: 868,
         balance: 19670,
-        income: 1506,
-        cnt: 590
+        income: 1506
     },
     {
         name: 'Mar',
         expense: 1397,
         balance: 10980,
-        income: 989,
-        cnt: 350
+        income: 989
     },
     {
         name: 'Apr',
         expense: 1480,
         balance: 14000,
-        income: 1228,
-        cnt: 480
+        income: 1228
     },
     {
         name: 'May',
         expense: 1520,
         balance: 19080,
-        income: 1100,
-        cnt: 460
+        income: 1100
     },
     {
         name: 'Jun',
         expense: 1400,
         balance: 6800,
-        income: 1700,
-        cnt: 380
+        income: 1700
     }
 ];
 

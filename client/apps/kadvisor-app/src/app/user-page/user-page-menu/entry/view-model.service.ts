@@ -1,6 +1,12 @@
-import { Class, Entry, RowData, TableState } from './view-model';
+import { RowData, TableState } from './view-model';
 import { Column } from 'material-table';
-import { LookupEntry } from '@client/klibs';
+import {
+    Class,
+    Entry,
+    KFormatUtil,
+    KLookupUtil,
+    LookupEntry
+} from '@client/klibs';
 
 class EntryViewModelService {
     formatTableState(
@@ -11,7 +17,7 @@ class EntryViewModelService {
         const [
             classLookups,
             entryTypeLookups
-        ] = this.createClassAndEntryTypeLookups(classes, lookups);
+        ] = KLookupUtil.createClassAndEntryTypeRecords(classes, lookups);
 
         return {
             columns: [
@@ -20,7 +26,8 @@ class EntryViewModelService {
                     title: 'Date',
                     field: 'date',
                     type: 'date',
-                    render: rowData => this.formatDate(rowData.date)
+                    render: rowData =>
+                        KFormatUtil.dateDisplayFormat(rowData.date)
                 },
                 {
                     title: 'Type',
@@ -85,34 +92,6 @@ class EntryViewModelService {
             codeTypeID: lookups.find(l => l.code === entry.entryTypeCodeID).id,
             amount: entry.amount
         } as RowData;
-    }
-
-    private formatDate(date: Date | string): string {
-        const asDate = new Date(date);
-        const ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(
-            asDate
-        );
-        const mo = new Intl.DateTimeFormat('en', { month: 'short' }).format(
-            asDate
-        );
-        const da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(
-            asDate
-        );
-
-        return `${da}-${mo}-${ye}`;
-    }
-
-    private createClassAndEntryTypeLookups(
-        classes: Class[],
-        typeLookups: LookupEntry[]
-    ): Record<number, string>[] {
-        const classLookups = {} as Record<number, string>;
-        const entryTypeLookups = {} as Record<number, string>;
-
-        classes.map((c: Class, i: number) => (classLookups[i + 1] = c.name));
-        typeLookups.map((l: LookupEntry) => (entryTypeLookups[l.id] = l.text));
-
-        return [classLookups, entryTypeLookups];
     }
 }
 

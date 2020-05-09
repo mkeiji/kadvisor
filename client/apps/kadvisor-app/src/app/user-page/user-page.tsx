@@ -5,7 +5,7 @@ import UserPageMenu from './user-page-menu/user-page-menu.component';
 import { useStyles } from './user-page-menu/user-page-menu.style.hook';
 import Dashboard from './user-page-menu/dashboard/dashboard.component';
 import EntryTable from './user-page-menu/entry/entry.component';
-import { Login, Match } from '@client/klibs';
+import { APP_PAGES, Login, Match } from '@client/klibs';
 
 function UserPage(props: UserHomePropTypes) {
     const styleClasses = useStyles();
@@ -25,10 +25,10 @@ function UserPage(props: UserHomePropTypes) {
     function getPage(idMatch: boolean, page: string): JSX.Element {
         if (idMatch) {
             switch (page) {
-                case 'dashboard':
-                    return <Dashboard classes={styleClasses} />;
+                case APP_PAGES.dashboard:
+                    return <Dashboard userID={userID} classes={styleClasses} />;
 
-                case 'entries':
+                case APP_PAGES.entries:
                     return (
                         <EntryTable userID={userID} classes={styleClasses} />
                     );
