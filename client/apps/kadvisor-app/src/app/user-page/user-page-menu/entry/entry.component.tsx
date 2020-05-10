@@ -53,12 +53,12 @@ export default function EntryTable(props: EntryComponentPropsType) {
     }, [nEntries]);
 
     function onAdd(newData: RowData) {
-        service
+        return service
             .postEntry(
                 viewModelService.rowDataToEntry(props.userID, lookups, newData)
             )
-            .pipe(take(1))
-            .subscribe((entry: Entry) => {
+            .toPromise()
+            .then((entry: Entry) => {
                 setTable((prevState: TableState) => {
                     const data = [...prevState.data];
                     const row = viewModelService.entryToRowData(entry, lookups);
@@ -66,29 +66,27 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     return { ...prevState, data };
                 });
             });
-        return new Promise(resolve => {
-            resolve();
-        });
     }
 
     function onEdit(newData: RowData, oldData: RowData | undefined) {
-        return new Promise(resolve => {
-            resolve();
-            if (oldData) {
+        return service
+            .putEntry(
+                viewModelService.rowDataToEntry(
+                    props.userID,
+                    lookups,
+                    viewModelService.parseRowDataDate(newData)
+                )
+            )
+            .toPromise()
+            .then((entry: Entry) => {
                 setTable((prevState: TableState) => {
                     const data = [...prevState.data];
-                    data[data.indexOf(oldData)] = newData;
-                    service.putEntry(
-                        viewModelService.rowDataToEntry(
-                            props.userID,
-                            lookups,
-                            viewModelService.parseRowDataDate(newData)
-                        )
-                    );
+                    data[
+                        data.indexOf(oldData)
+                    ] = viewModelService.entryToRowData(entry, lookups);
                     return { ...prevState, data };
                 });
-            }
-        });
+            });
     }
 
     function onDelete(oldData: RowData) {
@@ -97,7 +95,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
             setTable((prevState: TableState) => {
                 const data = [...prevState.data];
                 data.splice(data.indexOf(oldData), 1);
-                service.deleteEntry(oldData.entryID);
+                service.deleteEntry(oldData.entryID).subscribe();
                 return { ...prevState, data };
             });
         });
