@@ -12,4 +12,6 @@ var ControllerList = []interfaces.Controller {
 	&controllers.EntryController{},
 	&controllers.LookupController{},
 	&controllers.ReportController{},
+	&controllers.ForecastController{},
+	&controllers.ForecastEntryController{},
 }

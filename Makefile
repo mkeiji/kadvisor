@@ -29,7 +29,7 @@ testdb:
 	docker run --rm -d --name test -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
 
 db:
-	docker run -d --name kdb -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
+	docker run -d --name kdb --restart unless-stopped -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
 
 dependencies:
 	go get -u github.com/gin-gonic/gin

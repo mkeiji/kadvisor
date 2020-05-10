@@ -5,6 +5,7 @@ import (
 	"kadvisor/server/repository/structs"
 )
 
+// obs: list order matters
 var EntityList = []interfaces.Entity {
 	&structs.User{},
 	&structs.Login{},
@@ -14,4 +15,6 @@ var EntityList = []interfaces.Entity {
 	&structs.Permission{},
 	&structs.Code{},
 	&structs.CodeText{},
+	&structs.Forecast{},
+	&structs.ForecastEntry{},
 }

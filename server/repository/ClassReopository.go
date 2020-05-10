@@ -42,7 +42,7 @@ func (repo *ClassRepository) Update(
 func (repo *ClassRepository) Delete(
 	classID int) (int, error) {
 	classToDelete := structs.Class{
-		Base: structs.Base{ID: uint(classID)}}
+		Base: structs.Base{ID: classID}}
 	err := application.Db.Delete(&classToDelete).Error
 	return int(classToDelete.ID), err
 }
