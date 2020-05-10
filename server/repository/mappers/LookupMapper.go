@@ -11,7 +11,7 @@ func (l LookupMapper) MapCodeToLookup(
 	code structs.Code) dtos.LookupEntry {
 
 	return dtos.LookupEntry{
-		Id: int(code.ID),
+		Id: code.ID,
 		Text: code.Name,
 		Code: code.CodeTypeID,
 	}

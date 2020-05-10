@@ -1,14 +1,15 @@
 package repository
 
 import (
+	"kadvisor/server/repository/mappers"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/application"
-	"time"
 )
 
 type EntryRepository struct {
 	validator 	validators.EntryValidator
+	mapper 		mappers.EntryMapper
 }
 
 func (repo *EntryRepository) FindAllByUserId(
@@ -34,30 +35,30 @@ func (repo *EntryRepository) FindOne(id int) (structs.Entry, error) {
 func (repo *EntryRepository) Create(
 	entry structs.Entry) (structs.Entry, error) {
 
-	utc, _ := time.LoadLocation("UTC")
-	entry.Date = entry.Date.In(utc)
+	eMapped := repo.mapper.MapEntry(entry)
 
-	vErr := repo.validator.Validate(application.Db, entry)
+	vErr := repo.validator.Validate(application.Db, eMapped)
 	if vErr != nil {
 		return structs.Entry{}, vErr
 	} else {
-		err := application.Db.Save(&entry).Error
-		return entry, err
+		err := application.Db.Save(&eMapped).Error
+		return eMapped, err
 	}
 }
 
 func (repo *EntryRepository) Update(
 	entry structs.Entry) (structs.Entry, error) {
 	var stored structs.Entry
+	eMapped := repo.mapper.MapEntry(entry)
 
-	err := application.Db.Find(&stored, entry.ID).Updates(entry).Error
+	err := application.Db.Find(&stored, entry.ID).Updates(eMapped).Error
 	return stored, err
 }
 
 func (repo *EntryRepository) Delete(id int) (int, error) {
 	entry := structs.Entry{Base: structs.Base{ID: id}}
 	err := application.Db.Delete(&entry).Error
-	return int(entry.ID), err
+	return entry.ID, err
 }
 
 func getEntries(query structs.Entry, limit int) ([]structs.Entry, error){

@@ -1,0 +1,4 @@
+package constants
+
+const INCOME_ENTRY_TYPE 	= "INCOME_ENTRY_TYPE"
+const EXPENSE_ENTRY_TYPE 	= "EXPENSE_ENTRY_TYPE"
