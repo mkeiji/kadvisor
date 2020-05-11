@@ -1,5 +1,4 @@
 import { Column } from 'material-table';
-import { BaseModel } from '@client/klibs';
 
 export interface RowData {
     entryID: number;

@@ -10,7 +10,7 @@ import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import Divider from '@material-ui/core/Divider';
 import AssignmentIcon from '@material-ui/icons/Assignment';
-import { KRouterPathUtil } from '@client/klibs';
+import { APP_PAGES, KRouterPathUtil } from '@client/klibs';
 
 export default function MenuListItem(props: MenuListItemPropTypes) {
     const LIST_ITEMS = [
@@ -21,25 +21,25 @@ export default function MenuListItem(props: MenuListItemPropTypes) {
         {
             itemText: 'Dashboard',
             iconComponent: <DashboardIcon />,
-            pagePath: 'dashboard',
+            pagePath: APP_PAGES.dashboard,
             type: UserPageMenuListTypes.primary
         },
         {
             itemText: 'Entries',
             iconComponent: <AddIcon />,
-            pagePath: 'entries',
+            pagePath: APP_PAGES.entries,
+            type: UserPageMenuListTypes.primary
+        },
+        {
+            itemText: 'Settings',
+            iconComponent: <LayersIcon />,
+            pagePath: APP_PAGES.settings,
             type: UserPageMenuListTypes.primary
         },
         {
             itemText: 'Reports',
             iconComponent: <BarChartIcon />,
-            pagePath: 'reports',
-            type: UserPageMenuListTypes.primary
-        },
-        {
-            itemText: 'Other',
-            iconComponent: <LayersIcon />,
-            pagePath: 'other',
+            pagePath: APP_PAGES.reports,
             type: UserPageMenuListTypes.primary
         },
         {

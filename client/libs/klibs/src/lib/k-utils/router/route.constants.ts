@@ -8,7 +8,9 @@ export const APP_ROUTES = {
 export const APP_PAGES = {
     home: 'home',
     dashboard: 'dashboard',
-    entries: 'entries'
+    entries: 'entries',
+    reports: 'reports',
+    settings: 'settings'
 };
 
 // SERVER
@@ -17,6 +19,8 @@ export const APP_LOOKUP_ENDPOINT = '/lookup';
 export const APP_CLASS_ENDPOINT = '/class';
 export const APP_ENTRY_ENDPOINT = '/entry';
 export const APP_REPORT_ENDPOINT = '/report';
+export const APP_FORECAST_ENDPOINT = '/forecast';
+export const APP_FORECAST_ENTRY_ENDPOINT = '/forecastentry';
 export const APP_LOGIN_ENDPOINT = {
     login: '/login',
     logout: '/logout'

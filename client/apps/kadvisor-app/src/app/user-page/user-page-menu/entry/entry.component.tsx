@@ -24,7 +24,7 @@ import EntryService from './entry.service';
 import EntryViewModelService from './view-model.service';
 import { combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { Entry, LookupEntry } from '@client/klibs';
+import { Entry, LookupEntry, MATERIAL_TABLE_ICONS } from '@client/klibs';
 
 export default function EntryTable(props: EntryComponentPropsType) {
     const service = new EntryService(props.userID);
@@ -57,6 +57,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
             .postEntry(
                 viewModelService.rowDataToEntry(props.userID, lookups, newData)
             )
+            .pipe(take(1))
             .toPromise()
             .then((entry: Entry) => {
                 setTable((prevState: TableState) => {
@@ -77,6 +78,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     viewModelService.parseRowDataDate(newData)
                 )
             )
+            .pipe(take(1))
             .toPromise()
             .then((entry: Entry) => {
                 setTable((prevState: TableState) => {
@@ -90,15 +92,17 @@ export default function EntryTable(props: EntryComponentPropsType) {
     }
 
     function onDelete(oldData: RowData) {
-        return new Promise(resolve => {
-            resolve();
-            setTable((prevState: TableState) => {
-                const data = [...prevState.data];
-                data.splice(data.indexOf(oldData), 1);
-                service.deleteEntry(oldData.entryID).subscribe();
-                return { ...prevState, data };
+        return service
+            .deleteEntry(oldData.entryID)
+            .pipe(take(1))
+            .toPromise()
+            .then(() => {
+                setTable((prevState: TableState) => {
+                    const data = [...prevState.data];
+                    data.splice(data.indexOf(oldData), 1);
+                    return { ...prevState, data };
+                });
             });
-        });
     }
 
     return (
@@ -125,10 +129,11 @@ export default function EntryTable(props: EntryComponentPropsType) {
 
                 <MaterialTable
                     title="Entries"
-                    icons={tableIcons}
+                    icons={MATERIAL_TABLE_ICONS}
                     columns={table.columns}
                     data={table.data}
                     options={{
+                        headerStyle: headerStyles,
                         actionsColumnIndex: -1,
                         pageSize: 10,
                         addRowPosition: 'first',
@@ -153,32 +158,9 @@ interface EntryComponentPropsType {
     classes: ClassNameMap<any>;
 }
 
-const selectStyle = { display: 'flex' } as CSSProperties;
+const headerStyles = {
+    backgroundColor: 'gray',
+    color: 'white'
+} as CSSProperties;
 
-const tableIcons = {
-    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
-    Check: forwardRef((props, ref) => <Check {...props} ref={ref} />),
-    Clear: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Delete: forwardRef((props, ref) => <DeleteOutline {...props} ref={ref} />),
-    DetailPanel: forwardRef((props, ref) => (
-        <ChevronRight {...props} ref={ref} />
-    )),
-    Edit: forwardRef((props, ref) => <Edit {...props} ref={ref} />),
-    Export: forwardRef((props, ref) => <SaveAlt {...props} ref={ref} />),
-    Filter: forwardRef((props, ref) => <FilterList {...props} ref={ref} />),
-    FirstPage: forwardRef((props, ref) => <FirstPage {...props} ref={ref} />),
-    LastPage: forwardRef((props, ref) => <LastPage {...props} ref={ref} />),
-    NextPage: forwardRef((props, ref) => <ChevronRight {...props} ref={ref} />),
-    PreviousPage: forwardRef((props, ref) => (
-        <ChevronLeft {...props} ref={ref} />
-    )),
-    ResetSearch: forwardRef((props, ref) => <Clear {...props} ref={ref} />),
-    Search: forwardRef((props, ref) => <Search {...props} ref={ref} />),
-    SortArrow: forwardRef((props, ref) => (
-        <ArrowDownward {...props} ref={ref} />
-    )),
-    ThirdStateCheck: forwardRef((props, ref) => (
-        <Remove {...props} ref={ref} />
-    )),
-    ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
-} as Icons;
+const selectStyle = { display: 'flex' } as CSSProperties;

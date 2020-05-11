@@ -8,7 +8,6 @@ import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import clsx from 'clsx';
 import PageSpacer from '../page-spacer/page-spacer.component';
 
-// TODO: create a service to fetch from server and feed to children
 export default function Dashboard(props: DashboardPropsType) {
     const fixedHeightPaper = clsx(
         props.classes.paper,

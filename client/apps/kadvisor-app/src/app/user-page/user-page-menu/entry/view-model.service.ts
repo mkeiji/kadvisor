@@ -7,6 +7,7 @@ import {
     KLookupUtil,
     LookupEntry
 } from '@client/klibs';
+import { CSSProperties } from 'react';
 
 class EntryViewModelService {
     formatTableState(
@@ -79,7 +80,7 @@ class EntryViewModelService {
     entriesToRowDatas(entries: Entry[], lookups: LookupEntry[]): RowData[] {
         const result = [] as RowData[];
         entries.forEach(e => result.push(this.entryToRowData(e, lookups)));
-        return result.sort((n1, n2) => +n2.createdAt - +n1.createdAt);
+        return result;
     }
 
     entryToRowData(entry: Entry, lookups: LookupEntry[]): RowData {
