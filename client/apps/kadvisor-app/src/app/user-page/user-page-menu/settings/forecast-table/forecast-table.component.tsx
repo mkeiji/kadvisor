@@ -1,7 +1,12 @@
 import React, { CSSProperties, useEffect, useState } from 'react';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import MaterialTable from 'material-table';
-import { Forecast, ForecastEntry, MATERIAL_TABLE_ICONS } from '@client/klibs';
+import {
+    Forecast,
+    ForecastEntry,
+    KSpinner,
+    MATERIAL_TABLE_ICONS
+} from '@client/klibs';
 import ForecastTableService from './forecast-table.service';
 import ForecastTableViewModelService, {
     ForecastTableState
@@ -12,6 +17,7 @@ import { Button } from '@material-ui/core';
 export default function ForecastTable(props: ForecastTablePropsType) {
     const service = new ForecastTableService(props.userID);
     const viewModelService = new ForecastTableViewModelService();
+    const [loading, setLoading] = useState(true);
     const [hasForecast, setHasForecast] = useState(true);
     const [forecast, setForecast] = useState<Forecast>({} as Forecast);
     const [table, setTable] = useState<ForecastTableState>(
@@ -27,9 +33,13 @@ export default function ForecastTable(props: ForecastTablePropsType) {
                     if (f) {
                         setForecast(f);
                         setTable(viewModelService.formatTableState(f));
+                        setLoading(false);
                     }
                 },
-                () => setHasForecast(false)
+                () => {
+                    setHasForecast(false);
+                    setLoading(false);
+                }
             );
     }, [hasForecast]);
 
@@ -58,7 +68,7 @@ export default function ForecastTable(props: ForecastTablePropsType) {
             .subscribe(() => setHasForecast(true));
     }
 
-    function render(): JSX.Element {
+    function renderForecast(): JSX.Element {
         if (hasForecast) {
             return (
                 <MaterialTable
@@ -89,7 +99,8 @@ export default function ForecastTable(props: ForecastTablePropsType) {
             );
         }
     }
-    return <div>{render()}</div>;
+
+    return loading ? <KSpinner /> : renderForecast();
 }
 
 interface ForecastTablePropsType {

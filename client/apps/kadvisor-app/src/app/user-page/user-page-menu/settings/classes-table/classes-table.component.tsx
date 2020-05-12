@@ -1,6 +1,6 @@
 import React, { CSSProperties, useEffect, useState } from 'react';
 import { ClassTableState } from './view-model';
-import { Class, MATERIAL_TABLE_ICONS } from '@client/klibs';
+import { Class, KSpinner, MATERIAL_TABLE_ICONS } from '@client/klibs';
 import MaterialTable from 'material-table';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import ClassTableService from './class-table.service';
@@ -10,6 +10,7 @@ import ClassTableViewModelService from './class-table-view-model.service';
 export default function ClassesTable(props: ClassesTablePropsType) {
     const service = new ClassTableService(props.userID);
     const viewModelService = new ClassTableViewModelService();
+    const [loading, setLoading] = useState(true);
     const [table, setTable] = useState<ClassTableState>({} as ClassTableState);
 
     useEffect(() => {
@@ -18,6 +19,7 @@ export default function ClassesTable(props: ClassesTablePropsType) {
             .pipe(take(1))
             .subscribe((classes: Class[]) => {
                 setTable(viewModelService.formatTableState(classes));
+                setLoading(false);
             });
     }, []);
 
@@ -64,27 +66,37 @@ export default function ClassesTable(props: ClassesTablePropsType) {
             });
     }
 
-    return (
-        <MaterialTable
-            title={'Classes'}
-            icons={MATERIAL_TABLE_ICONS}
-            columns={table.columns}
-            data={table.data}
-            options={{
-                headerStyle: headerStyles,
-                actionsColumnIndex: -1,
-                pageSize: 10,
-                addRowPosition: 'first',
-                search: false
-            }}
-            editable={{
-                onRowAdd: (e: Class) => onAdd(e),
-                onRowUpdate: (newData: Class, oldData: Class | undefined) =>
-                    onEdit(newData, oldData),
-                onRowDelete: (oldData: Class) => onDelete(oldData)
-            }}
-        />
-    );
+    function renderTable(): JSX.Element {
+        if (loading) {
+            return <KSpinner />;
+        } else {
+            return (
+                <MaterialTable
+                    title={'Classes'}
+                    icons={MATERIAL_TABLE_ICONS}
+                    columns={table.columns}
+                    data={table.data}
+                    options={{
+                        headerStyle: headerStyles,
+                        actionsColumnIndex: -1,
+                        pageSize: 10,
+                        addRowPosition: 'first',
+                        search: false
+                    }}
+                    editable={{
+                        onRowAdd: (e: Class) => onAdd(e),
+                        onRowUpdate: (
+                            newData: Class,
+                            oldData: Class | undefined
+                        ) => onEdit(newData, oldData),
+                        onRowDelete: (oldData: Class) => onDelete(oldData)
+                    }}
+                />
+            );
+        }
+    }
+
+    return renderTable();
 }
 
 interface ClassesTablePropsType {
