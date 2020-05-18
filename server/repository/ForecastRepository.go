@@ -10,17 +10,18 @@ type ForecastRepository struct {
 	entryMapper 	mappers.ForecastEntryMapper
 }
 
-func (repo *ForecastRepository) FindForecastByUser(
-	userID int, isPreloaded bool) (structs.Forecast, error) {
+func (repo *ForecastRepository) FindOne(
+	userID int, year int, isPreloaded bool) (structs.Forecast, error) {
 
 	var forecast structs.Forecast
 	var err error
 
+	query := "user_id=? AND year=?"
 	if isPreloaded {
 		err = application.Db.Preload(
-			"Entries").Where("user_id=?", userID).Find(&forecast).Error
+			"Entries").Where(query, userID, year).Find(&forecast).Error
 	} else {
-		err = application.Db.Where("user_id=?", userID).Find(&forecast).Error
+		err = application.Db.Where(query, userID, year).Find(&forecast).Error
 	}
 
 	return forecast, err

@@ -2,9 +2,9 @@ package structs
 
 import (
 	"errors"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"os"
-	"time"
 )
 
 type Forecast struct {
@@ -27,10 +27,13 @@ func (f Forecast) Initialize(db *gorm.DB) {}
 
 /* GORM HOOKS */
 func (f *Forecast) BeforeSave(db *gorm.DB) (err error) {
-	// TODO: remove when multiple forecast/user is available
-	f.Year = time.Now().Year()
-
 	err = f.isDuplicate(db)
+	fmt.Print("\n\n")
+	fmt.Print(f.Year)
+	fmt.Print("\n\n")
+	if err == nil && f.Year == 0 {
+		err = errors.New("year is required")
+	}
 	return
 }
 
@@ -47,7 +50,7 @@ func (f *Forecast) BeforeDelete(db *gorm.DB) (err error) {
 func (f *Forecast) isDuplicate(db *gorm.DB) (err error) {
 	var forecast Forecast
 	fErr := db.Where(
-		"user_id=? AND is_active=?", f.UserID, true).Find(
+		"user_id=? AND year=? AND is_active=?", f.UserID, f.Year, true).Find(
 			&forecast).Error
 	if fErr == nil {
 		err = errors.New("user already has a forecast")

@@ -15,18 +15,21 @@ type ForecastController struct {
 }
 
 func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
-	// getOne(/forecast?preloaded)
+	// getOne(/forecast?year&preloaded)
 	router.GET("/api/kadvisor/:uid/forecast", func (c *gin.Context) {
 		userID		, _	:= strconv.Atoi(c.Param("uid"))
+		year		, _ := strconv.Atoi(c.Query("year"))
 		isPreloaded	, _	:= strconv.ParseBool(
 			c.DefaultQuery("preloaded", "false"))
 
 		uErr := KeiUserUtil.ValidUser(userID)
 
-		forecast, fErr := ctrl.service.GetOneByUserId(userID, isPreloaded)
+		forecast, fErr := ctrl.service.GetOne(userID, year, isPreloaded)
 		if uErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-		} else if fErr != nil {
+		} else if year == 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "year param is required"})
+		}  else if fErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": fErr.Error()})
 		} else {
 			c.JSON(http.StatusOK, forecast)

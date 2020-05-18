@@ -14,7 +14,7 @@ type User struct {
 	Login     	Login  		`gorm:"ForeignKey:UserID" json:"login,omitempty"`
 	Entries		[]Entry		`gorm:"ForeignKey:UserID" json:"entries,omitempty"`
 	Classes		[]Class		`gorm:"ForeignKey:UserID" json:"classes,omitempty"`
-	Forecast	Forecast	`gorm:"ForeignKey:UserID" json:"forecast,omitempty"`
+	Forecast	[]Forecast	`gorm:"ForeignKey:UserID" json:"forecast,omitempty"`
 }
 func (e User) IsInitializable() bool { return false }
 
