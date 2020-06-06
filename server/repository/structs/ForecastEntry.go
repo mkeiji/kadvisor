@@ -23,12 +23,12 @@ func (f ForecastEntry) Initialize(db *gorm.DB) {}
 
 /* GORM HOOKS */
 func (f *ForecastEntry) BeforeCreate(db *gorm.DB) (err error) {
-	f.validate(db)
+	err = f.validate(db)
 	return
 }
 
 func (f *ForecastEntry) BeforeUpdate(db *gorm.DB) (err error) {
-	f.validate(db)
+	err = f.validate(db)
 	return
 }
 
@@ -55,7 +55,7 @@ func (f *ForecastEntry) isDuplicate(db *gorm.DB) (err error) {
 		true,
 	).Find(&forecast).Error
 	if fErr == nil {
-		err = errors.New("month entry alreday exist")
+		err = errors.New("month entry already exist")
 	}
 	return
 }

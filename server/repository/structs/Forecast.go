@@ -26,7 +26,10 @@ func (f Forecast) Initialize(db *gorm.DB) {}
 
 /* GORM HOOKS */
 func (f *Forecast) BeforeSave(db *gorm.DB) (err error) {
-	err = f.isDuplicate(db)
+	err = f.validateEntriesMonth()
+	if err == nil {
+		err = f.isDuplicate(db)
+	}
 	if err == nil && f.Year == 0 {
 		err = errors.New("year is required")
 	}
@@ -56,4 +59,23 @@ func (f *Forecast) isDuplicate(db *gorm.DB) (err error) {
 
 func (f *Forecast) deleteChildren(db *gorm.DB) (err error) {
 	return db.Where("forecast_id=?", f.ID).Delete(ForecastEntry{}).Error
+}
+
+func (f *Forecast) validateEntriesMonth() (err error) {
+	var entriesMonth []int
+	checked := map[int]bool{}
+
+	for _, entry := range f.Entries {
+		entriesMonth = append(entriesMonth, entry.Month)
+	}
+
+	for _, month := range entriesMonth {
+		if checked[month] != true {
+			checked[month] = true
+		} else {
+			err = errors.New("repeated month not allowed")
+		}
+	}
+
+	return
 }
