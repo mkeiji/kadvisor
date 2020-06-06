@@ -18,7 +18,7 @@ func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
 	// getOne(/forecast?year&preloaded)
 	router.GET("/api/kadvisor/:uid/forecast", func (c *gin.Context) {
 		userID		, _	:= strconv.Atoi(c.Param("uid"))
-		year		, _ := strconv.Atoi(c.Query("year"))
+		year		, _	:= strconv.Atoi(c.Query("year"))
 		isPreloaded	, _	:= strconv.ParseBool(
 			c.DefaultQuery("preloaded", "false"))
 

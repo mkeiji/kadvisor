@@ -2,7 +2,6 @@ package structs
 
 import (
 	"errors"
-	"fmt"
 	"github.com/jinzhu/gorm"
 	"os"
 )
@@ -28,9 +27,6 @@ func (f Forecast) Initialize(db *gorm.DB) {}
 /* GORM HOOKS */
 func (f *Forecast) BeforeSave(db *gorm.DB) (err error) {
 	err = f.isDuplicate(db)
-	fmt.Print("\n\n")
-	fmt.Print(f.Year)
-	fmt.Print("\n\n")
 	if err == nil && f.Year == 0 {
 		err = errors.New("year is required")
 	}
