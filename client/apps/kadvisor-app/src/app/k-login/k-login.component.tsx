@@ -29,9 +29,7 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
 
     formInitialValues = { email: '', password: '' };
     formValidationSchema = Yup.object({
-        email: Yup.string()
-            .email('Invalid email address')
-            .required('Required'),
+        email: Yup.string().email('Invalid email address').required('Required'),
         password: Yup.string()
             .min(3, 'Must be more than 3 char')
             .required('Required')
@@ -120,9 +118,9 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
                 <Formik
                     initialValues={this.formInitialValues}
                     validationSchema={this.formValidationSchema}
-                    onSubmit={loginObj => this.login(loginObj)}
+                    onSubmit={(loginObj) => this.login(loginObj)}
                 >
-                    {formik => (
+                    {(formik) => (
                         <Form inline onSubmit={formik.handleSubmit}>
                             <FormControl
                                 type="text"

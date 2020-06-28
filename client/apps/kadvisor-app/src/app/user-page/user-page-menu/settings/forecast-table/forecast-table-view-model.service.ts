@@ -15,14 +15,14 @@ class ForecastTableViewModelService {
                     title: 'Month',
                     field: 'month',
                     editable: 'never',
-                    render: data => months[data.month - 1]
+                    render: (data) => months[data.month - 1]
                 },
                 {
                     title: 'Income',
                     field: 'income',
                     editable: 'onUpdate',
                     type: 'numeric',
-                    render: data =>
+                    render: (data) =>
                         KFormatUtil.toCurrency(data.income ? data.income : 0)
                 },
                 {
@@ -30,7 +30,7 @@ class ForecastTableViewModelService {
                     field: 'expense',
                     editable: 'onUpdate',
                     type: 'numeric',
-                    render: data =>
+                    render: (data) =>
                         KFormatUtil.toCurrency(data.expense ? data.expense : 0)
                 }
             ],

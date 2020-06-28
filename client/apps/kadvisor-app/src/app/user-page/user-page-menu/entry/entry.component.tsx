@@ -152,7 +152,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     <InputLabel># Entries</InputLabel>
                     <Select
                         value={nEntries}
-                        onChange={event =>
+                        onChange={(event) =>
                             setNEntries(event.target.value as number)
                         }
                     >

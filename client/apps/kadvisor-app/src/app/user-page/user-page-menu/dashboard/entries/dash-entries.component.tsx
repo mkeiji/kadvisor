@@ -57,7 +57,7 @@ export default function DashboardEntries(props: DashboardEntriesPropsType) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                         <TableRow key={row.id}>
                             <TableCell>{row.date}</TableCell>
                             <TableCell>{row.description}</TableCell>
@@ -81,7 +81,7 @@ interface DashboardEntriesPropsType {
     userID: number;
 }
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
     seeMore: {
         marginTop: theme.spacing(3)
     }

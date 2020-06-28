@@ -22,7 +22,7 @@
         "kadvisor-app": {
             "tags": []
         },
-        "kadvisor-e2e": {
+        "kadvisor-app-e2e": {
             "tags": [],
             "implicitDependencies": ["kadvisor-app"]
         },

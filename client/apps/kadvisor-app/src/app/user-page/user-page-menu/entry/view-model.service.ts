@@ -27,7 +27,7 @@ class EntryViewModelService {
                     title: 'Date',
                     field: 'date',
                     type: 'date',
-                    render: rowData =>
+                    render: (rowData) =>
                         KFormatUtil.dateDisplayFormat(rowData.date)
                 },
                 {
@@ -61,7 +61,7 @@ class EntryViewModelService {
             id: rowData.entryID,
             userID: userID,
             entryTypeCodeID: lookups.find(
-                l => l.id === Number(rowData.codeTypeID)
+                (l) => l.id === Number(rowData.codeTypeID)
             ).code,
             classID: Number(rowData.class),
             date: rowData.date.toISOString(),
@@ -79,7 +79,7 @@ class EntryViewModelService {
 
     entriesToRowDatas(entries: Entry[], lookups: LookupEntry[]): RowData[] {
         const result = [] as RowData[];
-        entries.forEach(e => result.push(this.entryToRowData(e, lookups)));
+        entries.forEach((e) => result.push(this.entryToRowData(e, lookups)));
         return result;
     }
 
@@ -90,7 +90,8 @@ class EntryViewModelService {
             date: new Date(entry.date),
             description: entry.description,
             class: entry.classID,
-            codeTypeID: lookups.find(l => l.code === entry.entryTypeCodeID).id,
+            codeTypeID: lookups.find((l) => l.code === entry.entryTypeCodeID)
+                .id,
             amount: entry.amount
         } as RowData;
     }
