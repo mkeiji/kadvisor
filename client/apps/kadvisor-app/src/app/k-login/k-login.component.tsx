@@ -101,7 +101,7 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
                         variant="secondary"
                         id="dropdown-variants-secondary"
                         title={this.state.login.email}
-                        style={dropdownMenuStyle}
+                        style={dropdownMenuStyle as CSSProperties}
                     >
                         <Dropdown.Item href="#/profilepage">
                             Profile
