@@ -44,7 +44,7 @@ class ForecastTableViewModelService {
         return entry;
     }
 
-    createNewForecast(userID: number): Forecast {
+    createNewForecast(userID: number, year: number): Forecast {
         const entries = [] as ForecastEntry[];
         for (let i = 1; i <= 12; i++) {
             entries.push({
@@ -54,6 +54,7 @@ class ForecastTableViewModelService {
 
         return {
             userID: userID,
+            year: year,
             entries: entries
         } as Forecast;
     }

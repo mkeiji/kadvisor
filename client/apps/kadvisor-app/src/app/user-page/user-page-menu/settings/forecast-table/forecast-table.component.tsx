@@ -15,6 +15,8 @@ import { take } from 'rxjs/operators';
 import { Button } from '@material-ui/core';
 
 export default function ForecastTable(props: ForecastTablePropsType) {
+    //TODO: add a dropdown for year selection
+    const currentYear = new Date().getFullYear();
     const service = new ForecastTableService(props.userID);
     const viewModelService = new ForecastTableViewModelService();
     const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ export default function ForecastTable(props: ForecastTablePropsType) {
 
     useEffect(() => {
         service
-            .getForecast()
+            .getForecast(currentYear)
             .pipe(take(1))
             .subscribe(
                 (f: Forecast) => {
@@ -61,7 +63,10 @@ export default function ForecastTable(props: ForecastTablePropsType) {
     }
 
     function createForecast() {
-        const newForecast = viewModelService.createNewForecast(props.userID);
+        const newForecast = viewModelService.createNewForecast(
+            props.userID,
+            currentYear
+        );
         service
             .postForecast(newForecast)
             .pipe(take(1))

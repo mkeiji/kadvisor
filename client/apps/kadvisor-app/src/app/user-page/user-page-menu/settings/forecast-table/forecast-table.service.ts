@@ -14,8 +14,10 @@ class ForecastTableService {
         this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));
     }
 
-    getForecast(): Observable<Forecast> {
-        return this.krxios.get(`${APP_FORECAST_ENDPOINT}?preloaded=true`);
+    getForecast(year: number): Observable<Forecast> {
+        return this.krxios.get(
+            `${APP_FORECAST_ENDPOINT}?year=${year}&preloaded=true`
+        );
     }
 
     postForecast(forecast: Forecast): Observable<Forecast> {
