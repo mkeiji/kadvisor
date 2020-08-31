@@ -8,11 +8,12 @@ import (
 
 type Forecast struct {
 	Base
-	UserID 		int				`json:"userID,omitempty"`
-	Year 		int				`json:"year,omitempty"`
-	Entries		[]ForecastEntry	`gorm:"ForeignKey:ForecastID" json:"entries,omitempty"`
+	UserID  int             `json:"userID,omitempty"`
+	Year    int             `json:"year,omitempty"`
+	Entries []ForecastEntry `gorm:"ForeignKey:ForecastID" json:"entries,omitempty"`
 }
-func (f Forecast) IsInitializable() bool {return false}
+
+func (f Forecast) IsInitializable() bool { return false }
 
 func (f Forecast) Migrate(db *gorm.DB) {
 	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
@@ -50,7 +51,7 @@ func (f *Forecast) isDuplicate(db *gorm.DB) (err error) {
 	var forecast Forecast
 	fErr := db.Where(
 		"user_id=? AND year=? AND is_active=?", f.UserID, f.Year, true).Find(
-			&forecast).Error
+		&forecast).Error
 	if fErr == nil {
 		err = errors.New("user already has a forecast")
 	}

@@ -7,7 +7,7 @@ import (
 )
 
 type ForecastEntryRepository struct {
-	mapper 	mappers.ForecastEntryMapper
+	mapper mappers.ForecastEntryMapper
 }
 
 func (repo *ForecastEntryRepository) Update(
@@ -17,5 +17,5 @@ func (repo *ForecastEntryRepository) Update(
 	eMapped := repo.mapper.MapForecastEntry(entry)
 
 	err := application.Db.Find(&stored, entry.ID).Updates(eMapped).Error
-	return  stored, err
+	return stored, err
 }

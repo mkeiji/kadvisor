@@ -3,19 +3,19 @@ package application
 import (
 	"bytes"
 	"fmt"
-	"kadvisor/server/repository/interfaces"
-	"kadvisor/server/resources/constants"
-	"os"
-	"sync"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"kadvisor/server/repository/interfaces"
+	"kadvisor/server/resources/constants"
+	"os"
+	"sync"
 )
 
-var Db          *gorm.DB
-var Router      *gin.Engine
-var once        sync.Once
+var Db *gorm.DB
+var Router *gin.Engine
+var once sync.Once
 
 type App struct {
 	EntityList  []interfaces.Entity
@@ -24,7 +24,7 @@ type App struct {
 
 func init() {
 	once.Do(func() {
-		Db , _ = gorm.Open(os.Getenv("DB_TYPE"), getDbConnection())
+		Db, _ = gorm.Open(os.Getenv("DB_TYPE"), getDbConnection())
 
 		if os.Getenv("APP_ENV") == os.Getenv("PROD_ENV") {
 			gin.SetMode(gin.ReleaseMode)
@@ -38,20 +38,24 @@ func (a App) SetRouter() {
 		Router.Use(static.Serve("/", static.LocalFile("./client/dist/apps/kadvisor-app", true)))
 	}
 
-    Router.Use(cors.New(cors.Config{
-        AllowOrigins: []string{constants.DEV_ORIGIN, constants.PROD_ORIGIN},
-        AllowMethods: []string{"POST", "PUT", "GET", "DELETE"},
-    }))
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{constants.DEV_ORIGIN, constants.PROD_ORIGIN}
+	corsConfig.AllowMethods = []string{"GET", "PUT", "POST", "DELETE", "OPTIONS"}
+	Router.Use(cors.New(corsConfig))
 
 	a.loadControllers()
 }
 
 func (a App) Run() {
 	routerErr := Router.Run(":" + os.Getenv("PORT"))
-	if routerErr != nil { fmt.Println(routerErr) }
+	if routerErr != nil {
+		fmt.Println(routerErr)
+	}
 
 	dbErr := Db.Close()
-	if dbErr != nil { fmt.Println(dbErr) }
+	if dbErr != nil {
+		fmt.Println(dbErr)
+	}
 }
 
 func (a App) DbMigrate() {

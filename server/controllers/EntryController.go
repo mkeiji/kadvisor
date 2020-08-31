@@ -12,19 +12,20 @@ import (
 type EntryController struct {
 	service services.EntryService
 }
+
 func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 	// get(/entry?id?classid?limit)
-	router.GET("/api/kadvisor/:uid/entry", func (c *gin.Context) {
-		userID		, _ := strconv.Atoi(c.Param("uid"))
-		id			, _ := strconv.Atoi(c.Query("id"))
-		classID		, _ := strconv.Atoi(c.Query("classid"))
-		limit		, _ := strconv.Atoi(c.Query("limit"))
+	router.GET("/api/kadvisor/:uid/entry", func(c *gin.Context) {
+		userID, _ := strconv.Atoi(c.Param("uid"))
+		id, _ := strconv.Atoi(c.Query("id"))
+		classID, _ := strconv.Atoi(c.Query("classid"))
+		limit, _ := strconv.Atoi(c.Query("limit"))
 
 		uErr := KeiUserUtil.ValidUser(userID)
 
-		getEntryById 					:= id != 0 && classID == 0
-		getEntriesByClassId 			:= id == 0 && classID != 0
-		getEntryByUserId				:= id == 0 && classID == 0
+		getEntryById := id != 0 && classID == 0
+		getEntriesByClassId := id == 0 && classID != 0
+		getEntryByUserId := id == 0 && classID == 0
 
 		if uErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
@@ -40,7 +41,7 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// post(/entry)
-	router.POST("/api/kadvisor/:uid/entry", func (c *gin.Context) {
+	router.POST("/api/kadvisor/:uid/entry", func(c *gin.Context) {
 		var entry structs.Entry
 
 		userID, _ := strconv.Atoi(c.Param("uid"))
@@ -58,7 +59,7 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// put(/entry)
-	router.PUT("/api/kadvisor/:uid/entry", func (c *gin.Context) {
+	router.PUT("/api/kadvisor/:uid/entry", func(c *gin.Context) {
 		var entry structs.Entry
 
 		userID, _ := strconv.Atoi(c.Param("uid"))
@@ -76,9 +77,9 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// delete(/entry?id)
-	router.DELETE("/api/kadvisor/:uid/entry", func (c *gin.Context) {
-		entryID	, _ := strconv.Atoi(c.Query("id"))
-		userID	, _ := strconv.Atoi(c.Param("uid"))
+	router.DELETE("/api/kadvisor/:uid/entry", func(c *gin.Context) {
+		entryID, _ := strconv.Atoi(c.Query("id"))
+		userID, _ := strconv.Atoi(c.Param("uid"))
 		uErr := KeiUserUtil.ValidUser(userID)
 
 		deletedID, err := ctrl.service.Delete(entryID)

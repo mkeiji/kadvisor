@@ -7,13 +7,13 @@ import (
 
 type ForecastEntry struct {
 	Base
-	ForecastID 	int		`json:"forecastID,omitempty"`
-	Month 		int		`json:"month,omitempty"`
-	Income 		float64	`json:"income,omitempty"`
-	Expense 	float64	`json:"expense,omitempty"`
+	ForecastID int     `json:"forecastID,omitempty"`
+	Month      int     `json:"month,omitempty"`
+	Income     float64 `json:"income,omitempty"`
+	Expense    float64 `json:"expense,omitempty"`
 }
 
-func (f ForecastEntry) IsInitializable() bool {return false}
+func (f ForecastEntry) IsInitializable() bool { return false }
 
 func (f ForecastEntry) Migrate(db *gorm.DB) {
 	db.AutoMigrate(&ForecastEntry{})
@@ -28,7 +28,7 @@ func (f *ForecastEntry) BeforeCreate(db *gorm.DB) (err error) {
 }
 
 func (f *ForecastEntry) BeforeUpdate(db *gorm.DB) (err error) {
-	err = f.validate(db)
+	err = f.validateMonth()
 	return
 }
 

@@ -1,7 +1,6 @@
-import React, { PureComponent, Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
     ComposedChart,
-    Line,
     Area,
     Bar,
     XAxis,
@@ -11,108 +10,98 @@ import {
     Legend,
     ResponsiveContainer
 } from 'recharts';
+import ChartService from './chart.service';
+import { MonthReport } from '@client/klibs';
 
-const data = [
-    {
-        name: 'Jan',
-        expense: 590,
-        balance: 18000,
-        income: 1400
-    },
-    {
-        name: 'Feb',
-        expense: 868,
-        balance: 19670,
-        income: 1506
-    },
-    {
-        name: 'Mar',
-        expense: 1397,
-        balance: 10980,
-        income: 989
-    },
-    {
-        name: 'Apr',
-        expense: 1480,
-        balance: 14000,
-        income: 1228
-    },
-    {
-        name: 'May',
-        expense: 1520,
-        balance: 19080,
-        income: 1100
-    },
-    {
-        name: 'Jun',
-        expense: 1400,
-        balance: 6800,
-        income: 1700
-    }
-];
+export default function KComposedChartComponent(props: ChartPropsType) {
+    const service = new ChartService(props.userID);
+    const [data, setData] = useState<MonthReport[]>([]);
+    const [minValue, setMinValue] = useState(0);
+    const currentYear = new Date().getFullYear();
 
-export default class KComposedChartComponent extends PureComponent {
-    render() {
-        return (
-            <Fragment>
-                <ResponsiveContainer>
-                    <ComposedChart
-                        width={500}
-                        height={400}
-                        data={data}
-                        margin={{
-                            top: 20,
-                            right: 20,
-                            bottom: 20,
-                            left: 20
+    useEffect(() => {
+        service.getYtdWithForecastReport(currentYear).subscribe((x) => {
+            const min = Math.min.apply(
+                Math,
+                x.map((obj) => obj.balance)
+            );
+
+            //NOTE: expenses need to be converted to positive values
+            x.map((obj) => (obj.expense = obj.expense * -1));
+
+            setMinValue(min > 0 ? 0 : min);
+            setData(x);
+            console.log(x);
+        });
+    }, []);
+
+    return (
+        <Fragment>
+            <ResponsiveContainer>
+                <ComposedChart
+                    width={500}
+                    height={400}
+                    data={data}
+                    margin={{
+                        top: 20,
+                        right: 20,
+                        bottom: 20,
+                        left: 20
+                    }}
+                >
+                    <CartesianGrid stroke="#f5f5f5" />
+                    <XAxis dataKey="month" />
+                    <YAxis
+                        yAxisId="left"
+                        orientation="left"
+                        type="number"
+                        domain={[minValue, 'auto']}
+                        label={{
+                            value: 'Inc / Exp',
+                            angle: -90,
+                            position: 'insideLeft'
                         }}
-                    >
-                        <CartesianGrid stroke="#f5f5f5" />
-                        <XAxis dataKey="name" />
-                        <YAxis
-                            yAxisId="left"
-                            orientation="left"
-                            label={{
-                                value: 'Inc / Exp',
-                                angle: -90,
-                                position: 'insideLeft'
-                            }}
-                        />
-                        <YAxis
-                            yAxisId="right"
-                            orientation="right"
-                            label={{
-                                value: 'Balance',
-                                angle: -90,
-                                position: 'insideRight'
-                            }}
-                        />
-                        <Tooltip />
-                        <Legend />
-                        <Area
-                            yAxisId="left"
-                            type="monotone"
-                            dataKey="income"
-                            fill="#8884d8"
-                            stroke="#8884d8"
-                        />
-                        <Area
-                            yAxisId="left"
-                            type="monotone"
-                            dataKey="expense"
-                            fill="#fcada1"
-                            stroke="#fcada1"
-                        />
-                        <Bar
-                            yAxisId="right"
-                            dataKey="balance"
-                            barSize={20}
-                            fill="#413ea0"
-                        />
-                        {/* <Scatter dataKey="cnt" fill="red" /> */}
-                    </ComposedChart>
-                </ResponsiveContainer>
-            </Fragment>
-        );
-    }
+                    />
+                    <YAxis
+                        yAxisId="right"
+                        orientation="right"
+                        type="number"
+                        domain={[minValue, 'auto']}
+                        label={{
+                            value: 'Balance',
+                            angle: -90,
+                            position: 'insideRight'
+                        }}
+                    />
+                    <Tooltip />
+                    <Legend />
+                    <Area
+                        yAxisId="left"
+                        type="monotone"
+                        dataKey="income"
+                        fill="#8884d8"
+                        stroke="#8884d8"
+                    />
+                    <Area
+                        yAxisId="left"
+                        type="monotone"
+                        dataKey="expense"
+                        fill="#fcada1"
+                        stroke="#fcada1"
+                    />
+                    <Bar
+                        yAxisId="right"
+                        dataKey="balance"
+                        barSize={20}
+                        fill="#413ea0"
+                    />
+                    {/* <Scatter dataKey="cnt" fill="red" /> */}
+                </ComposedChart>
+            </ResponsiveContainer>
+        </Fragment>
+    );
+}
+
+interface ChartPropsType {
+    userID: number;
 }

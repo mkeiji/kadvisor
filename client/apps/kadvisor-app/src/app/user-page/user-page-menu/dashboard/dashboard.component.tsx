@@ -19,7 +19,7 @@ export default function Dashboard(props: DashboardPropsType) {
                 {/* KComposedChartComponent */}
                 <Grid item xs={12} md={8} lg={9}>
                     <Paper className={fixedHeightPaper}>
-                        <KComposedChartComponent />
+                        <KComposedChartComponent userID={props.userID} />
                     </Paper>
                 </Grid>
                 {/* Recent BalanceCardComponent */}

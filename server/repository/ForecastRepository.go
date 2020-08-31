@@ -7,7 +7,7 @@ import (
 )
 
 type ForecastRepository struct {
-	entryMapper 	mappers.ForecastEntryMapper
+	entryMapper mappers.ForecastEntryMapper
 }
 
 func (repo *ForecastRepository) FindOne(
@@ -35,7 +35,7 @@ func (repo *ForecastRepository) Create(
 		mappedEntries = append(mappedEntries, repo.entryMapper.MapForecastEntry(e))
 	}
 	forecast.Entries = mappedEntries
-	
+
 	err := application.Db.Save(&forecast).Error
 	return forecast, err
 }
