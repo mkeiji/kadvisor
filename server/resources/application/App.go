@@ -3,18 +3,19 @@ package application
 import (
 	"bytes"
 	"fmt"
-	"github.com/gin-contrib/static"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
-	"github.com/jinzhu/gorm"
 	"kadvisor/server/repository/interfaces"
+	"kadvisor/server/resources/constants"
 	"os"
 	"sync"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
-var Db 			*gorm.DB
-var Router 		*gin.Engine
-var once 		sync.Once
+var Db          *gorm.DB
+var Router      *gin.Engine
+var once        sync.Once
 
 type App struct {
 	EntityList  []interfaces.Entity
@@ -34,10 +35,13 @@ func init() {
 
 func (a App) SetRouter() {
 	if os.Getenv("APP_ENV") == os.Getenv("PROD_ENV") {
-		Router.Use(static.Serve("/", static.LocalFile("./client/dist/apps/kadvisor", true)))
-	} else {
-		Router.Use(cors.Default())
+		Router.Use(static.Serve("/", static.LocalFile("./client/dist/apps/kadvisor-app", true)))
 	}
+
+    Router.Use(cors.New(cors.Config{
+        AllowOrigins: []string{constants.DEV_ORIGIN, constants.PROD_ORIGIN},
+        AllowMethods: []string{"POST", "PUT", "GET", "DELETE"},
+    }))
 
 	a.loadControllers()
 }
