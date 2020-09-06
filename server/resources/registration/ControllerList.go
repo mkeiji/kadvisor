@@ -5,7 +5,7 @@ import (
 	"kadvisor/server/repository/interfaces"
 )
 
-var ControllerList = []interfaces.Controller {
+var ControllerList = []interfaces.Controller{
 	&controllers.UserController{},
 	&controllers.LoginController{},
 	&controllers.ClassController{},

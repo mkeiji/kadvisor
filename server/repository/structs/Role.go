@@ -8,9 +8,9 @@ import (
 
 type Role struct {
 	Base
-	RoleType	string    		`json:"roleType,omitempty"`
-	Description	string 			`json:"description,omitempty"`
-	Permission	[]Permission 	`gorm:"many2many:role_permissions;ForeignKey:ID" json:"permission,omitempty"`
+	RoleType    string       `json:"roleType,omitempty"`
+	Description string       `json:"description,omitempty"`
+	Permission  []Permission `gorm:"many2many:role_permissions;ForeignKey:ID" json:"permission,omitempty"`
 }
 
 func (e Role) IsInitializable() bool { return true }
@@ -24,8 +24,8 @@ func (e Role) Migrate(db *gorm.DB) {
 }
 
 func (e Role) Initialize(db *gorm.DB) {
-	e.insertRole(db, "ADMIN"	, "Admin"	, []string{"VIEW", "EDIT"})
-	e.insertRole(db, "REGULAR"	, "Regular", []string{"VIEW"})
+	e.insertRole(db, "ADMIN", "Admin", []string{"VIEW", "EDIT"})
+	e.insertRole(db, "REGULAR", "Regular", []string{"VIEW"})
 }
 
 /* GORM HOOKS */
@@ -52,9 +52,9 @@ func (e Role) insertRole(
 
 func (e Role) createRole(roleType string, description string, permissions []string) Role {
 	return Role{
-		RoleType: strings.ToUpper(roleType),
+		RoleType:    strings.ToUpper(roleType),
 		Description: description,
-		Permission: e.createPermissions(permissions),
+		Permission:  e.createPermissions(permissions),
 	}
 }
 

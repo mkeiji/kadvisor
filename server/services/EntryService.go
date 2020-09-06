@@ -6,7 +6,7 @@ import (
 )
 
 type EntryService struct {
-	repository 	repository.EntryRepository
+	repository repository.EntryRepository
 }
 
 func (svc *EntryService) GetManyByUserId(

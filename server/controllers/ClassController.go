@@ -15,9 +15,9 @@ type ClassController struct {
 
 func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 	// getOne(/class?id)
-	router.GET("/api/kadvisor/:uid/class", func (c *gin.Context) {
-		userID		, _ := strconv.Atoi(c.Param("uid"))
-		classID		, _ := strconv.Atoi(c.Query("id"))
+	router.GET("/api/kadvisor/:uid/class", func(c *gin.Context) {
+		userID, _ := strconv.Atoi(c.Param("uid"))
+		classID, _ := strconv.Atoi(c.Query("id"))
 
 		uErr := KeiUserUtil.ValidUser(userID)
 
@@ -44,7 +44,7 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// post(/class)
-	router.POST("/api/kadvisor/:uid/class", func (c *gin.Context) {
+	router.POST("/api/kadvisor/:uid/class", func(c *gin.Context) {
 		var class structs.Class
 
 		userID, _ := strconv.Atoi(c.Param("uid"))
@@ -63,7 +63,7 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// put(/class)
-	router.PUT("/api/kadvisor/:uid/class", func (c *gin.Context) {
+	router.PUT("/api/kadvisor/:uid/class", func(c *gin.Context) {
 		var class structs.Class
 
 		userID, _ := strconv.Atoi(c.Param("uid"))
@@ -81,9 +81,9 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// delete(/class?id)
-	router.DELETE("/api/kadvisor/:uid/class", func (c *gin.Context) {
-		classID	, _ := strconv.Atoi(c.Query("id"))
-		userID	, _ := strconv.Atoi(c.Param("uid"))
+	router.DELETE("/api/kadvisor/:uid/class", func(c *gin.Context) {
+		classID, _ := strconv.Atoi(c.Query("id"))
+		userID, _ := strconv.Atoi(c.Param("uid"))
 		uErr := KeiUserUtil.ValidUser(userID)
 
 		deletedID, err := ctrl.service.Delete(classID)

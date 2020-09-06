@@ -9,13 +9,13 @@ import (
 
 type Code struct {
 	Base
-	CodeTypeID	string 		`json:"codeType,omitempty"`
-	CodeGroup	string		`json:"codeGroup,omitempty"`
-	Name 		string		`json:"name,omitempty"`
-	CodeText	[]CodeText 	`gorm:"ForeignKey:CodeID"`
+	CodeTypeID string     `json:"codeType,omitempty"`
+	CodeGroup  string     `json:"codeGroup,omitempty"`
+	Name       string     `json:"name,omitempty"`
+	CodeText   []CodeText `gorm:"ForeignKey:CodeID"`
 }
 
-func (e Code) IsInitializable() bool {return true}
+func (e Code) IsInitializable() bool { return true }
 
 func (e Code) Migrate(db *gorm.DB) {
 	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
@@ -26,8 +26,8 @@ func (e Code) Migrate(db *gorm.DB) {
 }
 
 func (e Code) Initialize(db *gorm.DB) {
-	e.insertCode(db, "INCOME_ENTRY_TYPE"	, "EntryTypeCodeID"	, "Income"		, "en")
-	e.insertCode(db, "EXPENSE_ENTRY_TYPE" , "EntryTypeCodeID"	, "Expense"	, "en")
+	e.insertCode(db, "INCOME_ENTRY_TYPE", "EntryTypeCodeID", "Income", "en")
+	e.insertCode(db, "EXPENSE_ENTRY_TYPE", "EntryTypeCodeID", "Expense", "en")
 }
 
 /* GORM HOOKS */
@@ -61,8 +61,8 @@ func (e Code) createCode(
 	textID := fmt.Sprintf("%v_%v", strings.ToUpper(lowLoc), codeTypeID)
 	return Code{
 		CodeTypeID: codeTypeID,
-		CodeGroup: codeGroup,
-		Name: name,
+		CodeGroup:  codeGroup,
+		Name:       name,
 		CodeText: []CodeText{
 			{
 				TextID: textID,

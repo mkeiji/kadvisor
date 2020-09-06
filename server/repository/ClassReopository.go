@@ -5,7 +5,7 @@ import (
 	"kadvisor/server/resources/application"
 )
 
-type ClassRepository struct {}
+type ClassRepository struct{}
 
 func (repo *ClassRepository) FindAllByUserId(
 	userID int) ([]structs.Class, error) {

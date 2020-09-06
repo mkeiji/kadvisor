@@ -7,10 +7,10 @@ import (
 )
 
 type CodeCodeTextRepository struct {
-	mapper 	mappers.LookupMapper
+	mapper mappers.LookupMapper
 }
 
-func (repo *CodeCodeTextRepository) FindAllByCodeGroup (
+func (repo *CodeCodeTextRepository) FindAllByCodeGroup(
 	codeGroup string) ([]structs.Code, error) {
 
 	var codes []structs.Code

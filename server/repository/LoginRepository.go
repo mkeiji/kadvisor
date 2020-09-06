@@ -5,7 +5,7 @@ import (
 	"kadvisor/server/resources/application"
 )
 
-type LoginRepository struct {}
+type LoginRepository struct{}
 
 func (l *LoginRepository) FindOneByEmail(email string) (structs.Login, error) {
 	var login structs.Login
@@ -32,6 +32,6 @@ func (l *LoginRepository) UpdateLoginStatus(login structs.Login, isLoggedIn bool
 	if err != nil {
 		return storedLogin, err
 	}
-	
+
 	return storedLogin, nil
 }

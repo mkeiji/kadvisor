@@ -18,32 +18,31 @@ type LoginController struct {
 func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 	// login(/login)
 	router.POST("/api/login",
-		func (context *gin.Context) {
+		func(context *gin.Context) {
 
-		var enteredLogin structs.Login
-		context.BindJSON(&enteredLogin)
+			var enteredLogin structs.Login
+			context.BindJSON(&enteredLogin)
 
-
-		storedLogin, err := l.loginService.GetOneByEmail(enteredLogin.Email)
-		if err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		} else {
-			if KeiPassUtil.IsValidPassword(storedLogin.Password, enteredLogin.Password) {
-				updatedLogin, err := l.loginService.UpdateLoginStatus(storedLogin, true)
-				if err != nil {
-					context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
-				} else {
-					context.JSON(http.StatusOK, updatedLogin)
-				}
+			storedLogin, err := l.loginService.GetOneByEmail(enteredLogin.Email)
+			if err != nil {
+				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			} else {
-				context.JSON(http.StatusBadRequest, gin.H{"error": errors.New("wrong password").Error()})
+				if KeiPassUtil.IsValidPassword(storedLogin.Password, enteredLogin.Password) {
+					updatedLogin, err := l.loginService.UpdateLoginStatus(storedLogin, true)
+					if err != nil {
+						context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					} else {
+						context.JSON(http.StatusOK, updatedLogin)
+					}
+				} else {
+					context.JSON(http.StatusBadRequest, gin.H{"error": errors.New("wrong password").Error()})
+				}
 			}
-		}
-	})
+		})
 
 	// login(/login)
 	router.PUT("/api/login",
-		func (context *gin.Context) {
+		func(context *gin.Context) {
 
 			var login structs.Login
 			context.BindJSON(&login)
@@ -57,7 +56,7 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 		})
 
 	//logout(/logout)
-	router.POST("/api/logout", func (context *gin.Context) {
+	router.POST("/api/logout", func(context *gin.Context) {
 		var currentLogin structs.Login
 		context.BindJSON(&currentLogin)
 
@@ -68,7 +67,7 @@ func (l *LoginController) LoadEndpoints(router *gin.Engine) {
 			if storedLogin.IsLoggedIn == true {
 				updatedLogin, err := l.loginService.UpdateLoginStatus(storedLogin, false)
 				if err != nil {
-					context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})	
+					context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				} else {
 					context.JSON(http.StatusOK, updatedLogin)
 				}

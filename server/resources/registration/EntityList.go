@@ -6,7 +6,7 @@ import (
 )
 
 // obs: list order matters
-var EntityList = []interfaces.Entity {
+var EntityList = []interfaces.Entity{
 	&structs.User{},
 	&structs.Login{},
 	&structs.Entry{},

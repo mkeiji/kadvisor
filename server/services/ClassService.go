@@ -6,7 +6,7 @@ import (
 )
 
 type ClassService struct {
-	repository 	repository.ClassRepository
+	repository repository.ClassRepository
 }
 
 func (svc *ClassService) GetManyByUserId(userID int) ([]structs.Class, error) {

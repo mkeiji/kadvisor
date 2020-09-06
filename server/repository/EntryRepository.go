@@ -8,8 +8,8 @@ import (
 )
 
 type EntryRepository struct {
-	validator 	validators.EntryValidator
-	mapper 		mappers.EntryMapper
+	validator validators.EntryValidator
+	mapper    mappers.EntryMapper
 }
 
 func (repo *EntryRepository) FindAllByUserId(
@@ -61,7 +61,7 @@ func (repo *EntryRepository) Delete(id int) (int, error) {
 	return entry.ID, err
 }
 
-func getEntries(query structs.Entry, limit int) ([]structs.Entry, error){
+func getEntries(query structs.Entry, limit int) ([]structs.Entry, error) {
 	var entries []structs.Entry
 	var err error
 

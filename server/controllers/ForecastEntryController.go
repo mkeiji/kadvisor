@@ -15,7 +15,7 @@ type ForecastEntryController struct {
 
 func (ctrl *ForecastEntryController) LoadEndpoints(router *gin.Engine) {
 	// put(/forecastentry)
-	router.PUT("/api/kadvisor/:uid/forecastentry", func (c *gin.Context) {
+	router.PUT("/api/kadvisor/:uid/forecastentry", func(c *gin.Context) {
 		var entry structs.ForecastEntry
 
 		userID, _ := strconv.Atoi(c.Param("uid"))

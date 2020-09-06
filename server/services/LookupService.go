@@ -7,11 +7,11 @@ import (
 )
 
 type LookupService struct {
-	mapper	 	mappers.LookupMapper
-	repository 	repository.CodeCodeTextRepository
+	mapper     mappers.LookupMapper
+	repository repository.CodeCodeTextRepository
 }
 
-func (svc *LookupService) GetAllByCodeGroup (
+func (svc *LookupService) GetAllByCodeGroup(
 	codeGroup string) ([]dtos.LookupEntry, error) {
 
 	var lookups []dtos.LookupEntry

@@ -4,12 +4,12 @@ import "github.com/jinzhu/gorm"
 
 type CodeText struct {
 	Base
-	TextID		string 	`json:"codeTextID,omitempty"`
-	CodeID		int 	`json:"codeID,omitempty"`
-	Locale		string	`json:"locale,omitempty"`
+	TextID string `json:"codeTextID,omitempty"`
+	CodeID int    `json:"codeID,omitempty"`
+	Locale string `json:"locale,omitempty"`
 }
 
-func (e CodeText) IsInitializable() bool {return false}
+func (e CodeText) IsInitializable() bool { return false }
 
 func (e CodeText) Migrate(db *gorm.DB) {
 	db.AutoMigrate(&CodeText{})

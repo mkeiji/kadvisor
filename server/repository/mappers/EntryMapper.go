@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type EntryMapper struct {}
+type EntryMapper struct{}
 
 func (e *EntryMapper) MapEntry(entry structs.Entry) structs.Entry {
 	entry = e.mapEntryDate(entry)

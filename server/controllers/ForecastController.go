@@ -11,15 +11,15 @@ import (
 )
 
 type ForecastController struct {
-	service 	services.ForecastService
+	service services.ForecastService
 }
 
 func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
 	// getOne(/forecast?year&preloaded)
-	router.GET("/api/kadvisor/:uid/forecast", func (c *gin.Context) {
-		userID		, _	:= strconv.Atoi(c.Param("uid"))
-		year		, _	:= strconv.Atoi(c.Query("year"))
-		isPreloaded	, _	:= strconv.ParseBool(
+	router.GET("/api/kadvisor/:uid/forecast", func(c *gin.Context) {
+		userID, _ := strconv.Atoi(c.Param("uid"))
+		year, _ := strconv.Atoi(c.Query("year"))
+		isPreloaded, _ := strconv.ParseBool(
 			c.DefaultQuery("preloaded", "false"))
 
 		uErr := KeiUserUtil.ValidUser(userID)
@@ -29,7 +29,7 @@ func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
 		} else if year == 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "year param is required"})
-		}  else if fErr != nil {
+		} else if fErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": fErr.Error()})
 		} else {
 			c.JSON(http.StatusOK, forecast)
@@ -37,7 +37,7 @@ func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// post(/forecast)
-	router.POST("/api/kadvisor/:uid/forecast", func (c *gin.Context) {
+	router.POST("/api/kadvisor/:uid/forecast", func(c *gin.Context) {
 		var forecast structs.Forecast
 		c.BindJSON(&forecast)
 
@@ -50,9 +50,9 @@ func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
 	})
 
 	// delete(/forecast?id)
-	router.DELETE("/api/kadvisor/:uid/forecast", func (c *gin.Context) {
-		forecastID	, _ := strconv.Atoi(c.Query("id"))
-		userID		, _ := strconv.Atoi(c.Param("uid"))
+	router.DELETE("/api/kadvisor/:uid/forecast", func(c *gin.Context) {
+		forecastID, _ := strconv.Atoi(c.Query("id"))
+		userID, _ := strconv.Atoi(c.Param("uid"))
 
 		uErr := KeiUserUtil.ValidUser(userID)
 
@@ -63,7 +63,7 @@ func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		} else if forecastID == 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": errors.New("missing id param")})
-		}else {
+		} else {
 			c.JSON(http.StatusOK, deleted)
 		}
 	})

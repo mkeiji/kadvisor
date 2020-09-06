@@ -13,11 +13,11 @@ type LookupController struct {
 	service services.LookupService
 }
 
-func (ctrl * LookupController) LoadEndpoints(router *gin.Engine) {
+func (ctrl *LookupController) LoadEndpoints(router *gin.Engine) {
 	// get(/lookup?codeGroup)
-	router.GET("/api/kadvisor/:uid/lookup", func (c *gin.Context) {
-		userID, _ 	:= strconv.Atoi(c.Param("uid"))
-		codeGroup	:= c.Query("codeGroup")
+	router.GET("/api/kadvisor/:uid/lookup", func(c *gin.Context) {
+		userID, _ := strconv.Atoi(c.Param("uid"))
+		codeGroup := c.Query("codeGroup")
 
 		uErr := KeiUserUtil.ValidUser(userID)
 

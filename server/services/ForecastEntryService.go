@@ -6,7 +6,7 @@ import (
 )
 
 type ForecastEntryService struct {
-	repository 	repository.ForecastEntryRepository
+	repository repository.ForecastEntryRepository
 }
 
 func (svc *ForecastEntryService) Put(

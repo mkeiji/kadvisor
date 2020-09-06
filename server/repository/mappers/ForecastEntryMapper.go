@@ -2,7 +2,7 @@ package mappers
 
 import "kadvisor/server/repository/structs"
 
-type ForecastEntryMapper struct {}
+type ForecastEntryMapper struct{}
 
 func (f *ForecastEntryMapper) MapForecastEntry(
 	entry structs.ForecastEntry) structs.ForecastEntry {

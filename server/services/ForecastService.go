@@ -6,7 +6,7 @@ import (
 )
 
 type ForecastService struct {
-	repository 	repository.ForecastRepository
+	repository repository.ForecastRepository
 }
 
 func (svc *ForecastService) GetOne(
@@ -14,11 +14,11 @@ func (svc *ForecastService) GetOne(
 	return svc.repository.FindOne(userID, year, isPreloaded)
 }
 
-func (svc *ForecastService) Post (
+func (svc *ForecastService) Post(
 	forecast structs.Forecast) (structs.Forecast, error) {
 	return svc.repository.Create(forecast)
 }
 
-func (svc *ForecastService) Delete (id int) (structs.Forecast, error) {
+func (svc *ForecastService) Delete(id int) (structs.Forecast, error) {
 	return svc.repository.Delete(id)
 }

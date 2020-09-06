@@ -7,4 +7,3 @@ type Entity interface {
 	IsInitializable() bool
 	Initialize(db *gorm.DB)
 }
-

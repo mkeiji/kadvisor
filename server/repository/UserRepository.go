@@ -5,7 +5,7 @@ import (
 	"kadvisor/server/resources/application"
 )
 
-type UserRepository struct {}
+type UserRepository struct{}
 
 func (t *UserRepository) FindAll(preloaded bool) ([]structs.User, error) {
 	var users []structs.User
@@ -58,8 +58,8 @@ func (t *UserRepository) Create(user structs.User) (structs.User, error) {
 }
 
 func (t *UserRepository) Update(user structs.User) (structs.User, error) {
-	var stored 	structs.User
-	var err 	error
+	var stored structs.User
+	var err error
 
 	err = application.Db.Set(
 		"gorm:association_autocreate", false).Find(

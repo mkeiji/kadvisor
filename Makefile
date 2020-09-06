@@ -6,8 +6,14 @@ run:
 runServer:
 	go run main.go
 
+formatServer:
+	(cd server/prettier/ && go run prettier.go -path ../)
+
 runClient:
 	(cd client/ && npm start)
+
+formatClient:
+	(cd client/ && npm run format)
 
 debug:
 	dlv debug --headless --listen=:2345 --api-version=2 --accept-multiclient
