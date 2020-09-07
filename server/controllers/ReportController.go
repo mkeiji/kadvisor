@@ -62,8 +62,17 @@ func (ctrl *ReportController) getYearToDateWithForecast(
 	c *gin.Context, userID int, year int) {
 	ytdFC, errors := ctrl.service.GetYearToDateWithForecastReport(userID, year)
 	if len(errors) > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errors})
+		errMsgs := ctrl.getErrorMessages(errors)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMsgs})
 	} else {
 		c.JSON(http.StatusOK, ytdFC)
 	}
+}
+
+func (ctrl *ReportController) getErrorMessages(errors []error) []string {
+	var errMsg []string
+	for _, err := range errors {
+		errMsg = append(errMsg, err.Error())
+	}
+	return errMsg
 }

@@ -31,7 +31,6 @@ export default function KComposedChartComponent(props: ChartPropsType) {
 
             setMinValue(min > 0 ? 0 : min);
             setData(x);
-            console.log(x);
         });
     }, []);
 
