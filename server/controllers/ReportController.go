@@ -30,12 +30,29 @@ func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
 		} else if rType == typeBalance {
 			ctrl.getBalance(c, userID)
-		} else if rType == typeYear {
-			ctrl.getYearToDateReport(c, userID)
+		} else if rType == typeYear && c.Query("year") != "" {
+			ctrl.getYearToDateReport(c, userID, year)
 		} else if rType == typeYearFC && c.Query("year") != "" {
 			ctrl.getYearToDateWithForecast(c, userID, year)
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
+		}
+	})
+
+	// get(/reportavailable)
+	router.GET("/api/kadvisor/:uid/reportavailable", func(c *gin.Context) {
+		userID, _ := strconv.Atoi(c.Param("uid"))
+		uErr := KeiUserUtil.ValidUser(userID)
+
+		if uErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+		} else {
+			rAvailable, err := ctrl.service.GetReportAvailable(userID)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			} else {
+				c.JSON(http.StatusOK, rAvailable)
+			}
 		}
 	})
 }
@@ -49,8 +66,8 @@ func (ctrl *ReportController) getBalance(c *gin.Context, userID int) {
 	}
 }
 
-func (ctrl *ReportController) getYearToDateReport(c *gin.Context, userID int) {
-	yearly, err := ctrl.service.GetYearToDateReport(userID)
+func (ctrl *ReportController) getYearToDateReport(c *gin.Context, userID int, year int) {
+	yearly, err := ctrl.service.GetYearToDateReport(userID, year)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	} else {

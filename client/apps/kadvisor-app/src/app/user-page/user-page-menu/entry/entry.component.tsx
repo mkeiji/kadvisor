@@ -1,7 +1,6 @@
 import React, { CSSProperties, useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
 import { RowData, TableState } from './view-model';
-import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import PageSpacer from '../page-spacer/page-spacer.component';
@@ -13,12 +12,20 @@ import {
     Entry,
     KSpinner,
     LookupEntry,
-    MATERIAL_TABLE_ICONS
+    MATERIAL_TABLE_ICONS,
+    KSelect
 } from '@client/klibs';
 
 export default function EntryTable(props: EntryComponentPropsType) {
     const service = new EntryService(props.userID);
     const viewModelService = new EntryViewModelService();
+    const selectMenuItems = [
+        { value: 10, displayValue: 'last 10' },
+        { value: 20, displayValue: 'last 20' },
+        { value: 50, displayValue: 'last 50' },
+        { value: 100, displayValue: 'last 100' },
+        { value: 0, displayValue: 'all entries' }
+    ];
     const [loading, setLoading] = useState(true);
     const [table, setTable] = useState<TableState>({} as TableState);
     const [nEntries, setNEntries] = useState<number>(10);
@@ -130,25 +137,14 @@ export default function EntryTable(props: EntryComponentPropsType) {
     return (
         <PageSpacer classes={props.classes}>
             <Grid item xs={12}>
-                <FormControl
-                    className={props.classes.formControl}
+                <KSelect
+                    label={'# Entries'}
+                    items={selectMenuItems}
+                    onValueChange={setNEntries}
+                    initialValue={nEntries}
+                    class={props.classes.formControl}
                     style={selectStyle}
-                >
-                    <InputLabel># Entries</InputLabel>
-                    <Select
-                        value={nEntries}
-                        onChange={(event) =>
-                            setNEntries(event.target.value as number)
-                        }
-                    >
-                        <MenuItem value={10}>last 10</MenuItem>
-                        <MenuItem value={20}>last 20</MenuItem>
-                        <MenuItem value={50}>last 50</MenuItem>
-                        <MenuItem value={100}>last 100</MenuItem>
-                        <MenuItem value={0}>all entries</MenuItem>
-                    </Select>
-                </FormControl>
-
+                />
                 {renderTable()}
             </Grid>
         </PageSpacer>

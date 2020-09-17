@@ -7,3 +7,8 @@ export interface LookupEntry {
     text: string;
     code: string;
 }
+
+export interface KSelectItem {
+    value: any;
+    displayValue: string;
+}

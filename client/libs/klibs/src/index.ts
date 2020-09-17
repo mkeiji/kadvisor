@@ -1,6 +1,7 @@
 export { KRxios } from './lib/k-rxios/krxios';
 export { KCopyright } from './lib/k-components/k-copyright/k-copyright.component';
 export { KSpinner } from './lib/k-components/k-spinner/k-spinner.component';
+export { KSelect } from './lib/k-components/k-select/k-select.component';
 export { BaseModel } from './lib/k-models/base-model';
 export { Class } from './lib/k-models/class-model';
 export { Entry } from './lib/k-models/entry-model';

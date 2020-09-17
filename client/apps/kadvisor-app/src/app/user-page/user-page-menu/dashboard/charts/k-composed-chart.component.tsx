@@ -12,27 +12,35 @@ import {
 } from 'recharts';
 import ChartService from './chart.service';
 import { MonthReport } from '@client/klibs';
+import { take } from 'rxjs/operators';
+
+interface ChartPropsType {
+    userID: number;
+    year: number;
+}
 
 export default function KComposedChartComponent(props: ChartPropsType) {
     const service = new ChartService(props.userID);
     const [data, setData] = useState<MonthReport[]>([]);
     const [minValue, setMinValue] = useState(0);
-    const currentYear = new Date().getFullYear();
 
     useEffect(() => {
-        service.getYtdWithForecastReport(currentYear).subscribe((x) => {
-            const min = Math.min.apply(
-                Math,
-                x.map((obj) => obj.balance)
-            );
+        service
+            .getYtdWithForecastReport(props.year)
+            .pipe(take(1))
+            .subscribe((x) => {
+                const min = Math.min.apply(
+                    Math,
+                    x.map((obj) => obj.balance)
+                );
 
-            //NOTE: expenses need to be converted to positive values
-            x.map((obj) => (obj.expense = obj.expense * -1));
+                //NOTE: expenses need to be converted to positive values
+                x.map((obj) => (obj.expense = obj.expense * -1));
 
-            setMinValue(min > 0 ? 0 : min);
-            setData(x);
-        });
-    }, []);
+                setMinValue(min > 0 ? 0 : min);
+                setData(x);
+            });
+    }, [props.year]);
 
     return (
         <Fragment>
@@ -99,8 +107,4 @@ export default function KComposedChartComponent(props: ChartPropsType) {
             </ResponsiveContainer>
         </Fragment>
     );
-}
-
-interface ChartPropsType {
-    userID: number;
 }

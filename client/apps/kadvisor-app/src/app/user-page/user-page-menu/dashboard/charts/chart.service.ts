@@ -2,7 +2,8 @@ import {
     KRxios,
     KEndpointUtil,
     MonthReport,
-    APP_REPORT_ENDPOINT
+    APP_REPORT_ENDPOINT,
+    APP_REPORT_AVAILABLE_ENDPOINT
 } from '@client/klibs';
 import { Observable } from 'rxjs';
 
@@ -14,5 +15,9 @@ export default class ChartService {
 
     getYtdWithForecastReport(year: number): Observable<MonthReport[]> {
         return this.krxios.get(`${APP_REPORT_ENDPOINT}?type=YFC&year=${year}`);
+    }
+
+    getAvailableReportYears(): Observable<number[]> {
+        return this.krxios.get(`${APP_REPORT_AVAILABLE_ENDPOINT}`);
     }
 }

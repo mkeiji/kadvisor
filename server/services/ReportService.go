@@ -4,6 +4,7 @@ import (
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository"
 	"kadvisor/server/repository/mappers"
+	"sort"
 )
 
 type ReportService struct {
@@ -18,8 +19,8 @@ func (svc *ReportService) GetBalance(
 }
 
 func (svc *ReportService) GetYearToDateReport(
-	userID int) ([]dtos.MonthReport, error) {
-	return svc.repository.FindYearToDateReport(userID)
+	userID int, year int) ([]dtos.MonthReport, error) {
+	return svc.repository.FindYearToDateReport(userID, year)
 }
 
 func (svc *ReportService) GetYearToDateWithForecastReport(
@@ -27,19 +28,22 @@ func (svc *ReportService) GetYearToDateWithForecastReport(
 
 	var result []dtos.MonthReport
 	errors := []error{}
-	ytdMonths, ytdErr := svc.repository.FindYearToDateReport(userID)
-	forecast, fctErr := svc.forecastRepository.FindOne(userID, year, true)
+	ytdMonths, ytdErr := svc.repository.FindYearToDateReport(userID, year)
+	forecast, _ := svc.forecastRepository.FindOne(userID, year, true)
 	forecastMonts := svc.forecastMapper.MapForecastToMonthReportDto(forecast)
 
 	if ytdErr != nil {
 		errors = append(errors, ytdErr)
 	}
-	if fctErr != nil {
-		errors = append(errors, fctErr)
-	}
 
 	result = svc.combineYtdWithForecast(ytdMonths, forecastMonts)
 	return result, errors
+}
+
+func (svc *ReportService) GetReportAvailable(userID int) ([]int, error) {
+	result, err := svc.repository.GetAvailableYears(userID)
+	sort.Sort(sort.Reverse(sort.IntSlice(result)))
+	return result, err
 }
 
 func (svc *ReportService) combineYtdWithForecast(

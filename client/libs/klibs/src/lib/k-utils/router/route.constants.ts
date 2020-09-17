@@ -19,6 +19,7 @@ export const APP_LOOKUP_ENDPOINT = '/lookup';
 export const APP_CLASS_ENDPOINT = '/class';
 export const APP_ENTRY_ENDPOINT = '/entry';
 export const APP_REPORT_ENDPOINT = '/report';
+export const APP_REPORT_AVAILABLE_ENDPOINT = '/reportavailable';
 export const APP_FORECAST_ENDPOINT = '/forecast';
 export const APP_FORECAST_ENTRY_ENDPOINT = '/forecastentry';
 export const APP_LOGIN_ENDPOINT = {

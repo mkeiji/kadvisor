@@ -15,6 +15,9 @@ runClient:
 formatClient:
 	(cd client/ && npm run format)
 
+formatAll:
+	(make formatServer && make formatClient)
+
 debug:
 	dlv debug --headless --listen=:2345 --api-version=2 --accept-multiclient
 
