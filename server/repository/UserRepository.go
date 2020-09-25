@@ -66,3 +66,15 @@ func (t *UserRepository) Update(user structs.User) (structs.User, error) {
 		&stored, user.ID).Updates(user).Error
 	return stored, err
 }
+
+func (t *UserRepository) Delete(userID int) (structs.User, error) {
+	var user structs.User
+	var err error
+
+	err = application.Db.First(&user, userID).Error
+	if err == nil {
+		err = application.Db.Delete(&user).Error
+	}
+
+	return user, err
+}

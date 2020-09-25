@@ -41,7 +41,13 @@ func (repo *ForecastRepository) Create(
 }
 
 func (repo *ForecastRepository) Delete(id int) (structs.Forecast, error) {
-	forecast := structs.Forecast{Base: structs.Base{ID: id}}
-	err := application.Db.Delete(&forecast).Error
+	var forecast structs.Forecast
+	var err error
+
+	err = application.Db.First(&forecast, id).Error
+	if err == nil {
+		err = application.Db.Delete(&forecast).Error
+	}
+
 	return forecast, err
 }

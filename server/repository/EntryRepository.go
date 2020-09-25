@@ -56,8 +56,14 @@ func (repo *EntryRepository) Update(
 }
 
 func (repo *EntryRepository) Delete(id int) (int, error) {
-	entry := structs.Entry{Base: structs.Base{ID: id}}
-	err := application.Db.Delete(&entry).Error
+	var entry structs.Entry
+	var err error
+
+	err = application.Db.First(&entry, id).Error
+	if err == nil {
+		err = application.Db.Delete(&entry).Error
+	}
+
 	return entry.ID, err
 }
 

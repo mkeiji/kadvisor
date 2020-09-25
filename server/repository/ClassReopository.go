@@ -41,8 +41,13 @@ func (repo *ClassRepository) Update(
 
 func (repo *ClassRepository) Delete(
 	classID int) (int, error) {
-	classToDelete := structs.Class{
-		Base: structs.Base{ID: classID}}
-	err := application.Db.Delete(&classToDelete).Error
+	var classToDelete structs.Class
+	var err error
+
+	err = application.Db.First(&classToDelete, classID).Error
+	if err == nil {
+		err = application.Db.Delete(&classToDelete).Error
+	}
+
 	return int(classToDelete.ID), err
 }

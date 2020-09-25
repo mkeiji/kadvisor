@@ -70,4 +70,19 @@ func (t *UserController) LoadEndpoints(router *gin.Engine) {
 			context.JSON(http.StatusOK, updated)
 		}
 	})
+
+	// delete(/user)
+	router.DELETE("/api/user/:id", func(context *gin.Context) {
+		userID, err := strconv.Atoi(context.Param("id"))
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+
+		deletedUser, dErr := t.userService.Delete(userID)
+		if dErr != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": dErr.Error()})
+		} else {
+			context.JSON(http.StatusOK, deletedUser)
+		}
+	})
 }

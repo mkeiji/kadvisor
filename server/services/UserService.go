@@ -9,18 +9,22 @@ type UserService struct {
 	userRepository repository.UserRepository
 }
 
-func (t *UserService) GetMany(preloaded bool) ([]structs.User, error) {
-	return t.userRepository.FindAll(preloaded)
+func (svc *UserService) GetMany(preloaded bool) ([]structs.User, error) {
+	return svc.userRepository.FindAll(preloaded)
 }
 
-func (t *UserService) GetOne(id int, preloaded bool) (structs.User, error) {
-	return t.userRepository.FindOne(id, preloaded)
+func (svc *UserService) GetOne(id int, preloaded bool) (structs.User, error) {
+	return svc.userRepository.FindOne(id, preloaded)
 }
 
-func (t *UserService) Post(user structs.User) (structs.User, error) {
-	return t.userRepository.Create(user)
+func (svc *UserService) Post(user structs.User) (structs.User, error) {
+	return svc.userRepository.Create(user)
 }
 
-func (t *UserService) Put(user structs.User) (structs.User, error) {
-	return t.userRepository.Update(user)
+func (svc *UserService) Put(user structs.User) (structs.User, error) {
+	return svc.userRepository.Update(user)
+}
+
+func (svc *UserService) Delete(userID int) (structs.User, error) {
+	return svc.userRepository.Delete(userID)
 }
