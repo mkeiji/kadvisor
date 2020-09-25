@@ -14,7 +14,9 @@ export const APP_PAGES = {
 };
 
 // SERVER
-export const APP_BACKEND_BASE = 'http://localhost:8081/api/kadvisor/:uid';
+export const APP_DOMAIN = `${process.env.NX_APP_DOMAIN}`;
+export const APP_BACKEND = `${process.env.NX_APP_DOMAIN}/api`;
+export const APP_BACKEND_BASE = `${APP_BACKEND}/kadvisor/:uid`;
 export const APP_LOOKUP_ENDPOINT = '/lookup';
 export const APP_CLASS_ENDPOINT = '/class';
 export const APP_ENTRY_ENDPOINT = '/entry';

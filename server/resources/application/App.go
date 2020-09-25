@@ -26,7 +26,7 @@ func init() {
 	once.Do(func() {
 		Db, _ = gorm.Open(os.Getenv("DB_TYPE"), getDbConnection())
 
-		if os.Getenv("APP_ENV") == os.Getenv("PROD_ENV") {
+		if os.Getenv("APP_ENV") == "PROD" {
 			gin.SetMode(gin.ReleaseMode)
 		}
 		Router = gin.Default()
@@ -34,7 +34,7 @@ func init() {
 }
 
 func (a App) SetRouter() {
-	if os.Getenv("APP_ENV") == os.Getenv("PROD_ENV") {
+	if os.Getenv("APP_ENV") == "PROD" {
 		Router.Use(static.Serve("/", static.LocalFile("./client/dist/apps/kadvisor-app", true)))
 	}
 
@@ -77,12 +77,20 @@ func (a App) loadControllers() {
 
 func getDbConnection() string {
 	var dbConnect bytes.Buffer
+	dbHost := os.Getenv("DB_HOST")
+	dbName := os.Getenv("DB_NAME")
+	dbUser := os.Getenv("DB_USER")
+	dbPass := os.Getenv("DB_PASS")
+	dbAddress := fmt.Sprintf(
+		"@tcp(%s)/%s?charset=utf8&parseTime=True",
+		dbHost,
+		dbName)
 
-	if os.Getenv("DB_TYPE") == os.Getenv("DB_MYSQL") {
-		dbConnect.WriteString(os.Getenv("DB_USER") + ":")
-		dbConnect.WriteString(os.Getenv("DB_PASS"))
-		dbConnect.WriteString(os.Getenv("DB_ADDRESS"))
-	} else if os.Getenv("DB_TYPE") == os.Getenv("DB_SQLITE") {
+	if os.Getenv("DB_TYPE") == "mysql" {
+		dbConnect.WriteString(dbUser + ":")
+		dbConnect.WriteString(dbPass)
+		dbConnect.WriteString(dbAddress)
+	} else if os.Getenv("DB_TYPE") == "sqlite3" {
 		dbConnect.WriteString(os.Getenv("DB_SQLITE_PATH"))
 	}
 

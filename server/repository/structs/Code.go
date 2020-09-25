@@ -18,7 +18,7 @@ type Code struct {
 func (e Code) IsInitializable() bool { return true }
 
 func (e Code) Migrate(db *gorm.DB) {
-	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
+	if os.Getenv("APP_ENV") == "DEV" {
 		db.DropTableIfExists(&CodeText{})
 	}
 

@@ -20,7 +20,7 @@ type User struct {
 func (e User) IsInitializable() bool { return false }
 
 func (e User) Migrate(db *gorm.DB) {
-	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
+	if os.Getenv("APP_ENV") == "DEV" {
 		db.DropTableIfExists(&Forecast{})
 		db.DropTableIfExists(&Class{})
 		db.DropTableIfExists(&Entry{})

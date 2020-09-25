@@ -7,12 +7,11 @@ stages:
 build-client:
    stage: build
    image: node
-   cache:
-        key: app-cache
+   artifacts:
         paths:
             - client/dist
-        policy: push
    script:
+        - echo NX_APP_DOMAIN=$API_HOST >> client/apps/kadvisor-app/.local.env
         - cd client/
         - npm install
         - npm run build
@@ -21,29 +20,21 @@ build-client:
 build-server:
     stage: build
     image: mgkeiji/gogcc
-    cache:
-        key: app-cache
+    artifacts:
         paths:
             - client/dist
-            - .env
             - kadvisor
-        policy: pull-push
     script:
         - go build
 
-#release:
-#    stage: release
-#    only:
-#        - master
-#    image: docker:stable
-#    cache:
-#        key: app-cache
-#        paths:
-#            - .env
-#            - app/build
-#            - todoApp
-#        policy: pull
-#    script:
-#        - echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_USER --password-stdin
-#        - docker build -t mgkeiji/kadvisor .
-#        - docker push mgkeiji/kadvisor
+release:
+    stage: release
+    only:
+        - master
+    image: docker:19.03.12
+    services:
+        - docker:19.03.12-dind
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build -t registry.gitlab.com/keijidev/kadvisor:latest .
+        - docker push registry.gitlab.com/keijidev/kadvisor:latest

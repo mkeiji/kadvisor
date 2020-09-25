@@ -16,7 +16,7 @@ type Forecast struct {
 func (f Forecast) IsInitializable() bool { return false }
 
 func (f Forecast) Migrate(db *gorm.DB) {
-	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
+	if os.Getenv("APP_ENV") == "DEV" {
 		db.DropTableIfExists(&ForecastEntry{})
 		db.DropTableIfExists(&Forecast{})
 	}

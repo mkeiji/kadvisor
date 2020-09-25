@@ -16,7 +16,7 @@ type Role struct {
 func (e Role) IsInitializable() bool { return true }
 
 func (e Role) Migrate(db *gorm.DB) {
-	if os.Getenv("APP_ENV") == os.Getenv("DEV_ENV") {
+	if os.Getenv("APP_ENV") == "DEV" {
 		db.DropTableIfExists(&Permission{})
 		db.DropTableIfExists(&Role{})
 	}
