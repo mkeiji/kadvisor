@@ -19,9 +19,9 @@ func (repo *ForecastRepository) FindOne(
 	query := "user_id=? AND year=?"
 	if isPreloaded {
 		err = application.Db.Preload(
-			"Entries").Where(query, userID, year).Find(&forecast).Error
+			"Entries").Where(query, userID, year).First(&forecast).Error
 	} else {
-		err = application.Db.Where(query, userID, year).Find(&forecast).Error
+		err = application.Db.Where(query, userID, year).First(&forecast).Error
 	}
 
 	return forecast, err

@@ -1,7 +1,7 @@
 package structs
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"os"
 	"strings"
 )
@@ -17,8 +17,8 @@ func (e Role) IsInitializable() bool { return true }
 
 func (e Role) Migrate(db *gorm.DB) {
 	if os.Getenv("APP_ENV") == "DEV" {
-		db.DropTableIfExists(&Permission{})
-		db.DropTableIfExists(&Role{})
+		db.Migrator().DropTable(&Permission{})
+		db.Migrator().DropTable(&Role{})
 	}
 	db.AutoMigrate(&Role{})
 }
@@ -26,12 +26,6 @@ func (e Role) Migrate(db *gorm.DB) {
 func (e Role) Initialize(db *gorm.DB) {
 	e.insertRole(db, "ADMIN", "Admin", []string{"VIEW", "EDIT"})
 	e.insertRole(db, "REGULAR", "Regular", []string{"VIEW"})
-}
-
-/* GORM HOOKS */
-func (e *Role) BeforeDelete(db *gorm.DB) (err error) {
-	db.Model(&e).Update("is_active", false)
-	return
 }
 
 func (e Role) insertRole(

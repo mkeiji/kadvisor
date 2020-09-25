@@ -1,7 +1,7 @@
 package structs
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -23,9 +23,3 @@ func (e Entry) Migrate(db *gorm.DB) {
 }
 
 func (e Entry) Initialize(db *gorm.DB) {}
-
-/* GORM HOOKS */
-func (e *Entry) BeforeDelete(db *gorm.DB) (err error) {
-	db.Model(&e).Update("is_active", false)
-	return
-}

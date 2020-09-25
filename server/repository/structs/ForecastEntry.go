@@ -2,7 +2,7 @@ package structs
 
 import (
 	"errors"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type ForecastEntry struct {
@@ -32,11 +32,6 @@ func (f *ForecastEntry) BeforeUpdate(db *gorm.DB) (err error) {
 	return
 }
 
-func (f *ForecastEntry) BeforeDelete(db *gorm.DB) (err error) {
-	db.Model(&f).Update("is_active", false)
-	return
-}
-
 /* PRIVATE */
 func (f *ForecastEntry) validate(db *gorm.DB) (err error) {
 	err = f.isDuplicate(db)
@@ -49,11 +44,10 @@ func (f *ForecastEntry) validate(db *gorm.DB) (err error) {
 func (f *ForecastEntry) isDuplicate(db *gorm.DB) (err error) {
 	var forecast ForecastEntry
 	fErr := db.Where(
-		"forecast_id=? AND month=? AND is_active=?",
+		"forecast_id=? AND month=?",
 		f.ForecastID,
 		f.Month,
-		true,
-	).Find(&forecast).Error
+	).First(&forecast).Error
 	if fErr == nil {
 		err = errors.New("month entry already exist")
 	}

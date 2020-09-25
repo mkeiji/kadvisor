@@ -2,7 +2,7 @@ package structs
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"os"
 	"strings"
 )
@@ -19,7 +19,7 @@ func (e Code) IsInitializable() bool { return true }
 
 func (e Code) Migrate(db *gorm.DB) {
 	if os.Getenv("APP_ENV") == "DEV" {
-		db.DropTableIfExists(&CodeText{})
+		db.Migrator().DropTable(&CodeText{})
 	}
 
 	db.AutoMigrate(&Code{})
@@ -28,12 +28,6 @@ func (e Code) Migrate(db *gorm.DB) {
 func (e Code) Initialize(db *gorm.DB) {
 	e.insertCode(db, "INCOME_ENTRY_TYPE", "EntryTypeCodeID", "Income", "en")
 	e.insertCode(db, "EXPENSE_ENTRY_TYPE", "EntryTypeCodeID", "Expense", "en")
-}
-
-/* GORM HOOKS */
-func (e *Code) BeforeDelete(db *gorm.DB) (err error) {
-	db.Model(&e).Update("is_active", false)
-	return
 }
 
 func (e Code) insertCode(

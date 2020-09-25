@@ -35,13 +35,13 @@ func (t *UserRepository) FindOne(id int, preloaded bool) (structs.User, error) {
 		err := application.Db.Preload(
 			"Login").Preload(
 			"Entries").Preload(
-			"Classes").Find(&user, id).Error
+			"Classes").First(&user, id).Error
 		if err != nil {
 			return user, err
 		}
 		return user, nil
 	} else {
-		err := application.Db.Preload("Login").Find(&user, id).Error
+		err := application.Db.Preload("Login").First(&user, id).Error
 		if err != nil {
 			return user, err
 		}
@@ -62,7 +62,7 @@ func (t *UserRepository) Update(user structs.User) (structs.User, error) {
 	var err error
 
 	err = application.Db.Set(
-		"gorm:association_autocreate", false).Find(
+		"gorm:association_autocreate", false).First(
 		&stored, user.ID).Updates(user).Error
 	return stored, err
 }

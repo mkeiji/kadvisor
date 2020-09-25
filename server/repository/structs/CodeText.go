@@ -1,6 +1,6 @@
 package structs
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type CodeText struct {
 	Base
@@ -16,9 +16,3 @@ func (e CodeText) Migrate(db *gorm.DB) {
 }
 
 func (e CodeText) Initialize(db *gorm.DB) {}
-
-/* GORM HOOKS */
-func (e *CodeText) BeforeDelete(db *gorm.DB) (err error) {
-	db.Model(&e).Update("is_active", false)
-	return
-}

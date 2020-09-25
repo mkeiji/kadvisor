@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type Entity interface {
 	Migrate(db *gorm.DB)

@@ -43,10 +43,10 @@ func (repo *ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos
 	query := fmt.Sprintf(`
 		select
 			year(date) year,
-			month(date) month, 
+			month(date) month,
 			sum(income) income, 
 			sum(expense) expense, 
-			(sum(income) + sum(expense)) balance 
+			(sum(income) + sum(expense)) balance
 		from (
 			select date,
 				case when entry_type_code_id='INCOME_ENTRY_TYPE' then amount else 0 end income, 

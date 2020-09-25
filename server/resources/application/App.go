@@ -6,7 +6,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"kadvisor/server/repository/interfaces"
 	"kadvisor/server/resources/constants"
 	"os"
@@ -24,7 +25,7 @@ type App struct {
 
 func init() {
 	once.Do(func() {
-		Db, _ = gorm.Open(os.Getenv("DB_TYPE"), getDbConnection())
+		Db, _ = gorm.Open(mysql.Open(getDbConnection()), &gorm.Config{})
 
 		if os.Getenv("APP_ENV") == "PROD" {
 			gin.SetMode(gin.ReleaseMode)
@@ -50,11 +51,6 @@ func (a App) Run() {
 	routerErr := Router.Run(":" + os.Getenv("PORT"))
 	if routerErr != nil {
 		fmt.Println(routerErr)
-	}
-
-	dbErr := Db.Close()
-	if dbErr != nil {
-		fmt.Println(dbErr)
 	}
 }
 
@@ -82,7 +78,7 @@ func getDbConnection() string {
 	dbUser := os.Getenv("DB_USER")
 	dbPass := os.Getenv("DB_PASS")
 	dbAddress := fmt.Sprintf(
-		"@tcp(%s)/%s?charset=utf8&parseTime=True",
+		"@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		dbHost,
 		dbName)
 

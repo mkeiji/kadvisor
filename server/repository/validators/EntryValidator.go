@@ -2,7 +2,7 @@ package validators
 
 import (
 	"errors"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"kadvisor/server/repository/structs"
 )
 

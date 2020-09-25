@@ -35,14 +35,15 @@ dockerimg:
 	docker build -t mgkeiji/kadvisor .
 
 testdb:
-	docker run --rm -d --name test --network local -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
+	docker run --rm -d --name test --network bridge -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
 
 db:
-	docker run -d --name kdb --restart unless-stopped --network local -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
+	docker run -d --name kdb --restart unless-stopped --network bridge -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
 
 dependencies:
 	go get -u github.com/gin-gonic/gin
-	go get -u github.com/jinzhu/gorm
+	go get -u gorm.io/gorm
+	go get -u gorm.io/driver/mysql
 	go get
 	(cd client/ && npm install)
 	echo "** DON'T FORGET THE .ENV FILE **"

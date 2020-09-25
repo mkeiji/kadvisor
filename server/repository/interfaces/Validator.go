@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/jinzhu/gorm"
+import "gorm.io/gorm"
 
 type Validator interface {
 	Validate(entity Entity, db *gorm.DB)
