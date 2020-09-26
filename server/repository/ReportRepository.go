@@ -16,8 +16,15 @@ func (repo *ReportRepository) GetAvailableYears(userID int) ([]int, error) {
 	var years []Year
 	var result []int
 
-	query := "select distinct year(date) as year from entries where user_id=?"
-	err := application.Db.Raw(query, userID).Scan(&years).Error
+	query := fmt.Sprintf(`
+        select distinct year(date) as year
+        from entries where user_id=%v
+        union
+        select distinct year as year
+        from forecasts where user_id=%v
+	`, userID, userID)
+
+	err := application.Db.Raw(query).Scan(&years).Error
 
 	for _, y := range years {
 		result = append(result, y.Year)
