@@ -26,7 +26,6 @@ func (svc *ReportService) GetYearToDateReport(
 func (svc *ReportService) GetYearToDateWithForecastReport(
 	userID int, year int) ([]dtos.MonthReport, []error) {
 
-	var result []dtos.MonthReport
 	errors := []error{}
 	ytdMonths, ytdErr := svc.repository.FindYearToDateReport(userID, year)
 	forecast, _ := svc.forecastRepository.FindOne(userID, year, true)
@@ -36,8 +35,8 @@ func (svc *ReportService) GetYearToDateWithForecastReport(
 		errors = append(errors, ytdErr)
 	}
 
-	result = svc.combineYtdWithForecast(ytdMonths, forecastMonts)
-	return result, errors
+	combined := svc.combineYtdWithForecast(ytdMonths, forecastMonts)
+	return svc.getCombinedWithAccumulatedBalance(combined), errors
 }
 
 func (svc *ReportService) GetReportAvailable(userID int) ([]int, error) {
@@ -46,8 +45,25 @@ func (svc *ReportService) GetReportAvailable(userID int) ([]int, error) {
 	return result, err
 }
 
+func (svc *ReportService) getCombinedWithAccumulatedBalance(
+	combinedMonths []dtos.MonthReport,
+) []dtos.MonthReport {
+	updated := []dtos.MonthReport{}
+
+	accBalance := 0.0
+	for _, month := range combinedMonths {
+		accBalance = accBalance + month.Balance
+		month.Balance = accBalance
+		updated = append(updated, month)
+	}
+
+	return updated
+}
+
 func (svc *ReportService) combineYtdWithForecast(
-	ytdMonths []dtos.MonthReport, forecastMonts []dtos.MonthReport) []dtos.MonthReport {
+	ytdMonths []dtos.MonthReport,
+	forecastMonts []dtos.MonthReport,
+) []dtos.MonthReport {
 
 	result := []dtos.MonthReport{}
 	for i := 1; i <= 12; i++ {

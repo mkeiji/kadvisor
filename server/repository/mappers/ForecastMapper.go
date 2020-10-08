@@ -19,7 +19,7 @@ func (f *ForecastMapper) MapForecastToMonthReportDto(
 			Month:   entry.Month,
 			Income:  entry.Income,
 			Expense: entry.Expense,
-			Balance: entry.Income - entry.Expense,
+			Balance: entry.Income + entry.Expense,
 		})
 	}
 
