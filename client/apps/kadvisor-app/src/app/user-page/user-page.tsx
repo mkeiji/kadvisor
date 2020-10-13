@@ -7,6 +7,7 @@ import Dashboard from './user-page-menu/dashboard/dashboard.component';
 import EntryTable from './user-page-menu/entry/entry.component';
 import { APP_PAGES, Login, Match } from '@client/klibs';
 import Settings from './user-page-menu/settings/settings.component';
+import Reports from './user-page-menu/reports/reports.component';
 
 function UserPage(props: UserHomePropTypes) {
     const styleClasses = useStyles();
@@ -36,6 +37,9 @@ function UserPage(props: UserHomePropTypes) {
 
                 case APP_PAGES.settings:
                     return <Settings userID={userID} classes={styleClasses} />;
+
+                case APP_PAGES.reports:
+                    return <Reports userID={userID} classes={styleClasses} />;
 
                 default:
                     return (
