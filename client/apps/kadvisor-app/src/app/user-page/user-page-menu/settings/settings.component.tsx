@@ -8,7 +8,7 @@ import ForecastTable from './forecast-table/forecast-table.component';
 export default function Settings(props: SettingsPropsType) {
     return (
         <PageSpacer classes={props.classes}>
-            <Grid container spacing={3}>
+            <Grid container spacing={3} alignItems="center">
                 <Grid item xs={6}>
                     <ForecastTable
                         userID={props.userID}

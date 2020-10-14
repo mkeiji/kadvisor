@@ -10,8 +10,7 @@ import {
     Legend,
     ResponsiveContainer
 } from 'recharts';
-import ChartService from './chart.service';
-import { MonthReport } from '@client/klibs';
+import { MonthReport, ReportsApiService } from '@client/klibs';
 import { take } from 'rxjs/operators';
 
 interface ChartPropsType {
@@ -20,7 +19,7 @@ interface ChartPropsType {
 }
 
 export default function KComposedChartComponent(props: ChartPropsType) {
-    const service = new ChartService(props.userID);
+    const service = new ReportsApiService(props.userID);
     const [data, setData] = useState<MonthReport[]>([]);
     const [minValue, setMinValue] = useState(0);
 

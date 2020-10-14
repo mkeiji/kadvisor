@@ -1,13 +1,13 @@
+import { Observable } from 'rxjs';
+import { KRxios } from '../k-rxios/krxios';
+import { KEndpointUtil } from '../k-utils/router/k-endpoint.util';
 import {
-    KRxios,
-    KEndpointUtil,
-    MonthReport,
     APP_REPORT_ENDPOINT,
     APP_REPORT_AVAILABLE_ENDPOINT
-} from '@client/klibs';
-import { Observable } from 'rxjs';
+} from '../k-utils/router/route.constants';
+import { MonthReport } from '../k-models/chart-models';
 
-export default class ChartService {
+export class ReportsApiService {
     private krxios: KRxios;
     constructor(userID: number) {
         this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));

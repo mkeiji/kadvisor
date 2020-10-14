@@ -3,20 +3,33 @@ import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
 import { KSelectItem } from '@client/klibs';
 
 interface KSelectPropsType {
-    label: string;
     items: KSelectItem[];
     onValueChange: Function;
-    initialValue?: any;
+    value?: any;
+    label?: string;
     class?: string;
     style?: CSSProperties;
+    formVariant?: 'standard' | 'outlined' | 'filled';
 }
 
 export function KSelect(props: KSelectPropsType) {
+    function getFormVariant(): 'standard' | 'outlined' | 'filled' {
+        return props.formVariant ? props.formVariant : 'standard';
+    }
+
+    function getLabel(): JSX.Element {
+        return <InputLabel>{props.label}</InputLabel>;
+    }
+
     return (
-        <FormControl className={props.class} style={props.style}>
-            <InputLabel>{props.label}</InputLabel>
+        <FormControl
+            variant={getFormVariant()}
+            className={props.class}
+            style={props.style}
+        >
+            {props.label ? getLabel() : null}
             <Select
-                value={props.initialValue}
+                value={props.value}
                 onChange={(event) =>
                     props.onValueChange(event.target.value as number)
                 }

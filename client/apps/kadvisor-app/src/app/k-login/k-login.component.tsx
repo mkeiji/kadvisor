@@ -93,7 +93,7 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
     };
 
     setupLoginFormControl = () => {
-        let loginControl;
+        let loginControl: JSX.Element;
         if (this.state.isLoggedIn) {
             loginControl = (
                 <Form inline>

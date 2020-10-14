@@ -9,6 +9,7 @@ export { UserBalance } from './lib/k-models/user-balance.model';
 export { KRouterPathUtil } from './lib/k-utils/router/k-router-path.util';
 export { Login } from './lib/k-models/login';
 export { MATERIAL_TABLE_ICONS } from './lib/k-utils/format/material-table.icons';
+export { ReportsApiService } from './lib/k-api-services/reports-api.service';
 export * from './lib/k-models/forecast-model';
 export * from './lib/k-models/gerneric-models';
 export * from './lib/k-utils/router/route.constants';

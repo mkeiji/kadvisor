@@ -6,8 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import PageSpacer from '../page-spacer/page-spacer.component';
 import EntryService from './entry.service';
 import EntryViewModelService from './view-model.service';
-import { combineLatest } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Subject, combineLatest } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
     Entry,
     KSpinner,
@@ -17,6 +17,7 @@ import {
 } from '@client/klibs';
 
 export default function EntryTable(props: EntryComponentPropsType) {
+    const destroy$ = new Subject<boolean>();
     const service = new EntryService(props.userID);
     const viewModelService = new EntryViewModelService();
     const selectMenuItems = [
@@ -37,7 +38,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
             service.getClasses(),
             service.getEntries(nEntries)
         ])
-            .pipe(take(1))
+            .pipe(takeUntil(destroy$))
             .subscribe(([resLookups, resClasses, resEntries]) => {
                 setLookups(resLookups);
                 setTable(
@@ -49,6 +50,11 @@ export default function EntryTable(props: EntryComponentPropsType) {
                 );
                 setLoading(false);
             });
+
+        return () => {
+            destroy$.next(true);
+            destroy$.unsubscribe();
+        };
     }, [nEntries]);
 
     async function onAdd(newData: RowData) {
@@ -56,7 +62,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
             .postEntry(
                 viewModelService.rowDataToEntry(props.userID, lookups, newData)
             )
-            .pipe(take(1))
+            .pipe(takeUntil(destroy$))
             .toPromise()
             .then((entry: Entry) => {
                 setTable((prevState: TableState) => {
@@ -77,7 +83,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     viewModelService.parseRowDataDate(newData)
                 )
             )
-            .pipe(take(1))
+            .pipe(takeUntil(destroy$))
             .toPromise()
             .then((entry: Entry) => {
                 setTable((prevState: TableState) => {
@@ -93,7 +99,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
     async function onDelete(oldData: RowData) {
         return service
             .deleteEntry(oldData.entryID)
-            .pipe(take(1))
+            .pipe(takeUntil(destroy$))
             .toPromise()
             .then(() => {
                 setTable((prevState: TableState) => {
@@ -141,7 +147,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
                     label={'# Entries'}
                     items={selectMenuItems}
                     onValueChange={setNEntries}
-                    initialValue={nEntries}
+                    value={nEntries}
                     class={props.classes.formControl}
                     style={selectStyle}
                 />

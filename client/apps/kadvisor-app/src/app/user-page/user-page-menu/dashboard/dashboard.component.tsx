@@ -7,12 +7,13 @@ import React, { useState, useEffect } from 'react';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import clsx from 'clsx';
 import PageSpacer from '../page-spacer/page-spacer.component';
-import { KSelect, KSelectItem } from '@client/klibs';
-import ChartService from './charts/chart.service';
-import { take } from 'rxjs/operators';
+import { KSelect, KSelectItem, ReportsApiService } from '@client/klibs';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 export default function Dashboard(props: DashboardPropsType) {
-    const chartService = new ChartService(props.userID);
+    const destroy$ = new Subject<boolean>();
+    const service = new ReportsApiService(props.userID);
     const currentYear = new Date().getFullYear();
     const [graphYear, setGraphYear] = useState<number>(currentYear);
     const [yearMenuItems, setYearMenuItems] = useState<KSelectItem[]>([]);
@@ -22,20 +23,27 @@ export default function Dashboard(props: DashboardPropsType) {
     );
 
     useEffect(() => {
-        chartService
+        service
             .getAvailableReportYears()
-            .pipe(take(1))
+            .pipe(takeUntil(destroy$))
             .subscribe((years: number[]) => {
                 const selectMenuItems = [];
-                years.map((year: number) => {
-                    selectMenuItems.push({
-                        value: year,
-                        displayValue: year.toString()
+                if (years) {
+                    years.map((year: number) => {
+                        selectMenuItems.push({
+                            value: year,
+                            displayValue: year.toString()
+                        });
                     });
-                });
-                setYearMenuItems(selectMenuItems);
+                    setYearMenuItems(selectMenuItems);
+                }
                 setGraphYear(currentYear);
             });
+
+        return () => {
+            destroy$.next(true);
+            destroy$.unsubscribe();
+        };
     }, []);
 
     return (
@@ -45,7 +53,7 @@ export default function Dashboard(props: DashboardPropsType) {
                     label={'Year'}
                     items={yearMenuItems}
                     onValueChange={setGraphYear}
-                    initialValue={graphYear}
+                    value={graphYear}
                 />
             </Grid>
             <Grid container spacing={3}>

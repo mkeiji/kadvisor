@@ -19,6 +19,10 @@ export default function BalanceCard(props: BalanceCardPropType) {
         service.getUserBalance().subscribe((u: UserBalance) => setBalance(u));
     }, []);
 
+    function getBalanceAsNumber(): number {
+        return !isNaN(userBalance.balance) ? userBalance.balance : 0;
+    }
+
     return (
         <React.Fragment>
             <Title>Balance Card</Title>
@@ -27,7 +31,7 @@ export default function BalanceCard(props: BalanceCardPropType) {
                 variant="h4"
                 style={{ paddingTop: '30px' }}
             >
-                {KFormatUtil.toCurrency(userBalance.balance)}
+                {KFormatUtil.toCurrency(getBalanceAsNumber())}
             </Typography>
             <Typography
                 color="textSecondary"
