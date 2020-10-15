@@ -180,7 +180,7 @@ export default function ForecastTable(props: ForecastTablePropsType) {
                                 variant="contained"
                                 onClick={createForecast}
                             >
-                                create
+                                + forecast
                             </Button>
                         </Col>
                     </Row>
