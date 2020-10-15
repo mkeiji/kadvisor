@@ -2,7 +2,8 @@ image: golang
 
 stages:
     - build
-    - release
+    - docker
+    - deploy
 
 build-client:
    stage: build
@@ -27,8 +28,8 @@ build-server:
     script:
         - go build
 
-release:
-    stage: release
+docker:
+    stage: docker
     only:
         - master
     image: docker:19.03.12
@@ -38,3 +39,25 @@ release:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
         - docker build -t registry.gitlab.com/keijidev/kadvisor:latest .
         - docker push registry.gitlab.com/keijidev/kadvisor:latest
+
+deploy:
+    stage: deploy
+    only:
+        - master
+    image: alpine:latest
+    before_script:
+        - apk add openssh-client
+        - eval $(ssh-agent -s)
+        - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+        - mkdir -p ~/.ssh
+        - chmod 700 ~/.ssh
+        - ssh-keyscan $K_SERVER >> ~/.ssh/known_hosts
+        - chmod 644 ~/.ssh/known_hosts
+
+    script:
+        - ssh -T -o StrictHostKeyChecking=no $K_USER@$K_SERVER '
+            cd ~/krepos/dev_ops/docker/docker-compose-orchestration &&
+            docker-compose pull kadvisor &&
+            docker-compose up -d kadvisor &&
+            exit
+         '
