@@ -2,6 +2,7 @@ package structs
 
 import (
 	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -28,6 +29,10 @@ func (f *ForecastEntry) BeforeCreate(db *gorm.DB) (err error) {
 }
 
 func (f *ForecastEntry) BeforeUpdate(db *gorm.DB) (err error) {
+	err = f.exists(db)
+	if err != nil {
+		return
+	}
 	err = f.validateMonth()
 	return
 }
@@ -38,6 +43,12 @@ func (f *ForecastEntry) validate(db *gorm.DB) (err error) {
 	if err == nil {
 		err = f.validateMonth()
 	}
+	return
+}
+
+func (f *ForecastEntry) exists(db *gorm.DB) (err error) {
+	var forecast ForecastEntry
+	err = db.Where("forecast_id=?", f.ForecastID).First(&forecast).Error
 	return
 }
 

@@ -41,7 +41,14 @@ func (a App) SetRouter() {
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{constants.DEV_ORIGIN, constants.PROD_ORIGIN}
-	corsConfig.AllowMethods = []string{"GET", "PUT", "POST", "DELETE", "OPTIONS"}
+	corsConfig.AllowMethods = []string{"GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{
+		"Origin",
+		"X-Requested-With",
+		"Content-Type",
+		"Accept",
+		"Authorization",
+	}
 	Router.Use(cors.New(corsConfig))
 
 	a.loadControllers()

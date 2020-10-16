@@ -12,7 +12,8 @@ type LookupService struct {
 }
 
 func (svc *LookupService) GetAllByCodeGroup(
-	codeGroup string) ([]dtos.LookupEntry, error) {
+	codeGroup string,
+) ([]dtos.LookupEntry, error) {
 
 	var lookups []dtos.LookupEntry
 

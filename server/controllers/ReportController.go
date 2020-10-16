@@ -3,13 +3,16 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"kadvisor/server/libs/KeiUserUtil"
+	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
+	"log"
 	"net/http"
 	"strconv"
 )
 
 type ReportController struct {
 	service services.ReportService
+	auth    services.KeiAuthService
 }
 
 func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
@@ -18,43 +21,53 @@ func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
 	typeYear := "YTD"
 	typeYearFC := "YFC"
 
-	// get(/report?type?year)
-	router.GET("/api/kadvisor/:uid/report", func(c *gin.Context) {
-		userID, _ := strconv.Atoi(c.Param("uid"))
-		year, _ := strconv.Atoi(c.Query("year"))
-		rType := c.Query("type")
+	reportRoutes := router.Group("/api/kadvisor/:uid")
+	permission := enums.REGULAR
+	jwt, err := ctrl.auth.GetAuthUtil(permission)
+	if err != nil {
+		log.Fatal("JWT Error: " + err.Error())
+	}
 
-		uErr := KeiUserUtil.ValidUser(userID)
+	reportRoutes.Use(jwt.MiddlewareFunc())
+	{
+		// get(/report?type?year)
+		reportRoutes.GET("/report", func(c *gin.Context) {
+			userID, _ := strconv.Atoi(c.Param("uid"))
+			year, _ := strconv.Atoi(c.Query("year"))
+			rType := c.Query("type")
 
-		if uErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-		} else if rType == typeBalance {
-			ctrl.getBalance(c, userID)
-		} else if rType == typeYear && c.Query("year") != "" {
-			ctrl.getYearToDateReport(c, userID, year)
-		} else if rType == typeYearFC && c.Query("year") != "" {
-			ctrl.getYearToDateWithForecast(c, userID, year)
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
-		}
-	})
+			uErr := KeiUserUtil.ValidUser(userID)
 
-	// get(/reportavailable)
-	router.GET("/api/kadvisor/:uid/reportavailable", func(c *gin.Context) {
-		userID, _ := strconv.Atoi(c.Param("uid"))
-		uErr := KeiUserUtil.ValidUser(userID)
-
-		if uErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-		} else {
-			rAvailable, err := ctrl.service.GetReportAvailable(userID)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			if uErr != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+			} else if rType == typeBalance {
+				ctrl.getBalance(c, userID)
+			} else if rType == typeYear && c.Query("year") != "" {
+				ctrl.getYearToDateReport(c, userID, year)
+			} else if rType == typeYearFC && c.Query("year") != "" {
+				ctrl.getYearToDateWithForecast(c, userID, year)
 			} else {
-				c.JSON(http.StatusOK, rAvailable)
+				c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
 			}
-		}
-	})
+		})
+
+		// get(/reportavailable)
+		reportRoutes.GET("/reportavailable", func(c *gin.Context) {
+			userID, _ := strconv.Atoi(c.Param("uid"))
+			uErr := KeiUserUtil.ValidUser(userID)
+
+			if uErr != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+			} else {
+				rAvailable, err := ctrl.service.GetReportAvailable(userID)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				} else {
+					c.JSON(http.StatusOK, rAvailable)
+				}
+			}
+		})
+	}
 }
 
 func (ctrl *ReportController) getBalance(c *gin.Context, userID int) {

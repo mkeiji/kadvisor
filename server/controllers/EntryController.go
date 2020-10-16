@@ -4,93 +4,106 @@ import (
 	"github.com/gin-gonic/gin"
 	"kadvisor/server/libs/KeiUserUtil"
 	"kadvisor/server/repository/structs"
+	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
+	"log"
 	"net/http"
 	"strconv"
 )
 
 type EntryController struct {
 	service services.EntryService
+	auth    services.KeiAuthService
 }
 
 func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
-	// get(/entry?id?classid?limit)
-	router.GET("/api/kadvisor/:uid/entry", func(c *gin.Context) {
-		userID, _ := strconv.Atoi(c.Param("uid"))
-		id, _ := strconv.Atoi(c.Query("id"))
-		classID, _ := strconv.Atoi(c.Query("classid"))
-		limit, _ := strconv.Atoi(c.Query("limit"))
+	entryRoutes := router.Group("/api/kadvisor/:uid")
+	permission := enums.REGULAR
+	jwt, err := ctrl.auth.GetAuthUtil(permission)
+	if err != nil {
+		log.Fatal("JWT Error: " + err.Error())
+	}
 
-		uErr := KeiUserUtil.ValidUser(userID)
+	entryRoutes.Use(jwt.MiddlewareFunc())
+	{
+		// get(/entry?id?classid?limit)
+		entryRoutes.GET("/entry", func(c *gin.Context) {
+			userID, _ := strconv.Atoi(c.Param("uid"))
+			id, _ := strconv.Atoi(c.Query("id"))
+			classID, _ := strconv.Atoi(c.Query("classid"))
+			limit, _ := strconv.Atoi(c.Query("limit"))
 
-		getEntryById := id != 0 && classID == 0
-		getEntriesByClassId := id == 0 && classID != 0
-		getEntryByUserId := id == 0 && classID == 0
+			uErr := KeiUserUtil.ValidUser(userID)
 
-		if uErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-		} else if getEntryByUserId {
-			ctrl.getEntriesByUserId(c, userID, limit)
-		} else if getEntryById {
-			ctrl.getEntryById(c, id)
-		} else if getEntriesByClassId {
-			ctrl.getEntriesByClassId(c, classID, limit)
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
-		}
-	})
+			getEntryById := id != 0 && classID == 0
+			getEntriesByClassId := id == 0 && classID != 0
+			getEntryByUserId := id == 0 && classID == 0
 
-	// post(/entry)
-	router.POST("/api/kadvisor/:uid/entry", func(c *gin.Context) {
-		var entry structs.Entry
+			if uErr != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+			} else if getEntryByUserId {
+				ctrl.getEntriesByUserId(c, userID, limit)
+			} else if getEntryById {
+				ctrl.getEntryById(c, id)
+			} else if getEntriesByClassId {
+				ctrl.getEntriesByClassId(c, classID, limit)
+			} else {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
+			}
+		})
 
-		userID, _ := strconv.Atoi(c.Param("uid"))
-		uErr := KeiUserUtil.ValidUser(userID)
+		// post(/entry)
+		entryRoutes.POST("/entry", func(c *gin.Context) {
+			var entry structs.Entry
 
-		c.BindJSON(&entry)
-		saved, err := ctrl.service.Post(entry)
-		if uErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-		} else if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		} else {
-			c.JSON(http.StatusOK, saved)
-		}
-	})
+			userID, _ := strconv.Atoi(c.Param("uid"))
+			uErr := KeiUserUtil.ValidUser(userID)
 
-	// put(/entry)
-	router.PUT("/api/kadvisor/:uid/entry", func(c *gin.Context) {
-		var entry structs.Entry
+			c.BindJSON(&entry)
+			saved, err := ctrl.service.Post(entry)
+			if uErr != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+			} else if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			} else {
+				c.JSON(http.StatusOK, saved)
+			}
+		})
 
-		userID, _ := strconv.Atoi(c.Param("uid"))
-		uErr := KeiUserUtil.ValidUser(userID)
+		// put(/entry)
+		entryRoutes.PUT("/entry", func(c *gin.Context) {
+			var entry structs.Entry
 
-		c.BindJSON(&entry)
-		updated, err := ctrl.service.Put(entry)
-		if uErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-		} else if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		} else {
-			c.JSON(http.StatusOK, updated)
-		}
-	})
+			userID, _ := strconv.Atoi(c.Param("uid"))
+			uErr := KeiUserUtil.ValidUser(userID)
 
-	// delete(/entry?id)
-	router.DELETE("/api/kadvisor/:uid/entry", func(c *gin.Context) {
-		entryID, _ := strconv.Atoi(c.Query("id"))
-		userID, _ := strconv.Atoi(c.Param("uid"))
-		uErr := KeiUserUtil.ValidUser(userID)
+			c.BindJSON(&entry)
+			updated, err := ctrl.service.Put(entry)
+			if uErr != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+			} else if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			} else {
+				c.JSON(http.StatusOK, updated)
+			}
+		})
 
-		deletedID, err := ctrl.service.Delete(entryID)
-		if uErr != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-		} else if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		} else {
-			c.JSON(http.StatusOK, deletedID)
-		}
-	})
+		// delete(/entry?id)
+		entryRoutes.DELETE("/entry", func(c *gin.Context) {
+			entryID, _ := strconv.Atoi(c.Query("id"))
+			userID, _ := strconv.Atoi(c.Param("uid"))
+			uErr := KeiUserUtil.ValidUser(userID)
+
+			deletedID, err := ctrl.service.Delete(entryID)
+			if uErr != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+			} else if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			} else {
+				c.JSON(http.StatusOK, deletedID)
+			}
+		})
+	}
 }
 
 func (ctrl *EntryController) getEntryById(c *gin.Context, entryID int) {
