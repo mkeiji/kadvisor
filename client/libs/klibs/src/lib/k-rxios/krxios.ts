@@ -3,12 +3,15 @@
     fork from: https://github.com/davguij/rxios
 */
 import { Observable } from 'rxjs';
-import axios from 'axios';
+import axios, { AxiosRequestConfig, AxiosInstance } from 'axios';
+import { Auth, Login, AuthError, AuthSuccess } from '../k-models/login';
+import { APP_LOGIN_ENDPOINT } from '../k-utils/router/route.constants';
 
 export class KRxios {
-    baseUrl: any;
-    options: any;
-    _httpClient: any;
+    private readonly TOKEN_KEY = 'token';
+    baseUrl: string;
+    options: AxiosRequestConfig;
+    _httpClient: AxiosInstance;
 
     constructor(baseUrl = '', options = {}) {
         this.baseUrl = baseUrl;
@@ -17,6 +20,16 @@ export class KRxios {
     }
     _makeRequest(method: any, url: any, queryParams?: any, body?: any) {
         let request: any;
+        if (localStorage.getItem(this.TOKEN_KEY) !== null) {
+            this._httpClient.interceptors.request.use(
+                (c: AxiosRequestConfig) => {
+                    c.headers.Authorization = `Bearer ${localStorage.getItem(
+                        this.TOKEN_KEY
+                    )}`;
+                    return c;
+                }
+            );
+        }
         switch (method) {
             case 'GET':
                 request = this._httpClient.get(url, { params: queryParams });
@@ -53,6 +66,17 @@ export class KRxios {
                     subscriber.complete();
                 });
         });
+    }
+    async getToken(login: Partial<Login>): Promise<Auth> {
+        const request = await this._httpClient
+            .post(`${this.baseUrl}${APP_LOGIN_ENDPOINT.auth}`, login)
+            .catch(() => {
+                return {
+                    code: 401,
+                    message: 'incorrect Username or Password'
+                } as AuthError;
+            });
+        return request;
     }
     get(url: any, queryParams?: any): Observable<any> {
         return this.baseUrl !== ''

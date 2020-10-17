@@ -13,7 +13,13 @@ import { Formik, FormikErrors } from 'formik';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import KLoginService from './k-login.service';
-import { GernericErr, Login } from '@client/klibs';
+import {
+    GernericErr,
+    Login,
+    AuthError,
+    AuthSuccess,
+    Auth
+} from '@client/klibs';
 
 class KLogin extends Component<KLoginPropTypes, KLoginState> {
     /* @input */ loginObj = this.props.loginObj;
@@ -52,7 +58,12 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
         this.unsubscribe$.complete();
     }
 
-    login = (loginObj: Partial<Login>) => {
+    responseIsError(res: Auth): res is AuthError {
+        const obj = res as AuthError;
+        return obj.code !== undefined;
+    }
+
+    login = async (loginObj: Partial<Login>) => {
         this.setState({
             login: {
                 ...this.state.login,
@@ -61,20 +72,28 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
             }
         });
 
-        this.service
-            .login(this.state.login)
-            .pipe(takeUntil(this.unsubscribe$))
-            .subscribe(
-                (res: Login) => {
-                    this.setState({ isLoggedIn: res.isLoggedIn });
-                    this.onLoginEmitter(res);
-                },
-                (err: GernericErr) => {
-                    if (err.message.includes('status code 400')) {
-                        this.setState({ hasWarning: true });
+        const tokenResponse = await this.service.getToken(this.state.login);
+        if (this.responseIsError(tokenResponse)) {
+            this.setState({ hasWarning: true });
+        } else {
+            const auth = tokenResponse.data as AuthSuccess;
+            localStorage.setItem('token', auth.token);
+
+            this.service
+                .login(this.state.login)
+                .pipe(takeUntil(this.unsubscribe$))
+                .subscribe(
+                    (res: Login) => {
+                        this.setState({ isLoggedIn: res.isLoggedIn });
+                        this.onLoginEmitter(res);
+                    },
+                    (err: GernericErr) => {
+                        if (err.message.includes('status code 400')) {
+                            this.setState({ hasWarning: true });
+                        }
                     }
-                }
-            );
+                );
+        }
     };
 
     logout = () => {

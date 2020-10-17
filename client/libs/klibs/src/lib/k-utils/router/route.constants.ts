@@ -25,6 +25,7 @@ export const APP_REPORT_AVAILABLE_ENDPOINT = '/reportavailable';
 export const APP_FORECAST_ENDPOINT = '/forecast';
 export const APP_FORECAST_ENTRY_ENDPOINT = '/forecastentry';
 export const APP_LOGIN_ENDPOINT = {
+    auth: '/auth',
     login: '/login',
     logout: '/logout'
 };

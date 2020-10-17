@@ -1,5 +1,11 @@
 import { Observable } from 'rxjs';
-import { APP_LOGIN_ENDPOINT, KRxios, Login, APP_BACKEND } from '@client/klibs';
+import {
+    APP_LOGIN_ENDPOINT,
+    KRxios,
+    Login,
+    Auth,
+    APP_BACKEND
+} from '@client/klibs';
 
 class KLoginService {
     krxios = new KRxios(APP_BACKEND);
@@ -13,6 +19,10 @@ class KLoginService {
             APP_LOGIN_ENDPOINT.logout,
             JSON.stringify(user)
         );
+    }
+
+    getToken(user: Partial<Login>): Promise<Auth> {
+        return this.krxios.getToken(user);
     }
 }
 
