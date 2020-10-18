@@ -26,6 +26,7 @@ export const APP_FORECAST_ENDPOINT = '/forecast';
 export const APP_FORECAST_ENTRY_ENDPOINT = '/forecastentry';
 export const APP_LOGIN_ENDPOINT = {
     auth: '/auth',
+    reAuth: '/refresh_token',
     login: '/login',
     logout: '/logout'
 };

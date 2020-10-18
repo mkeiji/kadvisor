@@ -30,6 +30,7 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
         this.props.onLogout(event);
     };
 
+    TOKEN_KEY = 'token';
     service = new KLoginService();
     unsubscribe$ = new Subject<void>();
 
@@ -77,7 +78,7 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
             this.setState({ hasWarning: true });
         } else {
             const auth = tokenResponse.data as AuthSuccess;
-            localStorage.setItem('token', auth.token);
+            localStorage.setItem(this.TOKEN_KEY, auth.token);
 
             this.service
                 .login(this.state.login)
@@ -104,6 +105,7 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
                 (res: Login) => {
                     this.setState({ isLoggedIn: res.isLoggedIn });
                     this.onLogoutEmitter(res);
+                    localStorage.removeItem(this.TOKEN_KEY);
                 },
                 (err: GernericErr) => {
                     console.log(err);

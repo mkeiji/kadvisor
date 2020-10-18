@@ -3,8 +3,13 @@
     fork from: https://github.com/davguij/rxios
 */
 import { Observable } from 'rxjs';
-import axios, { AxiosRequestConfig, AxiosInstance } from 'axios';
-import { Auth, Login, AuthError, AuthSuccess } from '../k-models/login';
+import axios, {
+    AxiosRequestConfig,
+    AxiosInstance,
+    AxiosResponse,
+    AxiosError
+} from 'axios';
+import { Auth, Login, AuthError } from '../k-models/login';
 import { APP_LOGIN_ENDPOINT } from '../k-utils/router/route.constants';
 
 export class KRxios {
@@ -18,8 +23,7 @@ export class KRxios {
         this.options = options;
         this._httpClient = axios.create(options);
     }
-    _makeRequest(method: any, url: any, queryParams?: any, body?: any) {
-        let request: any;
+    _setRequestInterceptor() {
         if (localStorage.getItem(this.TOKEN_KEY) !== null) {
             this._httpClient.interceptors.request.use(
                 (c: AxiosRequestConfig) => {
@@ -30,6 +34,50 @@ export class KRxios {
                 }
             );
         }
+    }
+    _setResponseInterceptor() {
+        let nTries = 0;
+        const maxTries = 2;
+        this._httpClient.interceptors.response.use(
+            async (r: AxiosResponse) => {
+                return r;
+            },
+            async (e: AxiosError) => {
+                nTries++;
+                if (e.response.status !== 401 || nTries >= maxTries) {
+                    return new Promise((_, reject) => reject(e));
+                }
+                if (
+                    e.config.url ===
+                    `${this.baseUrl}${APP_LOGIN_ENDPOINT.reAuth}`
+                ) {
+                    localStorage.removeItem(this.TOKEN_KEY);
+                    if (e.response.data.message === 'token is expired') {
+                        alert('Session has expired. Please login again.');
+                    } else {
+                        alert('Something went wrong, please login again.');
+                    }
+                    return new Promise((_, reject) => reject(e));
+                }
+                this._httpClient
+                    .get(`${this.baseUrl}${APP_LOGIN_ENDPOINT.reAuth}`)
+                    .then((r2: AxiosResponse) => {
+                        const newToken = `Bearer ${r2.data.token}`;
+                        localStorage.setItem(this.TOKEN_KEY, newToken);
+                        e.response.config.headers.Authorization = newToken;
+                        return axios(e.response.config);
+                    })
+                    .catch((e2: AxiosError) => {
+                        localStorage.removeItem(this.TOKEN_KEY);
+                        return new Promise((_, reject) => reject(e2));
+                    });
+            }
+        );
+    }
+    _makeRequest(method: any, url: any, queryParams?: any, body?: any) {
+        this._setRequestInterceptor();
+        this._setResponseInterceptor();
+        let request: any;
         switch (method) {
             case 'GET':
                 request = this._httpClient.get(url, { params: queryParams });
