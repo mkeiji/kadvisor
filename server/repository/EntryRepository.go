@@ -3,13 +3,11 @@ package repository
 import (
 	"kadvisor/server/repository/mappers"
 	"kadvisor/server/repository/structs"
-	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/application"
 )
 
 type EntryRepository struct {
-	validator validators.EntryValidator
-	mapper    mappers.EntryMapper
+	mapper mappers.EntryMapper
 }
 
 func (repo *EntryRepository) FindAllByUserId(
@@ -34,16 +32,9 @@ func (repo *EntryRepository) FindOne(id int) (structs.Entry, error) {
 
 func (repo *EntryRepository) Create(
 	entry structs.Entry) (structs.Entry, error) {
-
 	eMapped := repo.mapper.MapEntry(entry)
-
-	vErr := repo.validator.Validate(application.Db, eMapped)
-	if vErr != nil {
-		return structs.Entry{}, vErr
-	} else {
-		err := application.Db.Save(&eMapped).Error
-		return eMapped, err
-	}
+	err := application.Db.Save(&eMapped).Error
+	return eMapped, err
 }
 
 func (repo *EntryRepository) Update(

@@ -2,26 +2,56 @@ package validators
 
 import (
 	"errors"
-	"gorm.io/gorm"
+	util "kadvisor/server/libs/KeiGenUtil"
+	"kadvisor/server/repository"
 	"kadvisor/server/repository/structs"
+
+	"github.com/go-playground/validator/v10"
 )
 
-type EntryValidator struct{}
+type EntryValidator struct {
+	classRepository repository.ClassRepository
+	codeRepository  repository.CodeCodeTextRepository
+	validator       *validator.Validate
+}
 
-func (e *EntryValidator) Validate(
-	db *gorm.DB, entry structs.Entry) (err error) {
+var errList []error
 
-	var class structs.Class
-	cErr := db.Find(&class, entry.ClassID).Error
+func (e *EntryValidator) Validate(entry structs.Entry) []error {
+	errList = []error{}
+	e.validateProperties(entry)
+	e.validateClass(entry.ClassID)
+	e.validateCodeType(entry.EntryTypeCodeID)
+	return errList
+}
+
+func (e *EntryValidator) validateProperties(entry structs.Entry) {
+	e.validator = validator.New()
+	e.validator.RegisterValidation("ispositive", e.customIsPositive)
+
+	err := e.validator.Struct(entry)
+	if err != nil {
+		errList = append(errList, err)
+	}
+}
+
+func (e *EntryValidator) customIsPositive(fieldLevel validator.FieldLevel) bool {
+	return fieldLevel.Field().Int() >= 0
+}
+
+func (e *EntryValidator) validateClass(classID int) {
+	_, cErr := e.classRepository.FindOne(classID)
 	if cErr != nil {
-		err = errors.New("class not found")
+		errList = append(errList, errors.New(util.AsValidationMsg("invalid classID")))
 	}
+}
 
-	var lookup structs.Code
-	lErr := db.Where("code_type_id=?", entry.EntryTypeCodeID).Find(&lookup).Error
+func (e *EntryValidator) validateCodeType(codeTypeID string) {
+	_, lErr := e.codeRepository.FindOne(codeTypeID)
 	if lErr != nil {
-		err = errors.New("invalid lookup @ entryTypeCodeID")
+		errList = append(
+			errList,
+			errors.New(util.AsValidationMsg("invalid lookup @ entryTypeCodeID")),
+		)
 	}
-
-	return
 }

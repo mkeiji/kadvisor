@@ -3,7 +3,7 @@ package repository
 import (
 	"kadvisor/server/repository/mappers"
 	"kadvisor/server/repository/structs"
-	"kadvisor/server/resources/application"
+	app "kadvisor/server/resources/application"
 )
 
 type CodeCodeTextRepository struct {
@@ -16,6 +16,14 @@ func (repo *CodeCodeTextRepository) FindAllByCodeGroup(
 	var codes []structs.Code
 	query := structs.Code{CodeGroup: codeGroup}
 
-	err := application.Db.Where(query).Find(&codes).Error
+	err := app.Db.Where(query).Find(&codes).Error
 	return codes, err
+}
+
+func (repo *CodeCodeTextRepository) FindOne(
+	codeTypeID string,
+) (structs.Code, error) {
+	var code structs.Code
+	err := app.Db.Where("code_type_id=?", codeTypeID).First(&code).Error
+	return code, err
 }

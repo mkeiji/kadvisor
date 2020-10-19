@@ -1,19 +1,23 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
+	"kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/KeiUserUtil"
 	"kadvisor/server/repository/structs"
+	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type EntryController struct {
-	service services.EntryService
-	auth    services.KeiAuthService
+	service   services.EntryService
+	auth      services.KeiAuthService
+	validator validators.EntryValidator
 }
 
 func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
@@ -56,17 +60,22 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 		entryRoutes.POST("/entry", func(c *gin.Context) {
 			var entry structs.Entry
 
-			userID, _ := strconv.Atoi(c.Param("uid"))
-			uErr := KeiUserUtil.ValidUser(userID)
-
 			c.BindJSON(&entry)
-			saved, err := ctrl.service.Post(entry)
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			errList := ctrl.validator.Validate(entry)
+			if len(errList) > 0 {
+				c.JSON(http.StatusBadRequest, KeiGenUtil.MapValidationErrList(errList))
 			} else {
-				c.JSON(http.StatusOK, saved)
+				userID, _ := strconv.Atoi(c.Param("uid"))
+				uErr := KeiUserUtil.ValidUser(userID)
+
+				saved, err := ctrl.service.Post(entry)
+				if uErr != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
+				} else if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				} else {
+					c.JSON(http.StatusOK, saved)
+				}
 			}
 		})
 

@@ -18,11 +18,10 @@ func (repo *ClassRepository) FindAllByUserId(
 }
 
 func (repo *ClassRepository) FindOne(
-	classID int) (structs.Class, error) {
-
+	classID int,
+) (structs.Class, error) {
 	var class structs.Class
-	err := application.Db.Find(&class, classID).Error
-
+	err := application.Db.Where("id=?", classID).First(&class).Error
 	return class, err
 }
 
