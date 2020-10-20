@@ -24,7 +24,6 @@ build-server:
     image: mgkeiji/gogcc
     artifacts:
         paths:
-            - client/dist
             - kadvisor
     script:
         - go build
