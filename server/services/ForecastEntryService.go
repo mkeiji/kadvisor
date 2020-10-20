@@ -1,8 +1,10 @@
 package services
 
 import (
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository"
 	"kadvisor/server/repository/structs"
+	"net/http"
 )
 
 type ForecastEntryService struct {
@@ -10,6 +12,16 @@ type ForecastEntryService struct {
 }
 
 func (svc *ForecastEntryService) Put(
-	entry structs.ForecastEntry) (structs.ForecastEntry, error) {
-	return svc.repository.Update(entry)
+	entry structs.ForecastEntry,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	updated, err := svc.repository.Update(entry)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusNotFound, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, updated)
+	}
+
+	return response
 }

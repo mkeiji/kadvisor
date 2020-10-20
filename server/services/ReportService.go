@@ -1,9 +1,11 @@
 package services
 
 import (
+	"kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository"
 	"kadvisor/server/repository/mappers"
+	"net/http"
 	"sort"
 )
 
@@ -14,35 +16,79 @@ type ReportService struct {
 }
 
 func (svc *ReportService) GetBalance(
-	userID int) (dtos.Balance, error) {
-	return svc.repository.FindBalance(userID)
+	userID int,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	balance, err := svc.repository.FindBalance(userID)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusNotFound, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, balance)
+	}
+
+	return response
 }
 
 func (svc *ReportService) GetYearToDateReport(
-	userID int, year int) ([]dtos.MonthReport, error) {
-	return svc.repository.FindYearToDateReport(userID, year)
+	userID int,
+	year int,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	report, err := svc.repository.FindYearToDateReport(userID, year)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusNotFound, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, report)
+	}
+
+	return response
 }
 
 func (svc *ReportService) GetYearToDateWithForecastReport(
-	userID int, year int) ([]dtos.MonthReport, []error) {
+	userID int,
+	year int,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
 
 	errors := []error{}
 	ytdMonths, ytdErr := svc.repository.FindYearToDateReport(userID, year)
-	forecast, _ := svc.forecastRepository.FindOne(userID, year, true)
+	forecast, fcErr := svc.forecastRepository.FindOne(userID, year, true)
 	forecastMonts := svc.forecastMapper.MapForecastToMonthReportDto(forecast)
 
-	if ytdErr != nil {
+	if ytdErr != nil && fcErr != nil {
 		errors = append(errors, ytdErr)
+		errors = append(errors, fcErr)
+	}
+	if len(errors) > 0 {
+		response = dtos.NewKresponse(
+			http.StatusNotFound,
+			KeiGenUtil.MapErrList(errors),
+		)
+	} else {
+		combined := svc.combineYtdWithForecast(ytdMonths, forecastMonts)
+		response = dtos.NewKresponse(
+			http.StatusOK,
+			svc.getCombinedWithAccumulatedBalance(combined),
+		)
 	}
 
-	combined := svc.combineYtdWithForecast(ytdMonths, forecastMonts)
-	return svc.getCombinedWithAccumulatedBalance(combined), errors
+	return response
 }
 
-func (svc *ReportService) GetReportAvailable(userID int) ([]int, error) {
+func (svc *ReportService) GetReportAvailable(userID int) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
 	result, err := svc.repository.GetAvailableYears(userID)
-	sort.Sort(sort.Reverse(sort.IntSlice(result)))
-	return result, err
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusNotFound, err)
+	} else {
+		sort.Sort(sort.Reverse(sort.IntSlice(result)))
+		response = dtos.NewKresponse(http.StatusOK, result)
+	}
+
+	return response
 }
 
 func (svc *ReportService) getCombinedWithAccumulatedBalance(

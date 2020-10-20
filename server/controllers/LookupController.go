@@ -1,19 +1,19 @@
 package controllers
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	"kadvisor/server/libs/KeiUserUtil"
+	u "kadvisor/server/libs/KeiGenUtil"
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
-	"net/http"
 	"strconv"
 )
 
 type LookupController struct {
-	service services.LookupService
-	auth    services.KeiAuthService
+	service    services.LookupService
+	usrService services.UserService
+	auth       services.KeiAuthService
 }
 
 func (ctrl *LookupController) LoadEndpoints(router *gin.Engine) {
@@ -28,22 +28,20 @@ func (ctrl *LookupController) LoadEndpoints(router *gin.Engine) {
 	{
 		// get(/lookup?codeGroup)
 		lookupRoutes.GET("/lookup", func(c *gin.Context) {
+			var response dtos.KhttpResponse
+
 			userID, _ := strconv.Atoi(c.Param("uid"))
 			codeGroup := c.Query("codeGroup")
 
-			uErr := KeiUserUtil.ValidUser(userID)
-
-			lookups, err := ctrl.service.GetAllByCodeGroup(codeGroup)
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else if codeGroup != "" {
-				c.JSON(http.StatusOK, lookups)
-			} else {
-				c.JSON(http.StatusBadRequest,
-					gin.H{"error": errors.New("missing codeGroup param")})
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
 			}
+
+			response = ctrl.service.GetAllByCodeGroup(codeGroup)
+			c.JSON(response.Status, response.Body)
+			return
 		})
 	}
 }

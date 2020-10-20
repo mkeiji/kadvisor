@@ -1,23 +1,24 @@
 package controllers
 
 import (
-	"kadvisor/server/libs/KeiGenUtil"
-	"kadvisor/server/libs/KeiUserUtil"
+	u "kadvisor/server/libs/KeiGenUtil"
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type EntryController struct {
-	service   services.EntryService
-	auth      services.KeiAuthService
-	validator validators.EntryValidator
+	service           services.EntryService
+	usrService        services.UserService
+	auth              services.KeiAuthService
+	validator         validators.EntryValidator
+	validationService services.ValidationService
 }
 
 func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
@@ -32,114 +33,94 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 	{
 		// get(/entry?id?classid?limit)
 		entryRoutes.GET("/entry", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			userID, _ := strconv.Atoi(c.Param("uid"))
 			id, _ := strconv.Atoi(c.Query("id"))
 			classID, _ := strconv.Atoi(c.Query("classid"))
 			limit, _ := strconv.Atoi(c.Query("limit"))
 
-			uErr := KeiUserUtil.ValidUser(userID)
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
+			}
 
 			getEntryById := id != 0 && classID == 0
 			getEntriesByClassId := id == 0 && classID != 0
 			getEntryByUserId := id == 0 && classID == 0
 
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if getEntryByUserId {
-				ctrl.getEntriesByUserId(c, userID, limit)
+			if getEntryByUserId {
+				response = ctrl.service.GetManyByUserId(userID, limit)
 			} else if getEntryById {
-				ctrl.getEntryById(c, id)
+				response = ctrl.service.GetOneById(id)
 			} else if getEntriesByClassId {
-				ctrl.getEntriesByClassId(c, classID, limit)
-			} else {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
+				response = ctrl.service.GetManyByClassId(classID, limit)
 			}
+
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		// post(/entry)
 		entryRoutes.POST("/entry", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var entry structs.Entry
 
-			c.BindJSON(&entry)
-			errList := ctrl.validator.Validate(entry)
-			if len(errList) > 0 {
-				c.JSON(http.StatusBadRequest, KeiGenUtil.MapValidationErrList(errList))
-			} else {
-				userID, _ := strconv.Atoi(c.Param("uid"))
-				uErr := KeiUserUtil.ValidUser(userID)
-
-				saved, err := ctrl.service.Post(entry)
-				if uErr != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-				} else if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				} else {
-					c.JSON(http.StatusOK, saved)
-				}
+			userID, _ := strconv.Atoi(c.Param("uid"))
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
 			}
+
+			c.BindJSON(&entry)
+			response = ctrl.validationService.GetResponse(ctrl.validator, entry)
+			if u.IsOKresponse(response.Status) {
+				response = ctrl.service.Post(entry)
+			}
+
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		// put(/entry)
 		entryRoutes.PUT("/entry", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var entry structs.Entry
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			uErr := KeiUserUtil.ValidUser(userID)
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
+			}
 
 			c.BindJSON(&entry)
-			updated, err := ctrl.service.Put(entry)
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				c.JSON(http.StatusOK, updated)
+			response = ctrl.validationService.GetResponse(ctrl.validator, entry)
+			if u.IsOKresponse(response.Status) {
+				response = ctrl.service.Put(entry)
 			}
+
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		// delete(/entry?id)
 		entryRoutes.DELETE("/entry", func(c *gin.Context) {
+			var response dtos.KhttpResponse
+
 			entryID, _ := strconv.Atoi(c.Query("id"))
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			uErr := KeiUserUtil.ValidUser(userID)
 
-			deletedID, err := ctrl.service.Delete(entryID)
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				c.JSON(http.StatusOK, deletedID)
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
 			}
+
+			response = ctrl.service.Delete(entryID)
+			c.JSON(response.Status, response.Body)
+			return
 		})
-	}
-}
-
-func (ctrl *EntryController) getEntryById(c *gin.Context, entryID int) {
-	entry, err := ctrl.service.GetOneById(entryID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		c.JSON(http.StatusOK, entry)
-	}
-}
-
-func (ctrl *EntryController) getEntriesByUserId(
-	c *gin.Context, userID int, limit int) {
-	entries, err := ctrl.service.GetManyByUserId(userID, limit)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		c.JSON(http.StatusOK, entries)
-	}
-}
-
-func (ctrl *EntryController) getEntriesByClassId(
-	c *gin.Context, classID int, limit int) {
-	entries, err := ctrl.service.GetManyByClassId(classID, limit)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	} else {
-		c.JSON(http.StatusOK, entries)
 	}
 }

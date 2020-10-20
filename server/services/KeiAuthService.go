@@ -60,7 +60,8 @@ func (svc *KeiAuthService) GetAuthUtil(
 			if err := c.ShouldBind(&claimLogin); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			actualLogin, _ = svc.loginService.GetOneByEmail(claimLogin.Email)
+			res := svc.loginService.GetOneByEmail(claimLogin.Email)
+			actualLogin := res.Body.(structs.Login)
 			if svc.isValidLogin(actualLogin, claimLogin) {
 				return &authLogin{
 					Email:    claimLogin.Email,

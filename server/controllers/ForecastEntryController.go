@@ -2,18 +2,19 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"kadvisor/server/libs/KeiUserUtil"
+	u "kadvisor/server/libs/KeiGenUtil"
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
-	"net/http"
 	"strconv"
 )
 
 type ForecastEntryController struct {
-	service services.ForecastEntryService
-	auth    services.KeiAuthService
+	service    services.ForecastEntryService
+	usrService services.UserService
+	auth       services.KeiAuthService
 }
 
 func (ctrl *ForecastEntryController) LoadEndpoints(router *gin.Engine) {
@@ -28,20 +29,20 @@ func (ctrl *ForecastEntryController) LoadEndpoints(router *gin.Engine) {
 	{
 		// put(/forecastentry)
 		forecastEntryRoutes.PUT("/forecastentry", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var entry structs.ForecastEntry
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			uErr := KeiUserUtil.ValidUser(userID)
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
+			}
 
 			c.BindJSON(&entry)
-			updated, err := ctrl.service.Put(entry)
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				c.JSON(http.StatusOK, updated)
-			}
+			response = ctrl.service.Put(entry)
+			c.JSON(response.Status, response.Body)
+			return
 		})
 	}
 }

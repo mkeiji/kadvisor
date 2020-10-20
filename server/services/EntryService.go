@@ -1,8 +1,10 @@
 package services
 
 import (
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository"
 	"kadvisor/server/repository/structs"
+	"net/http"
 )
 
 type EntryService struct {
@@ -10,31 +12,93 @@ type EntryService struct {
 }
 
 func (svc *EntryService) GetManyByUserId(
-	userID int, limit int) ([]structs.Entry, error) {
-	return svc.repository.FindAllByUserId(userID, limit)
+	userID int,
+	limit int,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	entries, err := svc.repository.FindAllByUserId(userID, limit)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusBadRequest, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, entries)
+	}
+
+	return response
 }
 
 func (svc *EntryService) GetManyByClassId(
-	classID int, limit int) ([]structs.Entry, error) {
-	return svc.repository.FindAllByClassId(classID, limit)
+	classID int,
+	limit int,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	entries, err := svc.repository.FindAllByClassId(classID, limit)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusBadRequest, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, entries)
+	}
+
+	return response
 }
 
 func (svc *EntryService) GetOneById(
-	id int) (structs.Entry, error) {
-	return svc.repository.FindOne(id)
+	id int,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	entries, err := svc.repository.FindOne(id)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusBadRequest, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, entries)
+	}
+
+	return response
 }
 
 func (svc *EntryService) Post(
-	entry structs.Entry) (structs.Entry, error) {
-	return svc.repository.Create(entry)
+	entry structs.Entry,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	nEntry, err := svc.repository.Create(entry)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusBadRequest, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, nEntry)
+	}
+
+	return response
 }
 
 func (svc *EntryService) Put(
-	entry structs.Entry) (structs.Entry, error) {
-	return svc.repository.Update(entry)
+	entry structs.Entry,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	nEntry, err := svc.repository.Update(entry)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusBadRequest, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, nEntry)
+	}
+
+	return response
 }
 
 func (svc *EntryService) Delete(
-	id int) (int, error) {
-	return svc.repository.Delete(id)
+	id int,
+) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	nEntry, err := svc.repository.Delete(id)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusBadRequest, err)
+	} else {
+		response = dtos.NewKresponse(http.StatusOK, nEntry)
+	}
+
+	return response
 }

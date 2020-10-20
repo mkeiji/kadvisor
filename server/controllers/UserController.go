@@ -1,14 +1,14 @@
 package controllers
 
 import (
-	"github.com/gin-gonic/gin"
 	"kadvisor/server/libs/KeiPassUtil"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
-	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
@@ -24,37 +24,39 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 		log.Fatal("JWT Error: " + err.Error())
 	}
 
+	// post(/user) - unprotected by jwt
+	router.POST("/api/user", func(context *gin.Context) {
+		var user structs.User
+		context.BindJSON(&user)
+		KeiPassUtil.HashAndSalt(&user)
+		response := ctrl.userService.Post(user)
+		context.JSON(response.Status, response.Body)
+		return
+	})
+
 	userRoutes.Use(jwt.MiddlewareFunc())
 	{
 		// getOne(/user?preloaded)
 		userRoutes.GET("/user/:id", func(context *gin.Context) {
-			isPreloaded, err := strconv.ParseBool(
-				context.DefaultQuery("preloaded", "false"))
+			isPreloaded, _ := strconv.ParseBool(
+				context.DefaultQuery("preloaded", "false"),
+			)
+			userID, _ := strconv.Atoi(context.Param("id"))
 
-			userID, err := strconv.Atoi(context.Param("id"))
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			}
-
-			storedUser, err := ctrl.userService.GetOne(userID, isPreloaded)
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				context.JSON(http.StatusOK, storedUser)
-			}
+			response := ctrl.userService.GetOne(userID, isPreloaded)
+			context.JSON(response.Status, response.Body)
+			return
 		})
 
 		// getMany(/users?preloaded)
 		userRoutes.GET("/users", func(context *gin.Context) {
-			isPreloaded, err := strconv.ParseBool(
-				context.DefaultQuery("preloaded", "false"))
+			isPreloaded, _ := strconv.ParseBool(
+				context.DefaultQuery("preloaded", "false"),
+			)
 
-			users, err := ctrl.userService.GetMany(isPreloaded)
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				context.JSON(http.StatusOK, users)
-			}
+			response := ctrl.userService.GetMany(isPreloaded)
+			context.JSON(response.Status, response.Body)
+			return
 		})
 
 		// put(/user)
@@ -62,40 +64,18 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 			var user structs.User
 			context.BindJSON(&user)
 
-			updated, err := ctrl.userService.Put(user)
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				context.JSON(http.StatusOK, updated)
-			}
+			response := ctrl.userService.Put(user)
+			context.JSON(response.Status, response.Body)
+			return
 		})
 
 		// delete(/user)
 		userRoutes.DELETE("/user/:id", func(context *gin.Context) {
-			userID, err := strconv.Atoi(context.Param("id"))
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			}
+			userID, _ := strconv.Atoi(context.Param("id"))
 
-			deletedUser, dErr := ctrl.userService.Delete(userID)
-			if dErr != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": dErr.Error()})
-			} else {
-				context.JSON(http.StatusOK, deletedUser)
-			}
+			response := ctrl.userService.Delete(userID)
+			context.JSON(response.Status, response.Body)
+			return
 		})
 	}
-
-	// post(/user)
-	router.POST("/api/user", func(context *gin.Context) {
-		var user structs.User
-		context.BindJSON(&user)
-		KeiPassUtil.HashAndSalt(&user)
-		savedUser, err := ctrl.userService.Post(user)
-		if err != nil {
-			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		} else {
-			context.JSON(http.StatusOK, savedUser)
-		}
-	})
 }

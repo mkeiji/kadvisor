@@ -53,12 +53,11 @@ func (t *UserRepository) Create(user s.User) (s.User, error) {
 }
 
 func (t *UserRepository) Update(user s.User) (s.User, error) {
-	var stored s.User
-	var err error
+	stored, err := t.FindOne(user.ID, false)
+	if err == nil {
+		err = app.Db.Model(&stored).Updates(user).Error
+	}
 
-	err = app.Db.Set(
-		"gorm:association_autocreate", false).First(
-		&stored, user.ID).Updates(user).Error
 	return stored, err
 }
 
@@ -68,7 +67,7 @@ func (t *UserRepository) Delete(userID int) (s.User, error) {
 
 	err = app.Db.First(&user, userID).Error
 	if err == nil {
-		err = app.Db.Delete(&user).Error
+		err = app.Db.Delete(&s.User{}, userID).Error
 	}
 
 	return user, err

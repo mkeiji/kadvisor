@@ -1,20 +1,21 @@
 package controllers
 
 import (
-	"kadvisor/server/libs/KeiUserUtil"
+	u "kadvisor/server/libs/KeiGenUtil"
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
-	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type ClassController struct {
-	service services.ClassService
-	auth    services.KeiAuthService
+	service    services.ClassService
+	auth       services.KeiAuthService
+	usrService services.UserService
 }
 
 func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
@@ -29,84 +30,73 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 	{
 		// getOne(/class?id)
 		classRoutes.GET("/class", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			userID, _ := strconv.Atoi(c.Param("uid"))
 			classID, _ := strconv.Atoi(c.Query("id"))
 
-			uErr := KeiUserUtil.ValidUser(userID)
-
-			getClassesByUserId := classID == 0 && userID != 0
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if classID != 0 {
-				class, err := ctrl.service.GetOneById(classID)
-				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				} else {
-					c.JSON(http.StatusOK, class)
-				}
-			} else if getClassesByUserId {
-				classes, err := ctrl.service.GetManyByUserId(userID)
-				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				} else {
-					c.JSON(http.StatusOK, classes)
-				}
-			} else {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "query param error"})
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
 			}
+
+			response = ctrl.service.GetClass(userID, classID)
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		// post(/class)
 		classRoutes.POST("/class", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var class structs.Class
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			uErr := KeiUserUtil.ValidUser(userID)
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
+			}
 
 			c.BindJSON(&class)
-			saved, err := ctrl.service.Post(class)
-
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				c.JSON(http.StatusOK, saved)
-			}
+			response = ctrl.service.Post(class)
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		// put(/class)
 		classRoutes.PUT("/class", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var class structs.Class
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			uErr := KeiUserUtil.ValidUser(userID)
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
+			}
 
 			c.BindJSON(&class)
-			updated, err := ctrl.service.Put(class)
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				c.JSON(http.StatusOK, updated)
-			}
+			response = ctrl.service.Put(class)
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		// delete(/class?id)
 		classRoutes.DELETE("/class", func(c *gin.Context) {
+			var response dtos.KhttpResponse
+
 			classID, _ := strconv.Atoi(c.Query("id"))
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			uErr := KeiUserUtil.ValidUser(userID)
 
-			deletedID, err := ctrl.service.Delete(classID)
-			if uErr != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": uErr.Error()})
-			} else if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				c.JSON(http.StatusOK, deletedID)
+			response = ctrl.usrService.GetOne(userID, false)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
 			}
+
+			response = ctrl.service.Delete(classID)
+			c.JSON(response.Status, response.Body)
+			return
 		})
 	}
 }

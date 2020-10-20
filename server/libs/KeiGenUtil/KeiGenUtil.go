@@ -1,7 +1,6 @@
 package KeiGenUtil
 
 import (
-	"fmt"
 	"kadvisor/server/resources/enums"
 	"strconv"
 )
@@ -54,7 +53,7 @@ func HasPermission(roleID int, permissionLevel enums.RoleEnum) bool {
 	}
 }
 
-func MapValidationErrList(errList []error) []map[string]interface{} {
+func MapErrList(errList []error) []map[string]interface{} {
 	result := []map[string]interface{}{}
 	for _, err := range errList {
 		result = append(result, MapErrorMsg(err))
@@ -66,6 +65,11 @@ func MapErrorMsg(err error) map[string]interface{} {
 	return map[string]interface{}{"error": err.Error()}
 }
 
-func AsValidationMsg(msg string) string {
-	return fmt.Sprintf("Validation: %v", msg)
+func IsError(interfc interface{}) bool {
+	_, isError := interfc.(error)
+	return isError
+}
+
+func IsOKresponse(code int) bool {
+	return code == 200
 }

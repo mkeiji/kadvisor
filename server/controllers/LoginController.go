@@ -1,21 +1,23 @@
 package controllers
 
 import (
-	"errors"
-	"kadvisor/server/libs/KeiPassUtil"
+	u "kadvisor/server/libs/KeiGenUtil"
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
+	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 // LoginController class
 type LoginController struct {
-	loginService services.LoginService
-	auth         services.KeiAuthService
+	loginService      services.LoginService
+	auth              services.KeiAuthService
+	validator         validators.LoginValidator
+	validationService services.ValidationService
 }
 
 // LoadEndpoints enpoints list
@@ -37,61 +39,50 @@ func (ctrl *LoginController) LoadEndpoints(router *gin.Engine) {
 	loginRoutes.Use(jwt.MiddlewareFunc())
 	{
 		// login(/login)
-		loginRoutes.POST("/login", func(context *gin.Context) {
+		loginRoutes.POST("/login", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var enteredLogin structs.Login
-			context.BindJSON(&enteredLogin)
 
-			storedLogin, err := ctrl.loginService.GetOneByEmail(enteredLogin.Email)
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				if KeiPassUtil.IsValidPassword(storedLogin.Password, enteredLogin.Password) {
-					updatedLogin, err := ctrl.loginService.UpdateLoginStatus(storedLogin, true)
-					if err != nil {
-						context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-					} else {
-						context.JSON(http.StatusOK, updatedLogin)
-					}
-				} else {
-					context.JSON(
-						http.StatusBadRequest,
-						gin.H{"error": errors.New("wrong password").Error()},
-					)
-				}
+			c.BindJSON(&enteredLogin)
+			response = ctrl.validationService.GetResponse(ctrl.validator, enteredLogin)
+			if u.IsOKresponse(response.Status) {
+				response = ctrl.loginService.UpdateLoginStatus(enteredLogin, true)
 			}
+
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		// login(/login)
-		loginRoutes.PUT("/login", func(context *gin.Context) {
+		loginRoutes.PUT("/login", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var login structs.Login
-			context.BindJSON(&login)
 
-			updated, err := ctrl.loginService.Put(login)
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			} else {
-				context.JSON(http.StatusOK, updated)
-			}
+			c.BindJSON(&login)
+			response = ctrl.loginService.Put(login)
+			c.JSON(response.Status, response.Body)
+			return
 		})
 
 		//logout(/logout)
-		loginRoutes.POST("/logout", func(context *gin.Context) {
+		loginRoutes.POST("/logout", func(c *gin.Context) {
+			var response dtos.KhttpResponse
 			var currentLogin structs.Login
-			context.BindJSON(&currentLogin)
+			c.BindJSON(&currentLogin)
 
-			storedLogin, err := ctrl.loginService.GetOneByEmail(currentLogin.Email)
-			if err != nil {
-				context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			response = ctrl.loginService.GetOneByEmail(currentLogin.Email)
+			if !u.IsOKresponse(response.Status) {
+				c.JSON(response.Status, response.Body)
+				return
 			} else {
+				storedLogin := response.Body.(structs.Login)
 				if storedLogin.IsLoggedIn == true {
-					updatedLogin, err := ctrl.loginService.UpdateLoginStatus(storedLogin, false)
-					if err != nil {
-						context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-					} else {
-						context.JSON(http.StatusOK, updatedLogin)
-					}
+					response = ctrl.loginService.UpdateLoginStatus(storedLogin, false)
 				}
 			}
+
+			c.JSON(response.Status, response.Body)
+			return
 		})
 	}
 }

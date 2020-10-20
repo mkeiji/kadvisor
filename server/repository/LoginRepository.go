@@ -32,11 +32,17 @@ func (l *LoginRepository) UpdateLoginStatus(
 	login s.Login,
 	isLoggedIn bool,
 ) (s.Login, error) {
-	var storedLogin s.Login
-
-	err := app.Db.Find(&storedLogin, login.ID).Update("IsLoggedIn", isLoggedIn).Error
-	if err != nil {
-		return storedLogin, err
+	storedLogin, fErr := l.FindOneByEmail(login.Email)
+	if fErr != nil {
+		return storedLogin, fErr
+	} else {
+		err := app.Db.
+			Model(&storedLogin).
+			Where("email=?", login.Email).
+			Update("IsLoggedIn", isLoggedIn).Error
+		if err != nil {
+			return storedLogin, err
+		}
 	}
 
 	return storedLogin, nil
