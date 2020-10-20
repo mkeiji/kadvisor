@@ -5,7 +5,7 @@ import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import Grid from '@material-ui/core/Grid';
 import PageSpacer from '../page-spacer/page-spacer.component';
 import EntryService from './entry.service';
-import EntryViewModelService from './view-model.service';
+import EntryViewModelService from './entry-view-model.service';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {

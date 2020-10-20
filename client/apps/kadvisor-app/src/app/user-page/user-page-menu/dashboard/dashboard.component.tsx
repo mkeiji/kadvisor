@@ -16,6 +16,7 @@ export default function Dashboard(props: DashboardPropsType) {
     const service = new ReportsApiService(props.userID);
     const currentYear = new Date().getFullYear();
     const [graphYear, setGraphYear] = useState<number>(currentYear);
+    const [showYearDropdown, setShowYearDropdown] = useState<boolean>(false);
     const [yearMenuItems, setYearMenuItems] = useState<KSelectItem[]>([]);
     const fixedHeightPaper = clsx(
         props.classes.paper,
@@ -36,8 +37,13 @@ export default function Dashboard(props: DashboardPropsType) {
                         });
                     });
                     setYearMenuItems(selectMenuItems);
+                    setShowYearDropdown(true);
                 }
-                setGraphYear(currentYear);
+                setGraphYear(
+                    years.includes(currentYear)
+                        ? currentYear
+                        : years[years.length - 1]
+                );
             });
 
         return () => {
@@ -46,15 +52,21 @@ export default function Dashboard(props: DashboardPropsType) {
         };
     }, []);
 
+    function renderDropdown(): JSX.Element {
+        return showYearDropdown ? (
+            <KSelect
+                label={'Year'}
+                items={yearMenuItems}
+                onValueChange={setGraphYear}
+                value={graphYear}
+            />
+        ) : null;
+    }
+
     return (
         <PageSpacer classes={props.classes}>
             <Grid container item xs={12} alignContent={'flex-start'}>
-                <KSelect
-                    label={'Year'}
-                    items={yearMenuItems}
-                    onValueChange={setGraphYear}
-                    value={graphYear}
-                />
+                {renderDropdown()}
             </Grid>
             <Grid container spacing={3}>
                 {/* KComposedChartComponent */}

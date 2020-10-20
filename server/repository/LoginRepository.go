@@ -1,16 +1,16 @@
 package repository
 
 import (
-	"kadvisor/server/repository/structs"
-	"kadvisor/server/resources/application"
+	s "kadvisor/server/repository/structs"
+	app "kadvisor/server/resources/application"
 )
 
 type LoginRepository struct{}
 
-func (l *LoginRepository) FindOneByEmail(email string) (structs.Login, error) {
-	var login structs.Login
+func (l *LoginRepository) FindOneByEmail(email string) (s.Login, error) {
+	var login s.Login
 
-	err := application.Db.Where("email=?", email).First(&login).Error
+	err := app.Db.Where("email=?", email).First(&login).Error
 	if err != nil {
 		return login, err
 	}
@@ -18,20 +18,34 @@ func (l *LoginRepository) FindOneByEmail(email string) (structs.Login, error) {
 }
 
 func (l *LoginRepository) Update(
-	login structs.Login) (structs.Login, error) {
-	var storedLogin structs.Login
+	login s.Login,
+) (s.Login, error) {
+	stored, err := l.findOne(login.ID)
+	if err == nil {
+		err = app.Db.Model(&stored).Updates(login).Error
+	}
 
-	err := application.Db.Find(&storedLogin, login.ID).Updates(login).Error
-	return storedLogin, err
+	return stored, err
 }
 
-func (l *LoginRepository) UpdateLoginStatus(login structs.Login, isLoggedIn bool) (structs.Login, error) {
-	var storedLogin structs.Login
+func (l *LoginRepository) UpdateLoginStatus(
+	login s.Login,
+	isLoggedIn bool,
+) (s.Login, error) {
+	var storedLogin s.Login
 
-	err := application.Db.Find(&storedLogin, login.ID).Update("IsLoggedIn", isLoggedIn).Error
+	err := app.Db.Find(&storedLogin, login.ID).Update("IsLoggedIn", isLoggedIn).Error
 	if err != nil {
 		return storedLogin, err
 	}
 
 	return storedLogin, nil
+}
+
+func (l *LoginRepository) findOne(
+	id int,
+) (s.Login, error) {
+	var storedLogin s.Login
+	err := app.Db.Where("id=?", id).First(&storedLogin).Error
+	return storedLogin, err
 }

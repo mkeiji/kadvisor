@@ -2,8 +2,8 @@ package repository
 
 import (
 	"kadvisor/server/repository/mappers"
-	"kadvisor/server/repository/structs"
-	"kadvisor/server/resources/application"
+	s "kadvisor/server/repository/structs"
+	app "kadvisor/server/resources/application"
 )
 
 type EntryRepository struct {
@@ -11,58 +11,59 @@ type EntryRepository struct {
 }
 
 func (repo *EntryRepository) FindAllByUserId(
-	userID int, limit int) ([]structs.Entry, error) {
+	userID int, limit int) ([]s.Entry, error) {
 
-	queryStruct := structs.Entry{UserID: userID}
+	queryStruct := s.Entry{UserID: userID}
 	return getEntries(queryStruct, limit)
 }
 
 func (repo *EntryRepository) FindAllByClassId(
-	classID int, limit int) ([]structs.Entry, error) {
+	classID int, limit int) ([]s.Entry, error) {
 
-	queryStruct := structs.Entry{ClassID: classID}
+	queryStruct := s.Entry{ClassID: classID}
 	return getEntries(queryStruct, limit)
 }
 
-func (repo *EntryRepository) FindOne(id int) (structs.Entry, error) {
-	var entry structs.Entry
-	err := application.Db.Find(&entry, id).Error
+func (repo *EntryRepository) FindOne(id int) (s.Entry, error) {
+	var entry s.Entry
+	err := app.Db.Where("id=?", id).First(&entry).Error
 	return entry, err
 }
 
 func (repo *EntryRepository) Create(
-	entry structs.Entry) (structs.Entry, error) {
+	entry s.Entry) (s.Entry, error) {
 	eMapped := repo.mapper.MapEntry(entry)
-	err := application.Db.Save(&eMapped).Error
+	err := app.Db.Save(&eMapped).Error
 	return eMapped, err
 }
 
 func (repo *EntryRepository) Update(
-	entry structs.Entry) (structs.Entry, error) {
-	var stored structs.Entry
+	entry s.Entry) (s.Entry, error) {
 	eMapped := repo.mapper.MapEntry(entry)
-
-	err := application.Db.Find(&stored, entry.ID).Updates(eMapped).Error
+	stored, err := repo.FindOne(entry.ID)
+	if err == nil {
+		err = app.Db.Model(&stored).Updates(eMapped).Error
+	}
 	return stored, err
 }
 
 func (repo *EntryRepository) Delete(id int) (int, error) {
-	var entry structs.Entry
+	var entry s.Entry
 	var err error
 
-	err = application.Db.First(&entry, id).Error
+	err = app.Db.First(&entry, id).Error
 	if err == nil {
-		err = application.Db.Delete(&entry).Error
+		err = app.Db.Delete(&entry).Error
 	}
 
 	return entry.ID, err
 }
 
-func getEntries(query structs.Entry, limit int) ([]structs.Entry, error) {
-	var entries []structs.Entry
+func getEntries(query s.Entry, limit int) ([]s.Entry, error) {
+	var entries []s.Entry
 	var err error
 
-	dbQuery := application.Db.Order("created_at desc")
+	dbQuery := app.Db.Order("created_at desc")
 	if limit > 0 {
 		err = dbQuery.Limit(limit).Where(query).Find(&entries).Error
 	} else {

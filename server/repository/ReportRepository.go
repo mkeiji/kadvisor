@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/resources/application"
@@ -25,9 +26,12 @@ func (repo *ReportRepository) GetAvailableYears(userID int) ([]int, error) {
 	`, userID, userID)
 
 	err := application.Db.Raw(query).Scan(&years).Error
-
-	for _, y := range years {
-		result = append(result, y.Year)
+	if len(years) <= 0 {
+		err = errors.New("no available years found")
+	} else {
+		for _, y := range years {
+			result = append(result, y.Year)
+		}
 	}
 
 	return result, err
@@ -40,6 +44,9 @@ func (repo *ReportRepository) FindBalance(userID int) (dtos.Balance, error) {
 		"user_id as user_id, sum(amount) as balance").Group(
 		"user_id").Where(
 		"user_id=?", userID).Scan(&balance).Error
+	if balance.UserID == 0 && balance.Balance == 0 {
+		err = errors.New("no balance is available")
+	}
 
 	return balance, err
 }
@@ -66,6 +73,10 @@ func (repo *ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos
 	`, year)
 
 	err := application.Db.Raw(query, userID).Scan(&mReport).Error
+
+	if len(mReport) <= 0 {
+		err = errors.New("no report available")
+	}
 
 	return mReport, err
 }

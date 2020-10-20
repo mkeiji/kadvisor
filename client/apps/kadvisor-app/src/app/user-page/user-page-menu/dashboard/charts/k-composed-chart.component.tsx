@@ -11,7 +11,9 @@ import {
     ResponsiveContainer
 } from 'recharts';
 import { MonthReport, ReportsApiService } from '@client/klibs';
-import { take } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import ChartsViewModelService from './charts-view-model.service';
 
 interface ChartPropsType {
     userID: number;
@@ -19,6 +21,8 @@ interface ChartPropsType {
 }
 
 export default function KComposedChartComponent(props: ChartPropsType) {
+    const destroy$ = new Subject<boolean>();
+    const viewModelService = new ChartsViewModelService();
     const service = new ReportsApiService(props.userID);
     const [data, setData] = useState<MonthReport[]>([]);
     const [minValue, setMinValue] = useState(0);
@@ -26,19 +30,27 @@ export default function KComposedChartComponent(props: ChartPropsType) {
     useEffect(() => {
         service
             .getYtdWithForecastReport(props.year)
-            .pipe(take(1))
-            .subscribe((x) => {
-                const min = Math.min.apply(
-                    Math,
-                    x.map((obj) => obj.balance)
-                );
+            .pipe(takeUntil(destroy$))
+            .subscribe(
+                (m: MonthReport[]) => {
+                    const min = Math.min.apply(
+                        Math,
+                        m.map((obj) => obj.balance)
+                    );
 
-                //NOTE: expenses need to be converted to positive values
-                x.map((obj) => (obj.expense = obj.expense * -1));
+                    //NOTE: expenses need to be converted to positive values
+                    m.map((obj) => (obj.expense = obj.expense * -1));
 
-                setMinValue(min > 0 ? 0 : min);
-                setData(x);
-            });
+                    setMinValue(min > 0 ? 0 : min);
+                    setData(m);
+                },
+                () => setData(viewModelService.getEmptyMonthReport())
+            );
+
+        return () => {
+            destroy$.next(true);
+            destroy$.unsubscribe();
+        };
     }, [props.year]);
 
     return (

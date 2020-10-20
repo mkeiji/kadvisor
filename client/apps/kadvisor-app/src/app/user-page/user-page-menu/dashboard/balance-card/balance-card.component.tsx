@@ -16,7 +16,10 @@ export default function BalanceCard(props: BalanceCardPropType) {
     const [userBalance, setBalance] = useState<UserBalance>({} as UserBalance);
 
     useEffect(() => {
-        service.getUserBalance().subscribe((u: UserBalance) => setBalance(u));
+        service.getUserBalance().subscribe(
+            (u: UserBalance) => setBalance(u),
+            () => setBalance({ userID: props.userID, balance: 0 })
+        );
     }, []);
 
     function getBalanceAsNumber(): number {

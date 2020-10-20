@@ -10,11 +10,12 @@ import Title from '../../Title/title.component';
 import EntryService from '../../entry/entry.service';
 import DashEntriesViewModelService from './dash-entries-view-model.service';
 import { DashEntryRow } from './view-model';
-import { combineLatest } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { combineLatest, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { APP_PAGES, KRouterPathUtil } from '@client/klibs';
 
 export default function DashboardEntries(props: DashboardEntriesPropsType) {
+    const destroy$ = new Subject<boolean>();
     const service = new EntryService(props.userID);
     const viewModelService = new DashEntriesViewModelService();
     const classes = useStyles();
@@ -27,7 +28,7 @@ export default function DashboardEntries(props: DashboardEntriesPropsType) {
             service.getClasses(),
             service.getEntries(nEntries)
         )
-            .pipe(take(1))
+            .pipe(takeUntil(destroy$))
             .subscribe(([resLookups, resClasses, resEntries]) =>
                 setRows(
                     viewModelService.formatDashboardRowEntries(
@@ -37,6 +38,11 @@ export default function DashboardEntries(props: DashboardEntriesPropsType) {
                     )
                 )
             );
+
+        return () => {
+            destroy$.next(true);
+            destroy$.unsubscribe();
+        };
     }, []);
 
     function getEntriesPath(): string {

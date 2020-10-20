@@ -7,7 +7,6 @@ import {
     KLookupUtil,
     LookupEntry
 } from '@client/klibs';
-import { CSSProperties } from 'react';
 
 class EntryViewModelService {
     formatTableState(

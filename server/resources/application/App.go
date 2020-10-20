@@ -3,15 +3,17 @@ package application
 import (
 	"bytes"
 	"fmt"
+	"kadvisor/server/repository/interfaces"
+	"kadvisor/server/resources/constants"
+	"log"
+	"os"
+	"sync"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"kadvisor/server/repository/interfaces"
-	"kadvisor/server/resources/constants"
-	"os"
-	"sync"
 )
 
 var Db *gorm.DB
@@ -57,7 +59,7 @@ func (a App) SetRouter() {
 func (a App) Run() {
 	routerErr := Router.Run(":" + os.Getenv("PORT"))
 	if routerErr != nil {
-		fmt.Println(routerErr)
+		log.Fatalln(routerErr)
 	}
 }
 

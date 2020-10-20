@@ -1,80 +1,85 @@
 package repository
 
 import (
-	"kadvisor/server/repository/structs"
-	"kadvisor/server/resources/application"
+	"errors"
+	s "kadvisor/server/repository/structs"
+	app "kadvisor/server/resources/application"
 )
 
 type UserRepository struct{}
 
-func (t *UserRepository) FindAll(preloaded bool) ([]structs.User, error) {
-	var users []structs.User
+func (t *UserRepository) FindAll(preloaded bool) ([]s.User, error) {
+	var users []s.User
+	var err error
 
 	if preloaded {
-		err := application.Db.Preload(
-			"Login").Preload(
-			"Entries").Preload(
-			"Classes").Find(&users).Error
-		if err != nil {
-			return users, err
-		}
+		err = app.Db.
+			Preload("Login").
+			Preload("Entries").
+			Preload("Classes").
+			Find(&users).
+			Error
 	} else {
-		err := application.Db.Preload("Login").Find(&users).Error
-		if err != nil {
-			return users, err
-		}
+		err = app.Db.Preload("Login").Find(&users).Error
 	}
 
-	return users, nil
+	return t.handleFindManyErr(users, err)
 }
 
-func (t *UserRepository) FindOne(id int, preloaded bool) (structs.User, error) {
-	var user structs.User
+func (t *UserRepository) FindOne(id int, preloaded bool) (s.User, error) {
+	var user s.User
+	var err error
 
 	if preloaded {
-		err := application.Db.Preload(
-			"Login").Preload(
-			"Entries").Preload(
-			"Classes").First(&user, id).Error
-		if err != nil {
-			return user, err
-		}
-		return user, nil
+		err = app.Db.
+			Preload("Login").
+			Preload("Entries").
+			Preload("Classes").
+			First(&user, id).
+			Error
 	} else {
-		err := application.Db.Preload("Login").First(&user, id).Error
-		if err != nil {
-			return user, err
-		}
-		return user, nil
+		err = app.Db.Preload("Login").First(&user, id).Error
 	}
+
+	return user, err
 }
 
-func (t *UserRepository) Create(user structs.User) (structs.User, error) {
-	err := application.Db.Save(&user).Error
+func (t *UserRepository) Create(user s.User) (s.User, error) {
+	err := app.Db.Save(&user).Error
 	if err != nil {
 		return user, err
 	}
 	return user, nil
 }
 
-func (t *UserRepository) Update(user structs.User) (structs.User, error) {
-	var stored structs.User
+func (t *UserRepository) Update(user s.User) (s.User, error) {
+	var stored s.User
 	var err error
 
-	err = application.Db.Set(
+	err = app.Db.Set(
 		"gorm:association_autocreate", false).First(
 		&stored, user.ID).Updates(user).Error
 	return stored, err
 }
 
-func (t *UserRepository) Delete(userID int) (structs.User, error) {
-	var user structs.User
+func (t *UserRepository) Delete(userID int) (s.User, error) {
+	var user s.User
 	var err error
 
-	err = application.Db.First(&user, userID).Error
+	err = app.Db.First(&user, userID).Error
 	if err == nil {
-		err = application.Db.Delete(&user).Error
+		err = app.Db.Delete(&user).Error
 	}
 
 	return user, err
+}
+
+func (t *UserRepository) handleFindManyErr(
+	users []s.User,
+	err error,
+) ([]s.User, error) {
+	if len(users) < 1 {
+		err = errors.New("records not found")
+	}
+	return users, err
 }
