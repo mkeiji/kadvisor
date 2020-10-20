@@ -15,7 +15,8 @@ build-client:
         - echo NX_APP_DOMAIN=$API_HOST >> client/apps/kadvisor-app/.local.env
         - cd client/
         - npm install
-        - npm run build
+        - npm run format:check
+        - npm run build:prod
 
 
 build-server:
