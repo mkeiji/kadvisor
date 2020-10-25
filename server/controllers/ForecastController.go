@@ -5,6 +5,7 @@ import (
 	u "kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
+	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
@@ -12,9 +13,11 @@ import (
 )
 
 type ForecastController struct {
-	fcService  services.ForecastService
-	usrService services.UserService
-	auth       services.KeiAuthService
+	fcService         services.ForecastService
+	usrService        services.UserService
+	auth              services.KeiAuthService
+	validator         validators.ForecastValidator
+	validationService services.ValidationService
 }
 
 func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
@@ -59,7 +62,14 @@ func (ctrl *ForecastController) LoadEndpoints(router *gin.Engine) {
 			}
 
 			c.BindJSON(&forecast)
-			response = ctrl.fcService.Post(forecast)
+			response = ctrl.validationService.GetResponse(
+				ctrl.validator,
+				forecast,
+			)
+			if u.IsOKresponse(response.Status) {
+				response = ctrl.fcService.Post(forecast)
+			}
+
 			c.JSON(response.Status, response.Body)
 			return
 		})

@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	u "kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/KeiPassUtil"
+	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
+	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
@@ -12,8 +15,10 @@ import (
 )
 
 type UserController struct {
-	userService services.UserService
-	auth        services.KeiAuthService
+	userService       services.UserService
+	auth              services.KeiAuthService
+	validator         validators.UserValidator
+	validationService services.ValidationService
 }
 
 func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
@@ -26,10 +31,19 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 
 	// post(/user) - unprotected by jwt
 	router.POST("/api/user", func(context *gin.Context) {
+		var response dtos.KhttpResponse
 		var user structs.User
+
 		context.BindJSON(&user)
-		KeiPassUtil.HashAndSalt(&user)
-		response := ctrl.userService.Post(user)
+		response = ctrl.validationService.GetResponse(
+			ctrl.validator,
+			user,
+		)
+		if u.IsOKresponse(response.Status) {
+			KeiPassUtil.HashAndSalt(&user)
+			response = ctrl.userService.Post(user)
+		}
+
 		context.JSON(response.Status, response.Body)
 		return
 	})
@@ -61,10 +75,18 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 
 		// put(/user)
 		userRoutes.PUT("/user", func(context *gin.Context) {
+			var response dtos.KhttpResponse
 			var user structs.User
-			context.BindJSON(&user)
 
-			response := ctrl.userService.Put(user)
+			context.BindJSON(&user)
+			response = ctrl.validationService.GetResponse(
+				ctrl.validator,
+				user,
+			)
+			if u.IsOKresponse(response.Status) {
+				response = ctrl.userService.Put(user)
+			}
+
 			context.JSON(response.Status, response.Body)
 			return
 		})

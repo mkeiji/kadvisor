@@ -7,7 +7,7 @@ import (
 
 type Entry struct {
 	Base
-	UserID          int       `json:"userID,omitempty" validate:"required"`
+	UserID          int       `json:"userID,omitempty"`
 	ClassID         int       `json:"classID,omitempty" validate:"required,ispositive"`
 	EntryTypeCodeID string    `json:"entryTypeCodeID,omitempty"` // is lookup
 	Date            time.Time `json:"date,omitempty"`

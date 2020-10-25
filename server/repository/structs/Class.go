@@ -7,7 +7,7 @@ import (
 type Class struct {
 	Base
 	UserID      int    `json:"userID,omitempty"`
-	Name        string `json:"name,omitempty"`
+	Name        string `json:"name,omitempty" validate:"required"`
 	Description string `json:"description,omitempty"`
 }
 
