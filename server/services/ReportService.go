@@ -5,6 +5,7 @@ import (
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository"
 	"kadvisor/server/repository/mappers"
+	"kadvisor/server/resources/enums"
 	"net/http"
 	"sort"
 )
@@ -95,10 +96,18 @@ func (svc *ReportService) getCombinedWithAccumulatedBalance(
 	combinedMonths []dtos.MonthReport,
 ) []dtos.MonthReport {
 	updated := []dtos.MonthReport{}
+	latestActual := svc.getLatestActualMonth(combinedMonths)
 
 	accBalance := 0.0
 	for _, month := range combinedMonths {
-		accBalance = accBalance + month.Balance
+		if (latestActual == dtos.MonthReport{}) ||
+			(month.Type == enums.ACTUAL.ToString()) ||
+			(month.Month >= latestActual.Month) {
+			accBalance = accBalance + month.Balance
+		} else {
+			month.Income = 0.0
+			month.Expense = 0.0
+		}
 		month.Balance = accBalance
 		updated = append(updated, month)
 	}
@@ -108,23 +117,28 @@ func (svc *ReportService) getCombinedWithAccumulatedBalance(
 
 func (svc *ReportService) combineYtdWithForecast(
 	ytdMonths []dtos.MonthReport,
-	forecastMonts []dtos.MonthReport,
+	forecastMonths []dtos.MonthReport,
 ) []dtos.MonthReport {
 
 	result := []dtos.MonthReport{}
 	for i := 1; i <= 12; i++ {
-		month := svc.findMonthInMonthReport(i, ytdMonths)
-		if svc.isEmptyMonthReport(month) {
-			result = append(result, svc.findMonthInMonthReport(i, forecastMonts))
+		aMonth := svc.findMonthInMonthReport(i, ytdMonths)
+		fMonth := svc.findMonthInMonthReport(i, forecastMonths)
+		if svc.isEmptyMonthReport(aMonth) {
+			fMonth.Type = enums.FORECAST.ToString()
+			result = append(result, fMonth)
 		} else {
-			result = append(result, month)
+			aMonth.Type = enums.ACTUAL.ToString()
+			result = append(result, aMonth)
 		}
 	}
 	return result
 }
 
 func (svc *ReportService) findMonthInMonthReport(
-	month int, monthReports []dtos.MonthReport) dtos.MonthReport {
+	month int,
+	monthReports []dtos.MonthReport,
+) dtos.MonthReport {
 
 	result := dtos.MonthReport{}
 
@@ -139,4 +153,18 @@ func (svc *ReportService) findMonthInMonthReport(
 
 func (svc *ReportService) isEmptyMonthReport(month dtos.MonthReport) bool {
 	return (dtos.MonthReport{}) == month
+}
+
+func (svc *ReportService) getLatestActualMonth(
+	monthReports []dtos.MonthReport,
+) dtos.MonthReport {
+	var result dtos.MonthReport
+
+	for _, month := range monthReports {
+		if month.Type == enums.ACTUAL.ToString() {
+			result = month
+		}
+	}
+
+	return result
 }
