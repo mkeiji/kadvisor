@@ -2,20 +2,33 @@ package repository
 
 import (
 	"kadvisor/server/repository/mappers"
-	"kadvisor/server/repository/structs"
-	"kadvisor/server/resources/application"
+	s "kadvisor/server/repository/structs"
+	app "kadvisor/server/resources/application"
 )
 
 type ForecastEntryRepository struct {
 	mapper mappers.ForecastEntryMapper
 }
 
-func (repo *ForecastEntryRepository) Update(
-	entry structs.ForecastEntry) (structs.ForecastEntry, error) {
+func (repo *ForecastEntryRepository) FindOne(id int) (s.ForecastEntry, error) {
+	var entry s.ForecastEntry
+	err := app.Db.Where("id=?", id).First(&entry).Error
+	return entry, err
+}
 
-	var stored structs.ForecastEntry
+func (repo *ForecastEntryRepository) Update(
+	entry s.ForecastEntry,
+) (s.ForecastEntry, error) {
 	eMapped := repo.mapper.MapForecastEntry(entry)
 
-	err := application.Db.Find(&stored, entry.ID).Updates(eMapped).Error
+	stored, err := repo.FindOne(entry.ID)
+	err = app.Db.Model(&stored).Select("income", "expense").
+		UpdateColumns(
+			s.ForecastEntry{
+				Income:  eMapped.Income,
+				Expense: eMapped.Expense,
+			},
+		).Error
+
 	return stored, err
 }

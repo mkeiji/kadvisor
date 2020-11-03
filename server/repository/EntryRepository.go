@@ -31,18 +31,25 @@ func (repo *EntryRepository) FindOne(id int) (s.Entry, error) {
 }
 
 func (repo *EntryRepository) Create(
-	entry s.Entry) (s.Entry, error) {
+	entry s.Entry,
+) (s.Entry, error) {
 	eMapped := repo.mapper.MapEntry(entry)
 	err := app.Db.Save(&eMapped).Error
 	return eMapped, err
 }
 
 func (repo *EntryRepository) Update(
-	entry s.Entry) (s.Entry, error) {
+	entry s.Entry,
+) (s.Entry, error) {
 	eMapped := repo.mapper.MapEntry(entry)
 	stored, err := repo.FindOne(entry.ID)
 	if err == nil {
 		err = app.Db.Model(&stored).Updates(eMapped).Error
+		if entry.Amount == 0 {
+			err = app.Db.Model(&stored).
+				UpdateColumn("amount", 0).
+				Error
+		}
 	}
 	return stored, err
 }

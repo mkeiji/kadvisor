@@ -21,6 +21,6 @@ export class KFormatUtil {
             minimumFractionDigits: 2
         });
 
-        return formatter.format(value);
+        return formatter.format(value ? value : 0);
     }
 }

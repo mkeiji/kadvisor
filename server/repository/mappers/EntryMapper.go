@@ -1,21 +1,22 @@
 package mappers
 
 import (
-	"kadvisor/server/repository/structs"
+	s "kadvisor/server/repository/structs"
 	"kadvisor/server/resources/constants"
 	"time"
 )
 
 type EntryMapper struct{}
 
-func (e *EntryMapper) MapEntry(entry structs.Entry) structs.Entry {
+func (e *EntryMapper) MapEntry(entry s.Entry) s.Entry {
 	entry = e.mapEntryDate(entry)
 	entry = e.mapEntryAmount(entry)
 	return entry
 }
 
 func (e *EntryMapper) mapEntryDate(
-	entry structs.Entry) structs.Entry {
+	entry s.Entry,
+) s.Entry {
 
 	utc, _ := time.LoadLocation("UTC")
 	entry.Date = entry.Date.In(utc)
@@ -23,7 +24,8 @@ func (e *EntryMapper) mapEntryDate(
 }
 
 func (e *EntryMapper) mapEntryAmount(
-	entry structs.Entry) structs.Entry {
+	entry s.Entry,
+) s.Entry {
 	if entry.EntryTypeCodeID == constants.EXPENSE_ENTRY_TYPE {
 		if entry.Amount > 0 {
 			entry.Amount = entry.Amount * -1
