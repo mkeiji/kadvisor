@@ -65,7 +65,7 @@ export default function ForecastTable(props: ForecastTablePropsType) {
 
     async function getAvailableReportYears() {
         reportsService
-            .getAvailableReportYears()
+            .getAvailableReportYears(true)
             .pipe(takeUntil(destroy$))
             .subscribe((years: number[]) => {
                 mapYearMenuItems(years);

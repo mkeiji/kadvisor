@@ -17,7 +17,10 @@ export class ReportsApiService {
         return this.krxios.get(`${APP_REPORT_ENDPOINT}?type=YFC&year=${year}`);
     }
 
-    getAvailableReportYears(): Observable<number[]> {
-        return this.krxios.get(`${APP_REPORT_AVAILABLE_ENDPOINT}`);
+    getAvailableReportYears(isForecast?: boolean): Observable<number[]> {
+        const forecastParam = `?forecast=${isForecast}`;
+        return this.krxios.get(
+            `${APP_REPORT_AVAILABLE_ENDPOINT}${isForecast ? forecastParam : ''}`
+        );
     }
 }

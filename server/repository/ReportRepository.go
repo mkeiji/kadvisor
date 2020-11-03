@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"kadvisor/server/libs/dtos"
+	"kadvisor/server/repository/structs"
 	"kadvisor/server/resources/application"
 )
 
@@ -12,6 +13,27 @@ type Year struct {
 }
 
 type ReportRepository struct{}
+
+func (repo *ReportRepository) GetAvailableForecastYears(userID int) ([]int, error) {
+	var forecasts []structs.Forecast
+	var result []int
+
+	err := application.Db.
+		Distinct("year").
+		Order("year desc").
+		Find(&forecasts).
+		Error
+
+	if len(forecasts) <= 0 {
+		err = errors.New("no available years found")
+	} else {
+		for _, f := range forecasts {
+			result = append(result, f.Year)
+		}
+	}
+
+	return result, err
+}
 
 func (repo *ReportRepository) GetAvailableYears(userID int) ([]int, error) {
 	var years []Year

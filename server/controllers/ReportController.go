@@ -60,9 +60,10 @@ func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
 			return
 		})
 
-		// get(/reportavailable)
+		// get(/reportavailable?forecast)
 		reportRoutes.GET("/reportavailable", func(c *gin.Context) {
 			var response dtos.KhttpResponse
+			isForecast, _ := strconv.ParseBool(c.Query("forecast"))
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
 			response = ctrl.usrService.GetOne(userID, false)
@@ -71,7 +72,11 @@ func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
 				return
 			}
 
-			response = ctrl.service.GetReportAvailable(userID)
+			if isForecast == true {
+				response = ctrl.service.GetReportForecastAvailable(userID)
+			} else {
+				response = ctrl.service.GetReportAvailable(userID)
+			}
 			c.JSON(response.Status, response.Body)
 			return
 		})

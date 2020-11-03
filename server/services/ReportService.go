@@ -78,6 +78,20 @@ func (svc *ReportService) GetYearToDateWithForecastReport(
 	return response
 }
 
+func (svc *ReportService) GetReportForecastAvailable(userID int) dtos.KhttpResponse {
+	var response dtos.KhttpResponse
+
+	result, err := svc.repository.GetAvailableForecastYears(userID)
+	if err != nil {
+		response = dtos.NewKresponse(http.StatusNotFound, err)
+	} else {
+		sort.Sort(sort.Reverse(sort.IntSlice(result)))
+		response = dtos.NewKresponse(http.StatusOK, result)
+	}
+
+	return response
+}
+
 func (svc *ReportService) GetReportAvailable(userID int) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
