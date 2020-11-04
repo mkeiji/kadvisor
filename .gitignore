@@ -64,3 +64,4 @@ kadvisor.exe
 __debug_bin
 /client/.idea/
 /client/.vscode/
+*.coverprofile

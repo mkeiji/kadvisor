@@ -12,6 +12,9 @@ formatServer:
 runClient:
 	(cd client/ && nx serve)
 
+runTestsServer:
+	ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
+
 formatClient:
 	(cd client/ && npm run format)
 

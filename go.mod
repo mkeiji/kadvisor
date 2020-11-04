@@ -16,6 +16,8 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
+	github.com/onsi/ginkgo v1.7.0
+	github.com/onsi/gomega v1.4.3
 	github.com/ugorji/go v1.1.8 // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/sys v0.0.0-20200923182605-d9f96fdee20d // indirect

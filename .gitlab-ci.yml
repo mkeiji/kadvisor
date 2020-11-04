@@ -1,23 +1,21 @@
-image: golang
-
 stages:
     - build
+    - test
     - docker
     - deploy
 
 build-client:
-   stage: build
-   image: node
-   artifacts:
+    stage: build
+    image: node
+    artifacts:
         paths:
             - client/dist
-   script:
+    script:
         - echo NX_APP_DOMAIN=$API_HOST >> client/apps/kadvisor-app/.local.env
         - cd client/
         - npm install
         - npm run format:check
         - npm run build:prod
-
 
 build-server:
     stage: build
@@ -28,6 +26,17 @@ build-server:
     script:
         - go build
 
+test-server:
+    stage: test
+    image: golang
+    script:
+        - go get -v github.com/onsi/ginkgo/ginkgo
+        - go get -v github.com/onsi/gomega
+        - go get -v github.com/golang/mock/gomock
+        - go get -v -t ./...
+        - export PATH=$PATH:$HOME/gopath/bin
+        - ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
+
 docker:
     stage: docker
     only:
@@ -37,8 +46,7 @@ docker:
         - docker:19.03.12-dind
     script:
         - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-        - docker build -t registry.gitlab.com/keijidev/kadvisor:latest .
-        - docker push registry.gitlab.com/keijidev/kadvisor:latest
+        - docker build -t registry.gitlab.com/keijidev/kadvisor:latest .  - docker push registry.gitlab.com/keijidev/kadvisor:latest
 
 deploy:
     stage: deploy
