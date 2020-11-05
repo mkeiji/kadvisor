@@ -8,8 +8,8 @@ import (
 type ForecastMapper struct{}
 
 func (f *ForecastMapper) MapForecastToMonthReportDto(
-	forecast structs.Forecast) []dtos.MonthReport {
-
+	forecast structs.Forecast,
+) []dtos.MonthReport {
 	mapped := []dtos.MonthReport{}
 
 	year := forecast.Year

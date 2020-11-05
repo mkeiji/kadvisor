@@ -17,7 +17,6 @@ func (e *EntryMapper) MapEntry(entry s.Entry) s.Entry {
 func (e *EntryMapper) mapEntryDate(
 	entry s.Entry,
 ) s.Entry {
-
 	utc, _ := time.LoadLocation("UTC")
 	entry.Date = entry.Date.In(utc)
 	return entry
