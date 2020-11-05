@@ -33,8 +33,10 @@ test-server:
         - go get -v github.com/onsi/ginkgo/ginkgo
         - go get -v github.com/onsi/gomega
         - go get -v github.com/golang/mock/gomock
+        - go get -v github.com/golang/mock/mockgen
         - go get -v -t ./...
         - export PATH=$PATH:$HOME/gopath/bin
+        - (cd server/repository/interfaces/ && go generate)
         - ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
 
 docker:

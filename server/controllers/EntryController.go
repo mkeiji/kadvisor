@@ -17,7 +17,6 @@ type EntryController struct {
 	service           services.EntryService
 	usrService        services.UserService
 	auth              services.KeiAuthService
-	validator         validators.EntryValidator
 	validationService services.ValidationService
 }
 
@@ -74,7 +73,10 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 			}
 
 			c.BindJSON(&entry)
-			response = ctrl.validationService.GetResponse(ctrl.validator, entry)
+			response = ctrl.validationService.GetResponse(
+				validators.NewEntryValidator(),
+				entry,
+			)
 			if u.IsOKresponse(response.Status) {
 				response = ctrl.service.Post(entry)
 			}
@@ -96,7 +98,10 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 			}
 
 			c.BindJSON(&entry)
-			response = ctrl.validationService.GetResponse(ctrl.validator, entry)
+			response = ctrl.validationService.GetResponse(
+				validators.NewEntryValidator(),
+				entry,
+			)
 			if u.IsOKresponse(response.Status) {
 				response = ctrl.service.Put(entry)
 			}

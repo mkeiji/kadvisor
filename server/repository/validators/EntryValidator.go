@@ -2,17 +2,25 @@ package validators
 
 import (
 	"errors"
-	util "kadvisor/server/libs/ValidationHelper"
-	"kadvisor/server/repository"
-	"kadvisor/server/repository/structs"
-
 	"github.com/go-playground/validator/v10"
+	util "kadvisor/server/libs/ValidationHelper"
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
+	"kadvisor/server/repository/structs"
 )
 
 type EntryValidator struct {
-	tagValidator    *validator.Validate
-	classRepository repository.ClassRepository
-	codeRepository  repository.CodeCodeTextRepository
+	TagValidator    i.TagValidator
+	ClassRepository i.ClassRepository
+	CodeRepository  i.CodeCodeTextRepository
+}
+
+func NewEntryValidator() EntryValidator {
+	return EntryValidator{
+		TagValidator:    TagValidator{},
+		ClassRepository: r.ClassRepository{},
+		CodeRepository:  r.CodeCodeTextRepository{},
+	}
 }
 
 func (e EntryValidator) Validate(obj interface{}) []error {
@@ -28,10 +36,9 @@ func (e EntryValidator) validateProperties(
 	entry structs.Entry,
 	errList *[]error,
 ) {
-	e.tagValidator = validator.New()
-	e.tagValidator.RegisterValidation("ispositive", e.customIsPositive)
+	e.TagValidator.RegisterTag("ispositive", e.customIsPositive)
 
-	err := e.tagValidator.Struct(entry)
+	err := e.TagValidator.ValidateStruct(entry)
 	if err != nil {
 		*errList = append(*errList, err)
 	}
@@ -45,7 +52,7 @@ func (e EntryValidator) validateClass(
 	classID int,
 	errList *[]error,
 ) {
-	_, cErr := e.classRepository.FindOne(classID)
+	_, cErr := e.ClassRepository.FindOne(classID)
 	if cErr != nil {
 		*errList = append(
 			*errList,
@@ -61,7 +68,7 @@ func (e EntryValidator) validateCodeType(
 	codeTypeID string,
 	errList *[]error,
 ) {
-	_, lErr := e.codeRepository.FindOne(codeTypeID)
+	_, lErr := e.CodeRepository.FindOne(codeTypeID)
 	if lErr != nil {
 		*errList = append(
 			*errList,

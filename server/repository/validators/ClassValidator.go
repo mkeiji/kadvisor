@@ -1,29 +1,32 @@
 package validators
 
 import (
-	"kadvisor/server/repository/structs"
-
-	"github.com/go-playground/validator/v10"
+	i "kadvisor/server/repository/interfaces"
+	s "kadvisor/server/repository/structs"
 )
 
 type ClassValidator struct {
-	tagValidator *validator.Validate
+	TagValidator i.TagValidator
+}
+
+func NewClassValidator() ClassValidator {
+	return ClassValidator{
+		TagValidator: TagValidator{},
+	}
 }
 
 func (c ClassValidator) Validate(obj interface{}) []error {
 	errList := []error{}
-	class, _ := obj.(structs.Class)
+	class, _ := obj.(s.Class)
 	c.validateProperties(class, &errList)
 	return errList
 }
 
 func (c ClassValidator) validateProperties(
-	class structs.Class,
+	class s.Class,
 	errList *[]error,
 ) {
-	c.tagValidator = validator.New()
-
-	err := c.tagValidator.Struct(class)
+	err := c.TagValidator.ValidateStruct(class)
 	if err != nil {
 		*errList = append(*errList, err)
 	}

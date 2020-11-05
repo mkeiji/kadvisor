@@ -3,42 +3,46 @@ package validators
 import (
 	"errors"
 	util "kadvisor/server/libs/ValidationHelper"
-	"kadvisor/server/repository"
-	"kadvisor/server/repository/structs"
-
-	"github.com/go-playground/validator/v10"
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
+	s "kadvisor/server/repository/structs"
 )
 
 type UserValidator struct {
-	tagValidator    *validator.Validate
-	loginRepository repository.LoginRepository
+	TagValidator    i.TagValidator
+	LoginRepository i.LoginRepository
+}
+
+func NewUserValidator() UserValidator {
+	return UserValidator{
+		TagValidator:    TagValidator{},
+		LoginRepository: r.LoginRepository{},
+	}
 }
 
 func (u UserValidator) Validate(obj interface{}) []error {
 	errList := []error{}
-	user, _ := obj.(structs.User)
+	user, _ := obj.(s.User)
 	u.validateProperties(user, &errList)
 	u.validateLogin(user, &errList)
 	return errList
 }
 
 func (u UserValidator) validateProperties(
-	user structs.User,
+	user s.User,
 	errList *[]error,
 ) {
-	u.tagValidator = validator.New()
-
-	err := u.tagValidator.Struct(user)
+	err := u.TagValidator.ValidateStruct(user)
 	if err != nil {
 		*errList = append(*errList, err)
 	}
 }
 
 func (u UserValidator) validateLogin(
-	user structs.User,
+	user s.User,
 	errList *[]error,
 ) {
-	_, err := u.loginRepository.FindOneByEmail(user.Login.Email)
+	_, err := u.LoginRepository.FindOneByEmail(user.Login.Email)
 	if err == nil {
 		*errList = append(
 			*errList,

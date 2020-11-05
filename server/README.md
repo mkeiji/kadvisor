@@ -6,6 +6,21 @@
 2. [gomega](https://github.com/onsi/gomega)
 3. [gomock](https://github.com/golang/mock)
 
+## Install frameworks
+- ginkgo & gomega:
+
+```bash
+go get github.com/onsi/ginkgo/ginkgo
+go get github.com/onsi/gomega/...
+```
+
+- gomock w/ mockgen:
+
+```bash
+go get github.com/golang/mock/gomock
+go get github.com/golang/mock/mockgen
+```
+
 ## Generate package test suit with ginkgo
 - Navigate to `package/path` and run:
 

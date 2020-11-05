@@ -11,7 +11,7 @@ type CodeCodeTextRepository struct {
 	mapper mappers.LookupMapper
 }
 
-func (repo *CodeCodeTextRepository) FindAllByCodeGroup(
+func (repo CodeCodeTextRepository) FindAllByCodeGroup(
 	codeGroup string,
 ) ([]structs.Code, error) {
 	var codes []structs.Code
@@ -25,7 +25,7 @@ func (repo *CodeCodeTextRepository) FindAllByCodeGroup(
 	return codes, err
 }
 
-func (repo *CodeCodeTextRepository) FindOne(
+func (repo CodeCodeTextRepository) FindOne(
 	codeTypeID string,
 ) (structs.Code, error) {
 	var code structs.Code

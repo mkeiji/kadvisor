@@ -7,7 +7,7 @@ import (
 
 type LoginRepository struct{}
 
-func (l *LoginRepository) FindOneByEmail(email string) (s.Login, error) {
+func (l LoginRepository) FindOneByEmail(email string) (s.Login, error) {
 	var login s.Login
 
 	err := app.Db.Where("email=?", email).First(&login).Error
@@ -17,7 +17,7 @@ func (l *LoginRepository) FindOneByEmail(email string) (s.Login, error) {
 	return login, nil
 }
 
-func (l *LoginRepository) Update(
+func (l LoginRepository) Update(
 	login s.Login,
 ) (s.Login, error) {
 	stored, err := l.findOne(login.ID)
@@ -28,7 +28,7 @@ func (l *LoginRepository) Update(
 	return stored, err
 }
 
-func (l *LoginRepository) UpdateLoginStatus(
+func (l LoginRepository) UpdateLoginStatus(
 	login s.Login,
 	isLoggedIn bool,
 ) (s.Login, error) {
@@ -48,7 +48,7 @@ func (l *LoginRepository) UpdateLoginStatus(
 	return storedLogin, nil
 }
 
-func (l *LoginRepository) findOne(
+func (l LoginRepository) findOne(
 	id int,
 ) (s.Login, error) {
 	var storedLogin s.Login

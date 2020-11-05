@@ -12,7 +12,14 @@ formatServer:
 runClient:
 	(cd client/ && nx serve)
 
+serverTestSuite:
+	ginkgo bootstrap
+
+serverMocks:
+	(cd server/repository/interfaces/ && go generate)
+
 runTestsServer:
+	(cd server/repository/interfaces/ && go generate)
 	ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
 
 formatClient:

@@ -3,20 +3,26 @@ package validators
 import (
 	"errors"
 	util "kadvisor/server/libs/ValidationHelper"
-	"kadvisor/server/repository"
-	"kadvisor/server/repository/structs"
-
-	"github.com/go-playground/validator/v10"
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
+	s "kadvisor/server/repository/structs"
 )
 
 type ForecastValidator struct {
-	tagValidator *validator.Validate
-	forecastRepo repository.ForecastRepository
+	TagValidator i.TagValidator
+	ForecastRepo i.ForecastRepository
+}
+
+func NewForecastValidator() ForecastValidator {
+	return ForecastValidator{
+		TagValidator: TagValidator{},
+		ForecastRepo: r.ForecastRepository{},
+	}
 }
 
 func (f ForecastValidator) Validate(obj interface{}) []error {
 	errList := []error{}
-	forecast, _ := obj.(structs.Forecast)
+	forecast, _ := obj.(s.Forecast)
 	f.validateProperties(forecast, &errList)
 	f.validateIsUnique(forecast, &errList)
 	f.validateEntriesMonth(forecast, &errList)
@@ -24,22 +30,20 @@ func (f ForecastValidator) Validate(obj interface{}) []error {
 }
 
 func (f ForecastValidator) validateProperties(
-	forecast structs.Forecast,
+	forecast s.Forecast,
 	errList *[]error,
 ) {
-	f.tagValidator = validator.New()
-
-	err := f.tagValidator.Struct(forecast)
+	err := f.TagValidator.ValidateStruct(forecast)
 	if err != nil {
 		*errList = append(*errList, err)
 	}
 }
 
 func (f ForecastValidator) validateIsUnique(
-	forecast structs.Forecast,
+	forecast s.Forecast,
 	errList *[]error,
 ) {
-	_, fErr := f.forecastRepo.FindOne(forecast.UserID, forecast.Year, false)
+	_, fErr := f.ForecastRepo.FindOne(forecast.UserID, forecast.Year, false)
 	if fErr == nil {
 		*errList = append(
 			*errList,
@@ -52,7 +56,7 @@ func (f ForecastValidator) validateIsUnique(
 }
 
 func (f ForecastValidator) validateEntriesMonth(
-	forecast structs.Forecast,
+	forecast s.Forecast,
 	errList *[]error,
 ) {
 	var entriesMonth []int

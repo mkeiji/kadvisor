@@ -12,12 +12,14 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 var Db *gorm.DB
 var Router *gin.Engine
+var Validator *validator.Validate
 var once sync.Once
 
 type App struct {
@@ -27,12 +29,13 @@ type App struct {
 
 func (a App) Initialize() {
 	once.Do(func() {
-		Db, _ = gorm.Open(mysql.Open(getDbConnection()), &gorm.Config{})
-
 		if os.Getenv("APP_ENV") == "PROD" {
 			gin.SetMode(gin.ReleaseMode)
 		}
+
+		Db, _ = gorm.Open(mysql.Open(getDbConnection()), &gorm.Config{})
 		Router = gin.Default()
+		Validator = validator.New()
 	})
 }
 

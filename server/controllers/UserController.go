@@ -5,7 +5,7 @@ import (
 	"kadvisor/server/libs/KeiPassUtil"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
-	"kadvisor/server/repository/validators"
+	v "kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
@@ -17,7 +17,6 @@ import (
 type UserController struct {
 	userService       services.UserService
 	auth              services.KeiAuthService
-	validator         validators.UserValidator
 	validationService services.ValidationService
 }
 
@@ -36,7 +35,7 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 
 		context.BindJSON(&user)
 		response = ctrl.validationService.GetResponse(
-			ctrl.validator,
+			v.NewUserValidator(),
 			user,
 		)
 		if u.IsOKresponse(response.Status) {
@@ -80,7 +79,7 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 
 			context.BindJSON(&user)
 			response = ctrl.validationService.GetResponse(
-				ctrl.validator,
+				v.NewUserValidator(),
 				user,
 			)
 			if u.IsOKresponse(response.Status) {

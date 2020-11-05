@@ -28,12 +28,20 @@ var _ = Describe("KeiPassUtil", func() {
 	})
 
 	Describe("IsValidPassword", func() {
-		It("should set hashed password", func() {
+		It("should return true if password match", func() {
 			hashedPwd := "$2a$04$2XR0oPLu9ezz9YB3Pcztgu4asG53C3ywLQicQTcrMcS1FLO5R/vLG"
 			Expect(KeiPassUtil.IsValidPassword(
 				hashedPwd,
 				user.Login.Password,
 			)).To(BeTrue())
+		})
+
+		It("should return false if password does not match", func() {
+			hashedPwd := "wrong pwd"
+			Expect(KeiPassUtil.IsValidPassword(
+				hashedPwd,
+				user.Login.Password,
+			)).To(BeFalse())
 		})
 	})
 })

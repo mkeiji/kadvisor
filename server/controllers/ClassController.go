@@ -4,7 +4,7 @@ import (
 	u "kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
-	"kadvisor/server/repository/validators"
+	v "kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
@@ -17,7 +17,6 @@ type ClassController struct {
 	service           services.ClassService
 	auth              services.KeiAuthService
 	usrService        services.UserService
-	validator         validators.ClassValidator
 	validationService services.ValidationService
 }
 
@@ -62,7 +61,7 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 
 			c.BindJSON(&class)
 			response = ctrl.validationService.GetResponse(
-				ctrl.validator,
+				v.NewClassValidator(),
 				class,
 			)
 			if u.IsOKresponse(response.Status) {
@@ -87,7 +86,7 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 
 			c.BindJSON(&class)
 			response = ctrl.validationService.GetResponse(
-				ctrl.validator,
+				v.NewClassValidator(),
 				class,
 			)
 			if u.IsOKresponse(response.Status) {

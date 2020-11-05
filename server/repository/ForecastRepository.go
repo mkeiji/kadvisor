@@ -10,9 +10,9 @@ type ForecastRepository struct {
 	entryMapper mappers.ForecastEntryMapper
 }
 
-func (repo *ForecastRepository) FindOne(
-	userID int, year int, isPreloaded bool) (structs.Forecast, error) {
-
+func (repo ForecastRepository) FindOne(
+	userID int, year int, isPreloaded bool,
+) (structs.Forecast, error) {
 	var forecast structs.Forecast
 	var err error
 
@@ -27,9 +27,9 @@ func (repo *ForecastRepository) FindOne(
 	return forecast, err
 }
 
-func (repo *ForecastRepository) Create(
-	forecast structs.Forecast) (structs.Forecast, error) {
-
+func (repo ForecastRepository) Create(
+	forecast structs.Forecast,
+) (structs.Forecast, error) {
 	var mappedEntries []structs.ForecastEntry
 	for _, e := range forecast.Entries {
 		mappedEntries = append(mappedEntries, repo.entryMapper.MapForecastEntry(e))
@@ -40,7 +40,7 @@ func (repo *ForecastRepository) Create(
 	return forecast, err
 }
 
-func (repo *ForecastRepository) Delete(id int) (structs.Forecast, error) {
+func (repo ForecastRepository) Delete(id int) (structs.Forecast, error) {
 	var forecast structs.Forecast
 	var err error
 

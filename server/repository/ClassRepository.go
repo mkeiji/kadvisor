@@ -7,8 +7,9 @@ import (
 
 type ClassRepository struct{}
 
-func (repo *ClassRepository) FindAllByUserId(
-	userID int) ([]s.Class, error) {
+func (repo ClassRepository) FindAllByUserId(
+	userID int,
+) ([]s.Class, error) {
 
 	queryStruct := s.Class{UserID: userID}
 	var classes []s.Class
@@ -17,9 +18,8 @@ func (repo *ClassRepository) FindAllByUserId(
 	return classes, err
 }
 
-func (repo *ClassRepository) FindOne(
+func (repo ClassRepository) FindOne(
 	classID int,
-
 ) (s.Class, error) {
 	class := s.Class{
 		Base: s.Base{
@@ -31,13 +31,14 @@ func (repo *ClassRepository) FindOne(
 	return class, err
 }
 
-func (repo *ClassRepository) Create(
-	class s.Class) (s.Class, error) {
+func (repo ClassRepository) Create(
+	class s.Class,
+) (s.Class, error) {
 	err := app.Db.Save(&class).Error
 	return class, err
 }
 
-func (repo *ClassRepository) Update(
+func (repo ClassRepository) Update(
 	class s.Class,
 ) (s.Class, error) {
 	stored, err := repo.FindOne(class.ID)
@@ -47,8 +48,9 @@ func (repo *ClassRepository) Update(
 	return stored, err
 }
 
-func (repo *ClassRepository) Delete(
-	classID int) (int, error) {
+func (repo ClassRepository) Delete(
+	classID int,
+) (int, error) {
 	var classToDelete s.Class
 	var err error
 

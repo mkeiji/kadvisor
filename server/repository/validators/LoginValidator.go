@@ -4,30 +4,35 @@ import (
 	"errors"
 	"kadvisor/server/libs/KeiPassUtil"
 	util "kadvisor/server/libs/ValidationHelper"
-	"kadvisor/server/repository"
-	"kadvisor/server/repository/structs"
-
-	"github.com/go-playground/validator/v10"
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
+	s "kadvisor/server/repository/structs"
 )
 
 type LoginValidator struct {
-	tagValidator    *validator.Validate
-	loginRepository repository.LoginRepository
+	TagValidator    i.TagValidator
+	LoginRepository i.LoginRepository
+}
+
+func NewLoginValidator() LoginValidator {
+	return LoginValidator{
+		TagValidator:    TagValidator{},
+		LoginRepository: r.LoginRepository{},
+	}
 }
 
 func (l LoginValidator) Validate(obj interface{}) []error {
 	errList := []error{}
-	login, _ := obj.(structs.Login)
+	login, _ := obj.(s.Login)
 	l.validateLoginExists(login, &errList)
-	l.validatePassword(login, &errList)
 	return errList
 }
 
 func (l LoginValidator) validateLoginExists(
-	login structs.Login,
+	login s.Login,
 	errList *[]error,
 ) {
-	_, err := l.loginRepository.FindOneByEmail(login.Email)
+	stored, err := l.LoginRepository.FindOneByEmail(login.Email)
 	if err != nil {
 		*errList = append(
 			*errList,
@@ -36,15 +41,17 @@ func (l LoginValidator) validateLoginExists(
 				"invalid email",
 			)),
 		)
+	} else {
+		l.validatePassword(stored, login, errList)
 	}
 }
 
 func (l LoginValidator) validatePassword(
-	login structs.Login,
+	stored s.Login,
+	claim s.Login,
 	errList *[]error,
 ) {
-	stored, _ := l.loginRepository.FindOneByEmail(login.Email)
-	if !KeiPassUtil.IsValidPassword(stored.Password, login.Password) {
+	if !KeiPassUtil.IsValidPassword(stored.Password, claim.Password) {
 		*errList = append(
 			*errList,
 			errors.New(util.GetValidationMsg(

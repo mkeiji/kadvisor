@@ -110,4 +110,12 @@ var _ = Describe("KeiGenUtil", func() {
 			Expect(result).To(BeTrue())
 		})
 	})
+
+	Describe("RandomString", func() {
+		It("should generate a random string with given size", func() {
+			expectedSize := 20
+			result := KeiGenUtil.RandomString(expectedSize)
+			Expect(len(result)).To(Equal(expectedSize))
+		})
+	})
 })

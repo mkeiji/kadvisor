@@ -4,7 +4,7 @@ import (
 	u "kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
-	"kadvisor/server/repository/validators"
+	v "kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
 	"kadvisor/server/services"
 	"log"
@@ -16,7 +16,6 @@ import (
 type LoginController struct {
 	loginService      services.LoginService
 	auth              services.KeiAuthService
-	validator         validators.LoginValidator
 	validationService services.ValidationService
 }
 
@@ -44,7 +43,10 @@ func (ctrl *LoginController) LoadEndpoints(router *gin.Engine) {
 			var enteredLogin structs.Login
 
 			c.BindJSON(&enteredLogin)
-			response = ctrl.validationService.GetResponse(ctrl.validator, enteredLogin)
+			response = ctrl.validationService.GetResponse(
+				v.NewLoginValidator(),
+				enteredLogin,
+			)
 			if u.IsOKresponse(response.Status) {
 				response = ctrl.loginService.UpdateLoginStatus(enteredLogin, true)
 			}
