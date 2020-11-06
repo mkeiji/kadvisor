@@ -25,7 +25,7 @@ type App struct {
 	Controllers []interfaces.Controller
 }
 
-func init() {
+func (a App) Initialize() {
 	once.Do(func() {
 		Db, _ = gorm.Open(mysql.Open(getDbConnection()), &gorm.Config{})
 

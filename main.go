@@ -15,6 +15,7 @@ import (
 var app application.App
 
 func main() {
+    app.Initialize()
 	app.EntityList = registration.EntityList
 	app.Controllers = registration.ControllerList
 
