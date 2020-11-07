@@ -25,7 +25,11 @@ export default function KComposedChartComponent(props: ChartPropsType) {
     const viewModelService = new ChartsViewModelService();
     const service = new ReportsApiService(props.userID);
     const [data, setData] = useState<MonthReport[]>([]);
-    const [minValue, setMinValue] = useState(0);
+    const [minDomain, setMinDomain] = useState(0);
+    const [leftTicks, setLeftTicks] = useState<number[] | undefined>(undefined);
+    const [rightTicks, setRightTicks] = useState<number[] | undefined>(
+        undefined
+    );
 
     useEffect(() => {
         service
@@ -33,16 +37,20 @@ export default function KComposedChartComponent(props: ChartPropsType) {
             .pipe(takeUntil(destroy$))
             .subscribe(
                 (m: MonthReport[]) => {
-                    const min = Math.min.apply(
-                        Math,
-                        m.map((obj) => obj.balance)
-                    );
+                    const minBalance = viewModelService.getMinBalance(m);
 
                     //NOTE: expenses need to be converted to positive values
                     m.map((obj) => (obj.expense = obj.expense * -1));
 
-                    setMinValue(min > 0 ? 0 : min);
+                    setMinDomain(minBalance > 0 ? 0 : minBalance);
                     setData(m);
+
+                    const [
+                        left,
+                        right
+                    ] = viewModelService.getTicksForNegativeBalance(m);
+                    setLeftTicks(left);
+                    setRightTicks(right);
                 },
                 () => setData(viewModelService.getEmptyMonthReport())
             );
@@ -73,7 +81,8 @@ export default function KComposedChartComponent(props: ChartPropsType) {
                         yAxisId="left"
                         orientation="left"
                         type="number"
-                        domain={[minValue, 'auto']}
+                        domain={[minDomain, 'auto']}
+                        ticks={leftTicks}
                         label={{
                             value: 'Inc / Exp',
                             angle: -90,
@@ -84,7 +93,8 @@ export default function KComposedChartComponent(props: ChartPropsType) {
                         yAxisId="right"
                         orientation="right"
                         type="number"
-                        domain={[minValue, 'auto']}
+                        domain={[minDomain, 'auto']}
+                        ticks={rightTicks}
                         label={{
                             value: 'Balance',
                             angle: -90,
