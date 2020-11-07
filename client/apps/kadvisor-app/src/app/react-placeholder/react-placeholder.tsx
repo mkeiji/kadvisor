@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, CSSProperties } from 'react';
 import ReactPlaceholderStore from './react-placeholder.store';
 import { connect } from 'react-redux';
-import logo from '../../assets/logo.svg';
+import klogo from '../../assets/klogo.png';
 import { Button } from 'react-bootstrap';
 
 class ReactPlaceholder extends Component<ReactPlaceholderPropTypes> {
@@ -21,7 +21,12 @@ class ReactPlaceholder extends Component<ReactPlaceholderPropTypes> {
     render() {
         return (
             <div className="Main-header">
-                <img src={logo} className="Main-logo" alt="logo" />
+                <img
+                    src={klogo}
+                    style={logoStyle}
+                    className="Main-logo"
+                    alt="logo"
+                />
                 <p>
                     This is <code>kadvisor</code> home-page.
                 </p>
@@ -35,6 +40,11 @@ interface ReactPlaceholderPropTypes {
     getTestFromStore: string;
     testStoreFunc: Function;
 }
+
+const logoStyle = {
+    width: '10%',
+    height: '10%'
+} as CSSProperties;
 
 const store = new ReactPlaceholderStore();
 export default connect(

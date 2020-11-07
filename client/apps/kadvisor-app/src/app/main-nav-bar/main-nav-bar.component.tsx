@@ -4,6 +4,7 @@ import MainNavBarStore from './main-nav-bar.store';
 import { useHistory } from 'react-router';
 import { connect } from 'react-redux';
 import KLogin from '../k-login/k-login.component';
+import klogo from '../../assets/klogo.png';
 import { APP_PAGES, APP_ROUTES, KRouterPathUtil, Login } from '@client/klibs';
 
 function MainNavBar(props: MainNavBarPropTypes) {
@@ -29,6 +30,7 @@ function MainNavBar(props: MainNavBarPropTypes) {
     return (
         <div>
             <Navbar fixed="top" bg="dark" variant="dark" style={navBarStyle}>
+                <img src={klogo} style={kLogoStyle} alt="logo" />
                 <Navbar.Brand href="#home">Kadvisor</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
@@ -57,6 +59,11 @@ interface MainNavBarPropTypes {
 
 const navBarStyle = {
     position: 'static'
+} as CSSProperties;
+
+const kLogoStyle = {
+    width: '3%',
+    paddingRight: '10px'
 } as CSSProperties;
 
 const store = new MainNavBarStore();
