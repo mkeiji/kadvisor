@@ -6,13 +6,21 @@ import (
 	"kadvisor/server/repository"
 	"kadvisor/server/repository/structs"
 	"net/http"
+
+	i "kadvisor/server/repository/interfaces"
 )
 
 type ForecastService struct {
-	repository repository.ForecastRepository
+	Repository i.ForecastRepository
 }
 
-func (svc *ForecastService) GetOne(
+func NewForecastService() ForecastService {
+	return ForecastService{
+		Repository: repository.ForecastRepository{},
+	}
+}
+
+func (svc ForecastService) GetOne(
 	userID int,
 	year int,
 	isPreloaded bool,
@@ -24,7 +32,7 @@ func (svc *ForecastService) GetOne(
 		return dtos.NewKresponse(http.StatusBadRequest, yErr)
 	}
 
-	forecast, err := svc.repository.FindOne(userID, year, isPreloaded)
+	forecast, err := svc.Repository.FindOne(userID, year, isPreloaded)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -34,12 +42,12 @@ func (svc *ForecastService) GetOne(
 	return response
 }
 
-func (svc *ForecastService) Post(
+func (svc ForecastService) Post(
 	forecast structs.Forecast,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	frcast, err := svc.repository.Create(forecast)
+	frcast, err := svc.Repository.Create(forecast)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -49,10 +57,10 @@ func (svc *ForecastService) Post(
 	return response
 }
 
-func (svc *ForecastService) Delete(id int) dtos.KhttpResponse {
+func (svc ForecastService) Delete(id int) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	frcast, err := svc.repository.Delete(id)
+	frcast, err := svc.Repository.Delete(id)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {

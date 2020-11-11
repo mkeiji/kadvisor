@@ -10,13 +10,13 @@ type ForecastEntryRepository struct {
 	mapper mappers.ForecastEntryMapper
 }
 
-func (repo *ForecastEntryRepository) FindOne(id int) (s.ForecastEntry, error) {
+func (repo ForecastEntryRepository) FindOne(id int) (s.ForecastEntry, error) {
 	var entry s.ForecastEntry
 	err := app.Db.Where("id=?", id).First(&entry).Error
 	return entry, err
 }
 
-func (repo *ForecastEntryRepository) Update(
+func (repo ForecastEntryRepository) Update(
 	entry s.ForecastEntry,
 ) (s.ForecastEntry, error) {
 	eMapped := repo.mapper.MapForecastEntry(entry)

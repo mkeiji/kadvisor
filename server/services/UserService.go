@@ -2,18 +2,25 @@ package services
 
 import (
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository"
-	"kadvisor/server/repository/structs"
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
+	s "kadvisor/server/repository/structs"
 	"net/http"
 )
 
 type UserService struct {
-	userRepository repository.UserRepository
+	Repository i.UserRepository
 }
 
-func (svc *UserService) GetMany(preloaded bool) dtos.KhttpResponse {
+func NewUserService() UserService {
+	return UserService{
+		Repository: r.UserRepository{},
+	}
+}
+
+func (svc UserService) GetMany(preloaded bool) dtos.KhttpResponse {
 	var res dtos.KhttpResponse
-	users, err := svc.userRepository.FindAll(preloaded)
+	users, err := svc.Repository.FindAll(preloaded)
 	if err != nil {
 		res = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -22,10 +29,10 @@ func (svc *UserService) GetMany(preloaded bool) dtos.KhttpResponse {
 	return res
 }
 
-func (svc *UserService) GetOne(id int, preloaded bool) dtos.KhttpResponse {
+func (svc UserService) GetOne(id int, preloaded bool) dtos.KhttpResponse {
 	var res dtos.KhttpResponse
 
-	user, err := svc.userRepository.FindOne(id, preloaded)
+	user, err := svc.Repository.FindOne(id, preloaded)
 	if err != nil {
 		res = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -35,10 +42,10 @@ func (svc *UserService) GetOne(id int, preloaded bool) dtos.KhttpResponse {
 	return res
 }
 
-func (svc *UserService) Post(user structs.User) dtos.KhttpResponse {
+func (svc UserService) Post(user s.User) dtos.KhttpResponse {
 	var res dtos.KhttpResponse
 
-	user, err := svc.userRepository.Create(user)
+	user, err := svc.Repository.Create(user)
 	if err != nil {
 		res = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -48,10 +55,10 @@ func (svc *UserService) Post(user structs.User) dtos.KhttpResponse {
 	return res
 }
 
-func (svc *UserService) Put(user structs.User) dtos.KhttpResponse {
+func (svc UserService) Put(user s.User) dtos.KhttpResponse {
 	var res dtos.KhttpResponse
 
-	user, err := svc.userRepository.Update(user)
+	user, err := svc.Repository.Update(user)
 	if err != nil {
 		res = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -61,10 +68,10 @@ func (svc *UserService) Put(user structs.User) dtos.KhttpResponse {
 	return res
 }
 
-func (svc *UserService) Delete(userID int) dtos.KhttpResponse {
+func (svc UserService) Delete(userID int) dtos.KhttpResponse {
 	var res dtos.KhttpResponse
 
-	user, err := svc.userRepository.Delete(userID)
+	user, err := svc.Repository.Delete(userID)
 	if err != nil {
 		res = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {

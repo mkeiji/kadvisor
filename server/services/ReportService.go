@@ -3,25 +3,34 @@ package services
 import (
 	"kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository"
-	"kadvisor/server/repository/mappers"
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
+	m "kadvisor/server/repository/mappers"
 	"kadvisor/server/resources/enums"
 	"net/http"
 	"sort"
 )
 
 type ReportService struct {
-	repository         repository.ReportRepository
-	forecastRepository repository.ForecastRepository
-	forecastMapper     mappers.ForecastMapper
+	Repository         i.ReportRepository
+	ForecastRepository i.ForecastRepository
+	ForecastMapper     m.ForecastMapper
 }
 
-func (svc *ReportService) GetBalance(
+func NewReportService() ReportService {
+	return ReportService{
+		Repository:         r.ReportRepository{},
+		ForecastRepository: r.ForecastRepository{},
+		ForecastMapper:     m.ForecastMapper{},
+	}
+}
+
+func (svc ReportService) GetBalance(
 	userID int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	balance, err := svc.repository.FindBalance(userID)
+	balance, err := svc.Repository.FindBalance(userID)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -31,13 +40,13 @@ func (svc *ReportService) GetBalance(
 	return response
 }
 
-func (svc *ReportService) GetYearToDateReport(
+func (svc ReportService) GetYearToDateReport(
 	userID int,
 	year int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	report, err := svc.repository.FindYearToDateReport(userID, year)
+	report, err := svc.Repository.FindYearToDateReport(userID, year)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -47,28 +56,31 @@ func (svc *ReportService) GetYearToDateReport(
 	return response
 }
 
-func (svc *ReportService) GetYearToDateWithForecastReport(
+func (svc ReportService) GetYearToDateWithForecastReport(
 	userID int,
 	year int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
-
 	errors := []error{}
-	ytdMonths, ytdErr := svc.repository.FindYearToDateReport(userID, year)
-	forecast, fcErr := svc.forecastRepository.FindOne(userID, year, true)
-	forecastMonts := svc.forecastMapper.MapForecastToMonthReportDto(forecast)
 
-	if ytdErr != nil && fcErr != nil {
+	ytdMonths, ytdErr := svc.Repository.FindYearToDateReport(userID, year)
+	if ytdErr != nil {
 		errors = append(errors, ytdErr)
+	}
+
+	forecast, fcErr := svc.ForecastRepository.FindOne(userID, year, true)
+	if fcErr != nil {
 		errors = append(errors, fcErr)
 	}
+
 	if len(errors) > 0 {
 		response = dtos.NewKresponse(
 			http.StatusNotFound,
 			KeiGenUtil.MapErrList(errors),
 		)
 	} else {
-		combined := svc.combineYtdWithForecast(ytdMonths, forecastMonts)
+		forecastMonths := svc.ForecastMapper.MapForecastToMonthReportDto(forecast)
+		combined := svc.combineYtdWithForecast(ytdMonths, forecastMonths)
 		response = dtos.NewKresponse(
 			http.StatusOK,
 			svc.getCombinedWithAccumulatedBalance(combined),
@@ -78,10 +90,10 @@ func (svc *ReportService) GetYearToDateWithForecastReport(
 	return response
 }
 
-func (svc *ReportService) GetReportForecastAvailable(userID int) dtos.KhttpResponse {
+func (svc ReportService) GetReportForecastAvailable(userID int) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	result, err := svc.repository.GetAvailableForecastYears(userID)
+	result, err := svc.Repository.GetAvailableForecastYears(userID)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -92,10 +104,10 @@ func (svc *ReportService) GetReportForecastAvailable(userID int) dtos.KhttpRespo
 	return response
 }
 
-func (svc *ReportService) GetReportAvailable(userID int) dtos.KhttpResponse {
+func (svc ReportService) GetReportAvailable(userID int) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	result, err := svc.repository.GetAvailableYears(userID)
+	result, err := svc.Repository.GetAvailableYears(userID)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -106,7 +118,7 @@ func (svc *ReportService) GetReportAvailable(userID int) dtos.KhttpResponse {
 	return response
 }
 
-func (svc *ReportService) getCombinedWithAccumulatedBalance(
+func (svc ReportService) getCombinedWithAccumulatedBalance(
 	combinedMonths []dtos.MonthReport,
 ) []dtos.MonthReport {
 	updated := []dtos.MonthReport{}
@@ -129,7 +141,7 @@ func (svc *ReportService) getCombinedWithAccumulatedBalance(
 	return updated
 }
 
-func (svc *ReportService) combineYtdWithForecast(
+func (svc ReportService) combineYtdWithForecast(
 	ytdMonths []dtos.MonthReport,
 	forecastMonths []dtos.MonthReport,
 ) []dtos.MonthReport {
@@ -149,7 +161,7 @@ func (svc *ReportService) combineYtdWithForecast(
 	return result
 }
 
-func (svc *ReportService) findMonthInMonthReport(
+func (svc ReportService) findMonthInMonthReport(
 	month int,
 	monthReports []dtos.MonthReport,
 ) dtos.MonthReport {
@@ -165,11 +177,11 @@ func (svc *ReportService) findMonthInMonthReport(
 	return result
 }
 
-func (svc *ReportService) isEmptyMonthReport(month dtos.MonthReport) bool {
+func (svc ReportService) isEmptyMonthReport(month dtos.MonthReport) bool {
 	return (dtos.MonthReport{}) == month
 }
 
-func (svc *ReportService) getLatestActualMonth(
+func (svc ReportService) getLatestActualMonth(
 	monthReports []dtos.MonthReport,
 ) dtos.MonthReport {
 	var result dtos.MonthReport

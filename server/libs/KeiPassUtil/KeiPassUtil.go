@@ -3,18 +3,17 @@ package KeiPassUtil
 import (
 	"golang.org/x/crypto/bcrypt"
 	"kadvisor/server/repository/structs"
-	"log"
 )
 
-func HashAndSalt(user *structs.User) {
+func HashAndSalt(user *structs.User) (string, error) {
 	byte := []byte(user.Login.Password)
 
 	hash, err := bcrypt.GenerateFromPassword(byte, bcrypt.MinCost)
 	if err != nil {
-		log.Println(err)
+		return "", err
 	}
 
-	user.Login.Password = string(hash)
+	return string(hash), err
 }
 
 func IsValidPassword(hashedPwd string, plainPwd string) bool {
@@ -23,7 +22,6 @@ func IsValidPassword(hashedPwd string, plainPwd string) bool {
 
 	err := bcrypt.CompareHashAndPassword(byteHash, bytePwd)
 	if err != nil {
-		log.Println(err)
 		return false
 	}
 

@@ -1,12 +1,14 @@
 # Kadvisor
 
 ## Setup Dependencies:
+
 1. [Nodejs && npm](https://nodejs.org/en/)
 2. [Go lang](https://golang.org/)
 3. [Docker](https://www.docker.com/)
 4. [Make](https://www.gnu.org/software/make/)
 
 ## Setup
+
 - MAKE SURE you have the `.env` file in the root folder
 
 ### Using Make
@@ -22,6 +24,7 @@ make dependencies
 ```bash
 cd client/
 ```
+
 ```bash
 npm install
 ```
@@ -39,6 +42,7 @@ go run main.go
 ```
 
 ## Development
+
 ### Run Server
 
 ```bash
@@ -95,6 +99,6 @@ make db
 
 #### Just a table example
 
-| Option            | Usage                                                         |
-| ----------------- | ------------------------------------------------------------- |
-| -a=APP, --app=APP | Add some comments in this section                             |
+| Option            | Usage                             |
+| ----------------- | --------------------------------- |
+| -a=APP, --app=APP | Add some comments in this section |

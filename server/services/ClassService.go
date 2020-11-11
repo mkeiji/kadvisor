@@ -3,16 +3,24 @@ package services
 import (
 	"errors"
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository"
 	"kadvisor/server/repository/structs"
 	"net/http"
+
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
 )
 
 type ClassService struct {
-	repository repository.ClassRepository
+	Repository i.ClassRepository
 }
 
-func (svc *ClassService) GetClass(userID int, classID int) dtos.KhttpResponse {
+func NewClassService() ClassService {
+	return ClassService{
+		Repository: r.ClassRepository{},
+	}
+}
+
+func (svc ClassService) GetClass(userID int, classID int) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
 	shouldGetClassesByUserId := classID == 0 && userID != 0
@@ -30,10 +38,10 @@ func (svc *ClassService) GetClass(userID int, classID int) dtos.KhttpResponse {
 	return response
 }
 
-func (svc *ClassService) GetManyByUserId(userID int) dtos.KhttpResponse {
+func (svc ClassService) GetManyByUserId(userID int) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	classes, err := svc.repository.FindAllByUserId(userID)
+	classes, err := svc.Repository.FindAllByUserId(userID)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -43,10 +51,10 @@ func (svc *ClassService) GetManyByUserId(userID int) dtos.KhttpResponse {
 	return response
 }
 
-func (svc *ClassService) GetOneById(id int) dtos.KhttpResponse {
+func (svc ClassService) GetOneById(id int) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	class, err := svc.repository.FindOne(id)
+	class, err := svc.Repository.FindOne(id)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -56,12 +64,12 @@ func (svc *ClassService) GetOneById(id int) dtos.KhttpResponse {
 	return response
 }
 
-func (svc *ClassService) Post(
+func (svc ClassService) Post(
 	class structs.Class,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	class, err := svc.repository.Create(class)
+	class, err := svc.Repository.Create(class)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -71,12 +79,12 @@ func (svc *ClassService) Post(
 	return response
 }
 
-func (svc *ClassService) Put(
+func (svc ClassService) Put(
 	class structs.Class,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	class, err := svc.repository.Update(class)
+	class, err := svc.Repository.Update(class)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -86,12 +94,12 @@ func (svc *ClassService) Put(
 	return response
 }
 
-func (svc *ClassService) Delete(
+func (svc ClassService) Delete(
 	id int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	class, err := svc.repository.Delete(id)
+	class, err := svc.Repository.Delete(id)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {

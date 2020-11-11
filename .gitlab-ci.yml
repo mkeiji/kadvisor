@@ -6,7 +6,7 @@ stages:
 
 build-client:
     stage: build
-    image: node
+    image: node:14.15.1
     artifacts:
         paths:
             - client/dist
@@ -67,8 +67,8 @@ deploy:
 
     script:
         - ssh -T -o StrictHostKeyChecking=no $K_USER@$K_SERVER '
-            cd ~/krepos/dev_ops/docker/docker-compose-orchestration &&
-            docker-compose pull kadvisor &&
-            docker-compose up -d kadvisor &&
-            exit
-         '
+          cd ~/krepos/dev_ops/docker/docker-compose-orchestration &&
+          docker-compose pull kadvisor &&
+          docker-compose up -d kadvisor &&
+          exit
+          '

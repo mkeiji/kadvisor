@@ -1,12 +1,15 @@
 # Server
 
 ## Unit Tests
+
 ### Unit Tests Dependencies
+
 1. [ginkgo](https://github.com/onsi/ginkgo)
 2. [gomega](https://github.com/onsi/gomega)
 3. [gomock](https://github.com/golang/mock)
 
 ## Install frameworks
+
 - ginkgo & gomega:
 
 ```bash
@@ -22,6 +25,7 @@ go get github.com/golang/mock/mockgen
 ```
 
 ## Generate package test suit with ginkgo
+
 - Navigate to `package/path` and run:
 
 ```bash
@@ -29,6 +33,7 @@ ginkgo bootstrap
 ```
 
 ## Generate test file
+
 - Navigate to `package/path` and run:
 
 ```bash
@@ -36,6 +41,7 @@ ginkgo generate ${nameOfTheStruct}
 ```
 
 ## Running tests
+
 - To run the suite in the current directory, simply run:
 
 ```bash

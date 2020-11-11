@@ -21,9 +21,10 @@ var _ = Describe("KeiPassUtil", func() {
 	})
 
 	Describe("HashAndSalt", func() {
-		It("should set hashed password", func() {
-			KeiPassUtil.HashAndSalt(&user)
-			Expect(password).ToNot(Equal(user.Login.Password))
+		It("should return hashed password", func() {
+			hashed, err := KeiPassUtil.HashAndSalt(&user)
+			Expect(err).To(BeNil())
+			Expect(hashed).ToNot(Equal(user.Login.Password))
 		})
 	})
 

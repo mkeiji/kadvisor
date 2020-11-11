@@ -6,7 +6,7 @@ import (
 	"kadvisor/server/repository/structs"
 	v "kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
-	"kadvisor/server/services"
+	s "kadvisor/server/services"
 	"log"
 	"strconv"
 
@@ -14,16 +14,19 @@ import (
 )
 
 type ClassController struct {
-	service           services.ClassService
-	auth              services.KeiAuthService
-	usrService        services.UserService
-	validationService services.ValidationService
+	Service           s.ClassService
+	Auth              s.KeiAuthService
+	UsrService        s.UserService
+	ValidationService s.ValidationService
 }
 
-func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
+func (ctrl ClassController) LoadEndpoints(router *gin.Engine) {
+	ctrl.Service = s.NewClassService()
+	ctrl.UsrService = s.NewUserService()
+
 	classRoutes := router.Group("/api/kadvisor/:uid")
 	permission := enums.REGULAR
-	jwt, err := ctrl.auth.GetAuthUtil(permission)
+	jwt, err := ctrl.Auth.GetAuthUtil(permission)
 	if err != nil {
 		log.Fatal("JWT Error: " + err.Error())
 	}
@@ -36,13 +39,13 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 			userID, _ := strconv.Atoi(c.Param("uid"))
 			classID, _ := strconv.Atoi(c.Query("id"))
 
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
-			response = ctrl.service.GetClass(userID, classID)
+			response = ctrl.Service.GetClass(userID, classID)
 			c.JSON(response.Status, response.Body)
 			return
 		})
@@ -53,19 +56,19 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 			var class structs.Class
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
 			c.BindJSON(&class)
-			response = ctrl.validationService.GetResponse(
+			response = ctrl.ValidationService.GetResponse(
 				v.NewClassValidator(),
 				class,
 			)
 			if u.IsOKresponse(response.Status) {
-				response = ctrl.service.Post(class)
+				response = ctrl.Service.Post(class)
 			}
 
 			c.JSON(response.Status, response.Body)
@@ -78,19 +81,19 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 			var class structs.Class
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
 			c.BindJSON(&class)
-			response = ctrl.validationService.GetResponse(
+			response = ctrl.ValidationService.GetResponse(
 				v.NewClassValidator(),
 				class,
 			)
 			if u.IsOKresponse(response.Status) {
-				response = ctrl.service.Put(class)
+				response = ctrl.Service.Put(class)
 			}
 
 			c.JSON(response.Status, response.Body)
@@ -104,13 +107,13 @@ func (ctrl *ClassController) LoadEndpoints(router *gin.Engine) {
 			classID, _ := strconv.Atoi(c.Query("id"))
 			userID, _ := strconv.Atoi(c.Param("uid"))
 
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
-			response = ctrl.service.Delete(classID)
+			response = ctrl.Service.Delete(classID)
 			c.JSON(response.Status, response.Body)
 			return
 		})

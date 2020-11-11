@@ -25,12 +25,14 @@ type authLogin struct {
 }
 
 type KeiAuthService struct {
-	loginService LoginService
+	LoginService LoginService
 }
 
-func (svc *KeiAuthService) GetAuthUtil(
+func (svc KeiAuthService) GetAuthUtil(
 	permissionLevel enums.RoleEnum,
 ) (*jwt.GinJWTMiddleware, error) {
+	svc.LoginService = NewLoginService()
+
 	var actualLogin structs.Login
 
 	return jwt.New(&jwt.GinJWTMiddleware{
@@ -60,7 +62,7 @@ func (svc *KeiAuthService) GetAuthUtil(
 			if err := c.ShouldBind(&claimLogin); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			res := svc.loginService.GetOneByEmail(claimLogin.Email)
+			res := svc.LoginService.GetOneByEmail(claimLogin.Email)
 			actualLogin := res.Body.(structs.Login)
 			if svc.isValidLogin(actualLogin, claimLogin) {
 				return &authLogin{
@@ -91,7 +93,7 @@ func (svc *KeiAuthService) GetAuthUtil(
 	})
 }
 
-func (svc *KeiAuthService) isValidLogin(actual structs.Login, claim login) bool {
+func (svc KeiAuthService) isValidLogin(actual structs.Login, claim login) bool {
 	if actual.Email == claim.Email && KeiPassUtil.IsValidPassword(actual.Password, claim.Password) {
 		return true
 	} else {

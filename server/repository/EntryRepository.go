@@ -10,27 +10,27 @@ type EntryRepository struct {
 	mapper mappers.EntryMapper
 }
 
-func (repo *EntryRepository) FindAllByUserId(
+func (repo EntryRepository) FindAllByUserId(
 	userID int, limit int) ([]s.Entry, error) {
 
 	queryStruct := s.Entry{UserID: userID}
 	return getEntries(queryStruct, limit)
 }
 
-func (repo *EntryRepository) FindAllByClassId(
+func (repo EntryRepository) FindAllByClassId(
 	classID int, limit int) ([]s.Entry, error) {
 
 	queryStruct := s.Entry{ClassID: classID}
 	return getEntries(queryStruct, limit)
 }
 
-func (repo *EntryRepository) FindOne(id int) (s.Entry, error) {
+func (repo EntryRepository) FindOne(id int) (s.Entry, error) {
 	var entry s.Entry
 	err := app.Db.Where("id=?", id).First(&entry).Error
 	return entry, err
 }
 
-func (repo *EntryRepository) Create(
+func (repo EntryRepository) Create(
 	entry s.Entry,
 ) (s.Entry, error) {
 	eMapped := repo.mapper.MapEntry(entry)
@@ -38,7 +38,7 @@ func (repo *EntryRepository) Create(
 	return eMapped, err
 }
 
-func (repo *EntryRepository) Update(
+func (repo EntryRepository) Update(
 	entry s.Entry,
 ) (s.Entry, error) {
 	eMapped := repo.mapper.MapEntry(entry)
@@ -54,7 +54,7 @@ func (repo *EntryRepository) Update(
 	return stored, err
 }
 
-func (repo *EntryRepository) Delete(id int) (int, error) {
+func (repo EntryRepository) Delete(id int) (int, error) {
 	var entry s.Entry
 	var err error
 

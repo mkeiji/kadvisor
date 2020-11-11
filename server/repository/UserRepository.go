@@ -8,7 +8,7 @@ import (
 
 type UserRepository struct{}
 
-func (t *UserRepository) FindAll(preloaded bool) ([]s.User, error) {
+func (t UserRepository) FindAll(preloaded bool) ([]s.User, error) {
 	var users []s.User
 	var err error
 
@@ -26,7 +26,7 @@ func (t *UserRepository) FindAll(preloaded bool) ([]s.User, error) {
 	return t.handleFindManyErr(users, err)
 }
 
-func (t *UserRepository) FindOne(id int, preloaded bool) (s.User, error) {
+func (t UserRepository) FindOne(id int, preloaded bool) (s.User, error) {
 	var user s.User
 	var err error
 
@@ -44,7 +44,7 @@ func (t *UserRepository) FindOne(id int, preloaded bool) (s.User, error) {
 	return user, err
 }
 
-func (t *UserRepository) Create(user s.User) (s.User, error) {
+func (t UserRepository) Create(user s.User) (s.User, error) {
 	err := app.Db.Save(&user).Error
 	if err != nil {
 		return user, err
@@ -52,7 +52,7 @@ func (t *UserRepository) Create(user s.User) (s.User, error) {
 	return user, nil
 }
 
-func (t *UserRepository) Update(user s.User) (s.User, error) {
+func (t UserRepository) Update(user s.User) (s.User, error) {
 	stored, err := t.FindOne(user.ID, false)
 	if err == nil {
 		err = app.Db.Model(&stored).Updates(user).Error
@@ -61,7 +61,7 @@ func (t *UserRepository) Update(user s.User) (s.User, error) {
 	return stored, err
 }
 
-func (t *UserRepository) Delete(userID int) (s.User, error) {
+func (t UserRepository) Delete(userID int) (s.User, error) {
 	var user s.User
 	var err error
 
@@ -73,7 +73,7 @@ func (t *UserRepository) Delete(userID int) (s.User, error) {
 	return user, err
 }
 
-func (t *UserRepository) handleFindManyErr(
+func (t UserRepository) handleFindManyErr(
 	users []s.User,
 	err error,
 ) ([]s.User, error) {

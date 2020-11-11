@@ -6,7 +6,7 @@ import (
 	"kadvisor/server/repository/structs"
 	"kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
-	"kadvisor/server/services"
+	s "kadvisor/server/services"
 	"log"
 	"strconv"
 
@@ -14,16 +14,19 @@ import (
 )
 
 type EntryController struct {
-	service           services.EntryService
-	usrService        services.UserService
-	auth              services.KeiAuthService
-	validationService services.ValidationService
+	Service           s.EntryService
+	UsrService        s.UserService
+	Auth              s.KeiAuthService
+	ValidationService s.ValidationService
 }
 
-func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
+func (ctrl EntryController) LoadEndpoints(router *gin.Engine) {
+	ctrl.Service = s.NewEntryService()
+	ctrl.UsrService = s.NewUserService()
+
 	entryRoutes := router.Group("/api/kadvisor/:uid")
 	permission := enums.REGULAR
-	jwt, err := ctrl.auth.GetAuthUtil(permission)
+	jwt, err := ctrl.Auth.GetAuthUtil(permission)
 	if err != nil {
 		log.Fatal("JWT Error: " + err.Error())
 	}
@@ -38,7 +41,7 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 			classID, _ := strconv.Atoi(c.Query("classid"))
 			limit, _ := strconv.Atoi(c.Query("limit"))
 
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
@@ -49,11 +52,11 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 			getEntryByUserId := id == 0 && classID == 0
 
 			if getEntryByUserId {
-				response = ctrl.service.GetManyByUserId(userID, limit)
+				response = ctrl.Service.GetManyByUserId(userID, limit)
 			} else if getEntryById {
-				response = ctrl.service.GetOneById(id)
+				response = ctrl.Service.GetOneById(id)
 			} else if getEntriesByClassId {
-				response = ctrl.service.GetManyByClassId(classID, limit)
+				response = ctrl.Service.GetManyByClassId(classID, limit)
 			}
 
 			c.JSON(response.Status, response.Body)
@@ -66,19 +69,19 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 			var entry structs.Entry
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
 			c.BindJSON(&entry)
-			response = ctrl.validationService.GetResponse(
+			response = ctrl.ValidationService.GetResponse(
 				validators.NewEntryValidator(),
 				entry,
 			)
 			if u.IsOKresponse(response.Status) {
-				response = ctrl.service.Post(entry)
+				response = ctrl.Service.Post(entry)
 			}
 
 			c.JSON(response.Status, response.Body)
@@ -91,19 +94,19 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 			var entry structs.Entry
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
 			c.BindJSON(&entry)
-			response = ctrl.validationService.GetResponse(
+			response = ctrl.ValidationService.GetResponse(
 				validators.NewEntryValidator(),
 				entry,
 			)
 			if u.IsOKresponse(response.Status) {
-				response = ctrl.service.Put(entry)
+				response = ctrl.Service.Put(entry)
 			}
 
 			c.JSON(response.Status, response.Body)
@@ -117,13 +120,13 @@ func (ctrl *EntryController) LoadEndpoints(router *gin.Engine) {
 			entryID, _ := strconv.Atoi(c.Query("id"))
 			userID, _ := strconv.Atoi(c.Param("uid"))
 
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
-			response = ctrl.service.Delete(entryID)
+			response = ctrl.Service.Delete(entryID)
 			c.JSON(response.Status, response.Body)
 			return
 		})

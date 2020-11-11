@@ -5,7 +5,7 @@ import (
 	u "kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/resources/enums"
-	"kadvisor/server/services"
+	s "kadvisor/server/services"
 	"log"
 	"strconv"
 
@@ -13,12 +13,15 @@ import (
 )
 
 type ReportController struct {
-	service    services.ReportService
-	usrService services.UserService
-	auth       services.KeiAuthService
+	Service    s.ReportService
+	UsrService s.UserService
+	Auth       s.KeiAuthService
 }
 
-func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
+func (ctrl ReportController) LoadEndpoints(router *gin.Engine) {
+	ctrl.Service = s.NewReportService()
+	ctrl.UsrService = s.NewUserService()
+
 	// report types
 	typeBalance := "BALANCE"
 	typeYear := "YTD"
@@ -26,7 +29,7 @@ func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
 
 	reportRoutes := router.Group("/api/kadvisor/:uid")
 	permission := enums.REGULAR
-	jwt, err := ctrl.auth.GetAuthUtil(permission)
+	jwt, err := ctrl.Auth.GetAuthUtil(permission)
 	if err != nil {
 		log.Fatal("JWT Error: " + err.Error())
 	}
@@ -40,18 +43,18 @@ func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
 			year, _ := strconv.Atoi(c.Query("year"))
 			rType := c.Query("type")
 
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
 			if rType == typeBalance {
-				response = ctrl.service.GetBalance(userID)
+				response = ctrl.Service.GetBalance(userID)
 			} else if rType == typeYear && year != 0 {
-				response = ctrl.service.GetYearToDateReport(userID, year)
+				response = ctrl.Service.GetYearToDateReport(userID, year)
 			} else if rType == typeYearFC && year != 0 {
-				response = ctrl.service.GetYearToDateWithForecastReport(userID, year)
+				response = ctrl.Service.GetYearToDateWithForecastReport(userID, year)
 			} else {
 				response = dtos.NewBadKresponse(errors.New("query param error"))
 			}
@@ -66,16 +69,16 @@ func (ctrl *ReportController) LoadEndpoints(router *gin.Engine) {
 			isForecast, _ := strconv.ParseBool(c.Query("forecast"))
 
 			userID, _ := strconv.Atoi(c.Param("uid"))
-			response = ctrl.usrService.GetOne(userID, false)
+			response = ctrl.UsrService.GetOne(userID, false)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			}
 
 			if isForecast == true {
-				response = ctrl.service.GetReportForecastAvailable(userID)
+				response = ctrl.Service.GetReportForecastAvailable(userID)
 			} else {
-				response = ctrl.service.GetReportAvailable(userID)
+				response = ctrl.Service.GetReportAvailable(userID)
 			}
 			c.JSON(response.Status, response.Body)
 			return

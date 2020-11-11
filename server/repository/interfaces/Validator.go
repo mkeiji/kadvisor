@@ -2,6 +2,7 @@ package interfaces
 
 import "github.com/go-playground/validator/v10"
 
+//go:generate mockgen -destination=mocks/mock_validator.go -package=mocks . Validator
 type Validator interface {
 	Validate(obj interface{}) []error
 }

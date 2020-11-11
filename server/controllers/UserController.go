@@ -7,7 +7,7 @@ import (
 	"kadvisor/server/repository/structs"
 	v "kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
-	"kadvisor/server/services"
+	s "kadvisor/server/services"
 	"log"
 	"strconv"
 
@@ -15,15 +15,17 @@ import (
 )
 
 type UserController struct {
-	userService       services.UserService
-	auth              services.KeiAuthService
-	validationService services.ValidationService
+	UserService       s.UserService
+	Auth              s.KeiAuthService
+	ValidationService s.ValidationService
 }
 
-func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
+func (ctrl UserController) LoadEndpoints(router *gin.Engine) {
+	ctrl.UserService = s.NewUserService()
+
 	userRoutes := router.Group("/api")
 	permission := enums.ADMIN
-	jwt, err := ctrl.auth.GetAuthUtil(permission)
+	jwt, err := ctrl.Auth.GetAuthUtil(permission)
 	if err != nil {
 		log.Fatal("JWT Error: " + err.Error())
 	}
@@ -34,13 +36,14 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 		var user structs.User
 
 		context.BindJSON(&user)
-		response = ctrl.validationService.GetResponse(
+		response = ctrl.ValidationService.GetResponse(
 			v.NewUserValidator(),
 			user,
 		)
 		if u.IsOKresponse(response.Status) {
-			KeiPassUtil.HashAndSalt(&user)
-			response = ctrl.userService.Post(user)
+			hashedPwd, _ := KeiPassUtil.HashAndSalt(&user)
+			user.Login.Password = hashedPwd
+			response = ctrl.UserService.Post(user)
 		}
 
 		context.JSON(response.Status, response.Body)
@@ -56,7 +59,7 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 			)
 			userID, _ := strconv.Atoi(context.Param("id"))
 
-			response := ctrl.userService.GetOne(userID, isPreloaded)
+			response := ctrl.UserService.GetOne(userID, isPreloaded)
 			context.JSON(response.Status, response.Body)
 			return
 		})
@@ -67,7 +70,7 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 				context.DefaultQuery("preloaded", "false"),
 			)
 
-			response := ctrl.userService.GetMany(isPreloaded)
+			response := ctrl.UserService.GetMany(isPreloaded)
 			context.JSON(response.Status, response.Body)
 			return
 		})
@@ -78,12 +81,12 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 			var user structs.User
 
 			context.BindJSON(&user)
-			response = ctrl.validationService.GetResponse(
+			response = ctrl.ValidationService.GetResponse(
 				v.NewUserValidator(),
 				user,
 			)
 			if u.IsOKresponse(response.Status) {
-				response = ctrl.userService.Put(user)
+				response = ctrl.UserService.Put(user)
 			}
 
 			context.JSON(response.Status, response.Body)
@@ -94,7 +97,7 @@ func (ctrl *UserController) LoadEndpoints(router *gin.Engine) {
 		userRoutes.DELETE("/user/:id", func(context *gin.Context) {
 			userID, _ := strconv.Atoi(context.Param("id"))
 
-			response := ctrl.userService.Delete(userID)
+			response := ctrl.UserService.Delete(userID)
 			context.JSON(response.Status, response.Body)
 			return
 		})

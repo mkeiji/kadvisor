@@ -14,7 +14,7 @@ type Year struct {
 
 type ReportRepository struct{}
 
-func (repo *ReportRepository) GetAvailableForecastYears(userID int) ([]int, error) {
+func (repo ReportRepository) GetAvailableForecastYears(userID int) ([]int, error) {
 	var forecasts []structs.Forecast
 	var result []int
 
@@ -35,7 +35,7 @@ func (repo *ReportRepository) GetAvailableForecastYears(userID int) ([]int, erro
 	return result, err
 }
 
-func (repo *ReportRepository) GetAvailableYears(userID int) ([]int, error) {
+func (repo ReportRepository) GetAvailableYears(userID int) ([]int, error) {
 	var years []Year
 	var result []int
 
@@ -59,7 +59,7 @@ func (repo *ReportRepository) GetAvailableYears(userID int) ([]int, error) {
 	return result, err
 }
 
-func (repo *ReportRepository) FindBalance(userID int) (dtos.Balance, error) {
+func (repo ReportRepository) FindBalance(userID int) (dtos.Balance, error) {
 	var balance dtos.Balance
 
 	err := application.Db.Table("entries").Select(
@@ -73,7 +73,7 @@ func (repo *ReportRepository) FindBalance(userID int) (dtos.Balance, error) {
 	return balance, err
 }
 
-func (repo *ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos.MonthReport, error) {
+func (repo ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos.MonthReport, error) {
 	var mReport []dtos.MonthReport
 
 	query := fmt.Sprintf(`

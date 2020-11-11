@@ -2,19 +2,27 @@ package services
 
 import (
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository"
 	"kadvisor/server/repository/structs"
 	"net/http"
+
+	r "kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
 )
 
 type LoginService struct {
-	loginRepository repository.LoginRepository
+	Repository i.LoginRepository
 }
 
-func (l *LoginService) GetOneByEmail(email string) dtos.KhttpResponse {
+func NewLoginService() LoginService {
+	return LoginService{
+		Repository: r.LoginRepository{},
+	}
+}
+
+func (l LoginService) GetOneByEmail(email string) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	login, err := l.loginRepository.FindOneByEmail(email)
+	login, err := l.Repository.FindOneByEmail(email)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -24,10 +32,10 @@ func (l *LoginService) GetOneByEmail(email string) dtos.KhttpResponse {
 	return response
 }
 
-func (l *LoginService) Put(login structs.Login) dtos.KhttpResponse {
+func (l LoginService) Put(login structs.Login) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	login, err := l.loginRepository.Update(login)
+	login, err := l.Repository.Update(login)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {
@@ -37,13 +45,13 @@ func (l *LoginService) Put(login structs.Login) dtos.KhttpResponse {
 	return response
 }
 
-func (l *LoginService) UpdateLoginStatus(
+func (l LoginService) UpdateLoginStatus(
 	login structs.Login,
 	isLoggedIn bool,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	login, err := l.loginRepository.UpdateLoginStatus(login, isLoggedIn)
+	login, err := l.Repository.UpdateLoginStatus(login, isLoggedIn)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusNotFound, err)
 	} else {

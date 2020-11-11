@@ -6,7 +6,7 @@ import (
 	"kadvisor/server/repository/structs"
 	v "kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
-	"kadvisor/server/services"
+	s "kadvisor/server/services"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -14,16 +14,18 @@ import (
 
 // LoginController class
 type LoginController struct {
-	loginService      services.LoginService
-	auth              services.KeiAuthService
-	validationService services.ValidationService
+	LoginService      s.LoginService
+	Auth              s.KeiAuthService
+	ValidationService s.ValidationService
 }
 
 // LoadEndpoints enpoints list
-func (ctrl *LoginController) LoadEndpoints(router *gin.Engine) {
+func (ctrl LoginController) LoadEndpoints(router *gin.Engine) {
+	ctrl.LoginService = s.NewLoginService()
+
 	loginRoutes := router.Group("/api")
 	permission := enums.REGULAR
-	jwt, err := ctrl.auth.GetAuthUtil(permission)
+	jwt, err := ctrl.Auth.GetAuthUtil(permission)
 	if err != nil {
 		log.Fatal("JWT Error: " + err.Error())
 	}
@@ -43,12 +45,12 @@ func (ctrl *LoginController) LoadEndpoints(router *gin.Engine) {
 			var enteredLogin structs.Login
 
 			c.BindJSON(&enteredLogin)
-			response = ctrl.validationService.GetResponse(
+			response = ctrl.ValidationService.GetResponse(
 				v.NewLoginValidator(),
 				enteredLogin,
 			)
 			if u.IsOKresponse(response.Status) {
-				response = ctrl.loginService.UpdateLoginStatus(enteredLogin, true)
+				response = ctrl.LoginService.UpdateLoginStatus(enteredLogin, true)
 			}
 
 			c.JSON(response.Status, response.Body)
@@ -61,7 +63,7 @@ func (ctrl *LoginController) LoadEndpoints(router *gin.Engine) {
 			var login structs.Login
 
 			c.BindJSON(&login)
-			response = ctrl.loginService.Put(login)
+			response = ctrl.LoginService.Put(login)
 			c.JSON(response.Status, response.Body)
 			return
 		})
@@ -72,14 +74,14 @@ func (ctrl *LoginController) LoadEndpoints(router *gin.Engine) {
 			var currentLogin structs.Login
 			c.BindJSON(&currentLogin)
 
-			response = ctrl.loginService.GetOneByEmail(currentLogin.Email)
+			response = ctrl.LoginService.GetOneByEmail(currentLogin.Email)
 			if !u.IsOKresponse(response.Status) {
 				c.JSON(response.Status, response.Body)
 				return
 			} else {
 				storedLogin := response.Body.(structs.Login)
 				if storedLogin.IsLoggedIn == true {
-					response = ctrl.loginService.UpdateLoginStatus(storedLogin, false)
+					response = ctrl.LoginService.UpdateLoginStatus(storedLogin, false)
 				}
 			}
 

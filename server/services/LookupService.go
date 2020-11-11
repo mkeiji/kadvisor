@@ -4,16 +4,24 @@ import (
 	"errors"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository"
+	i "kadvisor/server/repository/interfaces"
 	"kadvisor/server/repository/mappers"
 	"net/http"
 )
 
 type LookupService struct {
-	mapper     mappers.LookupMapper
-	repository repository.CodeCodeTextRepository
+	Mapper     mappers.LookupMapper
+	Repository i.CodeCodeTextRepository
 }
 
-func (svc *LookupService) GetAllByCodeGroup(
+func NewLookupService() LookupService {
+	return LookupService{
+		Mapper:     mappers.LookupMapper{},
+		Repository: repository.CodeCodeTextRepository{},
+	}
+}
+
+func (svc LookupService) GetAllByCodeGroup(
 	codeGroup string,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
@@ -26,10 +34,10 @@ func (svc *LookupService) GetAllByCodeGroup(
 		)
 	}
 
-	codes, err := svc.repository.FindAllByCodeGroup(codeGroup)
+	codes, err := svc.Repository.FindAllByCodeGroup(codeGroup)
 	if err == nil {
 		for _, c := range codes {
-			lookups = append(lookups, svc.mapper.MapCodeToLookup(c))
+			lookups = append(lookups, svc.Mapper.MapCodeToLookup(c))
 		}
 		response = dtos.NewKresponse(http.StatusOK, lookups)
 	} else {
