@@ -26,14 +26,22 @@ class ChartsViewModelService {
         }
 
         const maxNegativeIncExp = this.getMaxIncomeOrExpense(m) * -1;
+        const maxBalance = this.getMaxBalance(m);
         return [
             this.getTicksForYAxis(maxNegativeIncExp),
-            this.getTicksForYAxis(minBalance)
+            this.getTicksForYAxis(maxBalance)
         ];
     }
 
     getMinBalance(m: MonthReport[]): number {
         return Math.min.apply(
+            Math,
+            m.map((obj) => obj.balance)
+        );
+    }
+
+    getMaxBalance(m: MonthReport[]): number {
+        return Math.max.apply(
             Math,
             m.map((obj) => obj.balance)
         );
