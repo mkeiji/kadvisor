@@ -1,6 +1,7 @@
 package KeiGenUtil
 
 import (
+	"fmt"
 	"kadvisor/server/resources/enums"
 	"math/rand"
 	"strconv"
@@ -85,4 +86,12 @@ func RandomString(n int) string {
 		s[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(s)
+}
+
+func ToString(obj interface{}) string {
+	return fmt.Sprintf("%v", obj)
+}
+
+func ConsoleLog(obj interface{}) {
+	fmt.Printf("\nLog: %v\n\n", obj)
 }

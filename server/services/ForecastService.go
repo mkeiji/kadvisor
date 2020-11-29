@@ -4,7 +4,7 @@ import (
 	"errors"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository"
-	"kadvisor/server/repository/structs"
+	s "kadvisor/server/repository/structs"
 	"net/http"
 
 	i "kadvisor/server/repository/interfaces"
@@ -43,7 +43,7 @@ func (svc ForecastService) GetOne(
 }
 
 func (svc ForecastService) Post(
-	forecast structs.Forecast,
+	forecast s.Forecast,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 

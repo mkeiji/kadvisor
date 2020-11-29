@@ -2,7 +2,7 @@ package services
 
 import (
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository/structs"
+	s "kadvisor/server/repository/structs"
 	"net/http"
 
 	r "kadvisor/server/repository"
@@ -32,7 +32,7 @@ func (l LoginService) GetOneByEmail(email string) dtos.KhttpResponse {
 	return response
 }
 
-func (l LoginService) Put(login structs.Login) dtos.KhttpResponse {
+func (l LoginService) Put(login s.Login) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
 	login, err := l.Repository.Update(login)
@@ -46,7 +46,7 @@ func (l LoginService) Put(login structs.Login) dtos.KhttpResponse {
 }
 
 func (l LoginService) UpdateLoginStatus(
-	login structs.Login,
+	login s.Login,
 	isLoggedIn bool,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse

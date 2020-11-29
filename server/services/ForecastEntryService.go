@@ -2,7 +2,7 @@ package services
 
 import (
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository/structs"
+	s "kadvisor/server/repository/structs"
 	"net/http"
 
 	r "kadvisor/server/repository"
@@ -20,7 +20,7 @@ func NewForecastEntryService() ForecastEntryService {
 }
 
 func (svc ForecastEntryService) Put(
-	entry structs.ForecastEntry,
+	entry s.ForecastEntry,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 

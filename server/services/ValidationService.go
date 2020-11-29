@@ -9,7 +9,11 @@ import (
 
 type ValidationService struct{}
 
-func (v *ValidationService) GetResponse(
+func NewValidationService() ValidationService {
+	return ValidationService{}
+}
+
+func (v ValidationService) GetResponse(
 	validator interfaces.Validator,
 	obj interface{},
 ) dtos.KhttpResponse {

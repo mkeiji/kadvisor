@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository/structs"
+	s "kadvisor/server/repository/structs"
 	"net/http"
 
 	r "kadvisor/server/repository"
@@ -65,7 +65,7 @@ func (svc ClassService) GetOneById(id int) dtos.KhttpResponse {
 }
 
 func (svc ClassService) Post(
-	class structs.Class,
+	class s.Class,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
@@ -80,7 +80,7 @@ func (svc ClassService) Post(
 }
 
 func (svc ClassService) Put(
-	class structs.Class,
+	class s.Class,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 

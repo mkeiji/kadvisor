@@ -28,6 +28,10 @@ type KeiAuthService struct {
 	LoginService LoginService
 }
 
+func NewKeiAuthService() KeiAuthService {
+	return KeiAuthService{LoginService: NewLoginService()}
+}
+
 func (svc KeiAuthService) GetAuthUtil(
 	permissionLevel enums.RoleEnum,
 ) (*jwt.GinJWTMiddleware, error) {

@@ -1,6 +1,5 @@
 import {
     APP_CLASS_ENDPOINT,
-    APP_ENTRY_ENDPOINT,
     Class,
     KEndpointUtil,
     KRxios

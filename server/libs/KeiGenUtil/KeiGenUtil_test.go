@@ -118,4 +118,13 @@ var _ = Describe("KeiGenUtil", func() {
 			Expect(len(result)).To(Equal(expectedSize))
 		})
 	})
+
+	Describe("ToString", func() {
+		It("should return obj as string", func() {
+			intObj := 5
+			expected := "5"
+			result := KeiGenUtil.ToString(intObj)
+			Expect(result).To(Equal(expected))
+		})
+	})
 })

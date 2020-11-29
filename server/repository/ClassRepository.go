@@ -50,7 +50,7 @@ func (repo ClassRepository) Update(
 
 func (repo ClassRepository) Delete(
 	classID int,
-) (int, error) {
+) (s.Class, error) {
 	var classToDelete s.Class
 	var err error
 
@@ -59,5 +59,5 @@ func (repo ClassRepository) Delete(
 		err = app.Db.Delete(&classToDelete).Error
 	}
 
-	return int(classToDelete.ID), err
+	return classToDelete, err
 }

@@ -8,5 +8,5 @@ type ClassRepository interface {
 	FindOne(classID int) (s.Class, error)
 	Create(class s.Class) (s.Class, error)
 	Update(class s.Class) (s.Class, error)
-	Delete(classID int) (int, error)
+	Delete(classID int) (s.Class, error)
 }

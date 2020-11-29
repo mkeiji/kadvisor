@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	u "kadvisor/server/libs/KeiGenUtil"
 	"kadvisor/server/libs/dtos"
+	i "kadvisor/server/repository/interfaces"
 	"kadvisor/server/repository/structs"
 	v "kadvisor/server/repository/validators"
 	"kadvisor/server/resources/enums"
@@ -13,85 +14,98 @@ import (
 )
 
 type ForecastController struct {
-	FcService         s.ForecastService
-	UsrService        s.UserService
-	Auth              s.KeiAuthService
-	ValidationService s.ValidationService
+	FcService         i.ForecastService
+	UsrService        i.UserService
+	Auth              i.KeiAuthService
+	ValidationService i.ValidationService
 }
 
-func (ctrl ForecastController) LoadEndpoints(router *gin.Engine) {
-	ctrl.FcService = s.NewForecastService()
-	ctrl.UsrService = s.NewUserService()
+func NewForecastController() ForecastController {
+	return ForecastController{
+		FcService:         s.NewForecastService(),
+		UsrService:        s.NewUserService(),
+		Auth:              s.NewKeiAuthService(),
+		ValidationService: s.NewValidationService(),
+	}
+}
+
+func (this ForecastController) LoadEndpoints(router *gin.Engine) {
+	this.FcService = s.NewForecastService()
+	this.UsrService = s.NewUserService()
 
 	forecastRoutes := router.Group("/api/kadvisor/:uid")
 	permission := enums.REGULAR
-	jwt, err := ctrl.Auth.GetAuthUtil(permission)
+	jwt, err := this.Auth.GetAuthUtil(permission)
 	if err != nil {
 		log.Fatal("JWT Error: " + err.Error())
 	}
 
 	forecastRoutes.Use(jwt.MiddlewareFunc())
 	{
-		// getOne(/forecast?year&preloaded)
-		forecastRoutes.GET("/forecast", func(c *gin.Context) {
-			var response dtos.KhttpResponse
-
-			userID, _ := strconv.Atoi(c.Param("uid"))
-			year, _ := strconv.Atoi(c.Query("year"))
-			isPreloaded, _ := strconv.ParseBool(
-				c.DefaultQuery("preloaded", "false"))
-
-			response = ctrl.UsrService.GetOne(userID, false)
-			if !u.IsOKresponse(response.Status) {
-				c.JSON(response.Status, response.Body)
-				return
-			}
-
-			response = ctrl.FcService.GetOne(userID, year, isPreloaded)
-			c.JSON(response.Status, response.Body)
-			return
-		})
-
-		// post(/forecast)
-		forecastRoutes.POST("/forecast", func(c *gin.Context) {
-			var forecast structs.Forecast
-
-			userID, _ := strconv.Atoi(c.Param("uid"))
-			response := ctrl.UsrService.GetOne(userID, false)
-			if !u.IsOKresponse(response.Status) {
-				c.JSON(response.Status, response.Body)
-				return
-			}
-
-			c.BindJSON(&forecast)
-			response = ctrl.ValidationService.GetResponse(
-				v.NewForecastValidator(),
-				forecast,
-			)
-			if u.IsOKresponse(response.Status) {
-				response = ctrl.FcService.Post(forecast)
-			}
-
-			c.JSON(response.Status, response.Body)
-			return
-		})
-
-		// delete(/forecast?id)
-		forecastRoutes.DELETE("/forecast", func(c *gin.Context) {
-			var response dtos.KhttpResponse
-
-			forecastID, _ := strconv.Atoi(c.Query("id"))
-			userID, _ := strconv.Atoi(c.Param("uid"))
-
-			response = ctrl.UsrService.GetOne(userID, false)
-			if !u.IsOKresponse(response.Status) {
-				c.JSON(response.Status, response.Body)
-				return
-			}
-
-			response = ctrl.FcService.Delete(forecastID)
-			c.JSON(response.Status, response.Body)
-			return
-		})
+		forecastRoutes.GET("/forecast", this.GetOneForecast)
+		forecastRoutes.POST("/forecast", this.PostForecast)
+		forecastRoutes.DELETE("/forecast", this.DeleteForecast)
 	}
+}
+
+// getOne(/forecast?year&preloaded)
+func (this ForecastController) GetOneForecast(c *gin.Context) {
+	var response dtos.KhttpResponse
+
+	userID, _ := strconv.Atoi(c.Param("uid"))
+	year, _ := strconv.Atoi(c.Query("year"))
+	isPreloaded, _ := strconv.ParseBool(
+		c.DefaultQuery("preloaded", "false"))
+
+	response = this.UsrService.GetOne(userID, false)
+	if !u.IsOKresponse(response.Status) {
+		c.JSON(response.Status, response.Body)
+		return
+	}
+
+	response = this.FcService.GetOne(userID, year, isPreloaded)
+	c.JSON(response.Status, response.Body)
+	return
+}
+
+// post(/forecast)
+func (this ForecastController) PostForecast(c *gin.Context) {
+	var forecast structs.Forecast
+
+	userID, _ := strconv.Atoi(c.Param("uid"))
+	response := this.UsrService.GetOne(userID, false)
+	if !u.IsOKresponse(response.Status) {
+		c.JSON(response.Status, response.Body)
+		return
+	}
+
+	c.ShouldBindJSON(&forecast)
+	response = this.ValidationService.GetResponse(
+		v.NewForecastValidator(),
+		forecast,
+	)
+	if u.IsOKresponse(response.Status) {
+		response = this.FcService.Post(forecast)
+	}
+
+	c.JSON(response.Status, response.Body)
+	return
+}
+
+// delete(/forecast?id)
+func (this ForecastController) DeleteForecast(c *gin.Context) {
+	var response dtos.KhttpResponse
+
+	forecastID, _ := strconv.Atoi(c.Query("id"))
+	userID, _ := strconv.Atoi(c.Param("uid"))
+
+	response = this.UsrService.GetOne(userID, false)
+	if !u.IsOKresponse(response.Status) {
+		c.JSON(response.Status, response.Body)
+		return
+	}
+
+	response = this.FcService.Delete(forecastID)
+	c.JSON(response.Status, response.Body)
+	return
 }

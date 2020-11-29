@@ -71,6 +71,7 @@ func (a App) DbMigrate() {
 		entity.Migrate(Db)
 	}
 	for _, entity := range a.EntityList {
+		// TODO: move this if to the loop above, no need for 2 loops
 		if entity.IsInitializable() {
 			entity.Initialize(Db)
 		}

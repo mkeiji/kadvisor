@@ -6,12 +6,12 @@ import (
 )
 
 var ControllerList = []interfaces.Controller{
-	&controllers.UserController{},
-	&controllers.LoginController{},
-	&controllers.ClassController{},
-	&controllers.EntryController{},
-	&controllers.LookupController{},
-	&controllers.ReportController{},
-	&controllers.ForecastController{},
-	&controllers.ForecastEntryController{},
+	controllers.NewUserController(),
+	controllers.NewLoginController(),
+	controllers.NewClassController(),
+	controllers.NewEntryController(),
+	controllers.NewLookupController(),
+	controllers.NewReportController(),
+	controllers.NewForecastController(),
+	controllers.NewForecastEntryController(),
 }
