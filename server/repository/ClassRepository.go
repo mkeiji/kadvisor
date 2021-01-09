@@ -3,22 +3,30 @@ package repository
 import (
 	s "kadvisor/server/repository/structs"
 	app "kadvisor/server/resources/application"
+
+	"gorm.io/gorm"
 )
 
-type ClassRepository struct{}
+type ClassRepository struct {
+	Db *gorm.DB
+}
 
-func (repo ClassRepository) FindAllByUserId(
+func NewClassRepository() ClassRepository {
+	return ClassRepository{Db: app.Db}
+}
+
+func (this ClassRepository) FindAllByUserId(
 	userID int,
 ) ([]s.Class, error) {
 
 	queryStruct := s.Class{UserID: userID}
 	var classes []s.Class
-	err := app.Db.Where(&queryStruct).Find(&classes).Error
+	err := this.Db.Where(&queryStruct).Find(&classes).Error
 
 	return classes, err
 }
 
-func (repo ClassRepository) FindOne(
+func (this ClassRepository) FindOne(
 	classID int,
 ) (s.Class, error) {
 	class := s.Class{
@@ -26,37 +34,37 @@ func (repo ClassRepository) FindOne(
 			ID: classID,
 		},
 	}
-	err := app.Db.First(&class).Error
+	err := this.Db.First(&class).Error
 
 	return class, err
 }
 
-func (repo ClassRepository) Create(
+func (this ClassRepository) Create(
 	class s.Class,
 ) (s.Class, error) {
-	err := app.Db.Save(&class).Error
+	err := this.Db.Save(&class).Error
 	return class, err
 }
 
-func (repo ClassRepository) Update(
+func (this ClassRepository) Update(
 	class s.Class,
 ) (s.Class, error) {
-	stored, err := repo.FindOne(class.ID)
+	stored, err := this.FindOne(class.ID)
 	if err == nil {
-		err = app.Db.Model(&stored).Updates(class).Error
+		err = this.Db.Model(&stored).Updates(class).Error
 	}
 	return stored, err
 }
 
-func (repo ClassRepository) Delete(
+func (this ClassRepository) Delete(
 	classID int,
 ) (s.Class, error) {
 	var classToDelete s.Class
 	var err error
 
-	err = app.Db.First(&classToDelete, classID).Error
+	err = this.Db.First(&classToDelete, classID).Error
 	if err == nil {
-		err = app.Db.Delete(&classToDelete).Error
+		err = this.Db.Delete(&classToDelete).Error
 	}
 
 	return classToDelete, err

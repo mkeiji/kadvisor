@@ -16,7 +16,7 @@ type ClassService struct {
 
 func NewClassService() ClassService {
 	return ClassService{
-		Repository: r.ClassRepository{},
+		Repository: r.NewClassRepository(),
 	}
 }
 
