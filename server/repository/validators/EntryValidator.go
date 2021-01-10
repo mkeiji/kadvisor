@@ -18,8 +18,8 @@ type EntryValidator struct {
 func NewEntryValidator() EntryValidator {
 	return EntryValidator{
 		TagValidator:    TagValidator{},
-		ClassRepository: r.ClassRepository{},
-		CodeRepository:  r.CodeCodeTextRepository{},
+		ClassRepository: r.NewClassRepository(),
+		CodeRepository:  r.NewCodeCodeTextRepository(),
 	}
 }
 

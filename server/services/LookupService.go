@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository"
+	r "kadvisor/server/repository"
 	i "kadvisor/server/repository/interfaces"
 	"kadvisor/server/repository/mappers"
 	"net/http"
@@ -17,7 +17,7 @@ type LookupService struct {
 func NewLookupService() LookupService {
 	return LookupService{
 		Mapper:     mappers.LookupMapper{},
-		Repository: repository.CodeCodeTextRepository{},
+		Repository: r.NewCodeCodeTextRepository(),
 	}
 }
 
