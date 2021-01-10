@@ -26,7 +26,7 @@ func SetupMockDB() (*gorm.DB, *sql.DB, sqlmock.Sqlmock) {
 			Logger: logger.Default.LogMode(logger.Silent),
 			NowFunc: func() time.Time {
 				d := (60 * time.Second)
-				return time.Now().Truncate(d)
+				return time.Now().UTC().Truncate(d)
 			},
 		},
 	)
@@ -38,13 +38,13 @@ func AnySelectQuery() string {
 	return `^SELECT+`
 }
 
-func GetToday() time.Time {
+func GetTodayUTC() time.Time {
 	d := (60 * time.Second)
-	return time.Now().Truncate(d)
+	return time.Now().UTC().Truncate(d)
 }
 
-func GetYesterday() time.Time {
+func GetYesterdayUTC() time.Time {
 	minusADay := -24 * time.Hour
 	d := (60 * time.Second)
-	return time.Now().Add(minusADay).Truncate(d)
+	return time.Now().UTC().Add(minusADay).Truncate(d)
 }

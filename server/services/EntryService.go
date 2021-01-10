@@ -15,17 +15,17 @@ type EntryService struct {
 
 func NewEntryService() EntryService {
 	return EntryService{
-		Repository: r.EntryRepository{},
+		Repository: r.NewEntryRepository(),
 	}
 }
 
-func (svc EntryService) GetManyByUserId(
+func (this EntryService) GetManyByUserId(
 	userID int,
 	limit int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	entries, err := svc.Repository.FindAllByUserId(userID, limit)
+	entries, err := this.Repository.FindAllByUserId(userID, limit)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -35,13 +35,13 @@ func (svc EntryService) GetManyByUserId(
 	return response
 }
 
-func (svc EntryService) GetManyByClassId(
+func (this EntryService) GetManyByClassId(
 	classID int,
 	limit int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	entries, err := svc.Repository.FindAllByClassId(classID, limit)
+	entries, err := this.Repository.FindAllByClassId(classID, limit)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -51,12 +51,12 @@ func (svc EntryService) GetManyByClassId(
 	return response
 }
 
-func (svc EntryService) GetOneById(
+func (this EntryService) GetOneById(
 	id int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	entries, err := svc.Repository.FindOne(id)
+	entries, err := this.Repository.FindOne(id)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -66,12 +66,12 @@ func (svc EntryService) GetOneById(
 	return response
 }
 
-func (svc EntryService) Post(
+func (this EntryService) Post(
 	entry s.Entry,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	nEntry, err := svc.Repository.Create(entry)
+	nEntry, err := this.Repository.Create(entry)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -81,12 +81,12 @@ func (svc EntryService) Post(
 	return response
 }
 
-func (svc EntryService) Put(
+func (this EntryService) Put(
 	entry s.Entry,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	nEntry, err := svc.Repository.Update(entry)
+	nEntry, err := this.Repository.Update(entry)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {
@@ -96,12 +96,12 @@ func (svc EntryService) Put(
 	return response
 }
 
-func (svc EntryService) Delete(
+func (this EntryService) Delete(
 	id int,
 ) dtos.KhttpResponse {
 	var response dtos.KhttpResponse
 
-	nEntry, err := svc.Repository.Delete(id)
+	nEntry, err := this.Repository.Delete(id)
 	if err != nil {
 		response = dtos.NewKresponse(http.StatusBadRequest, err)
 	} else {

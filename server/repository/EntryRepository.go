@@ -4,49 +4,59 @@ import (
 	"kadvisor/server/repository/mappers"
 	s "kadvisor/server/repository/structs"
 	app "kadvisor/server/resources/application"
+
+	"gorm.io/gorm"
 )
 
 type EntryRepository struct {
-	mapper mappers.EntryMapper
+	Db     *gorm.DB
+	Mapper mappers.EntryMapper
 }
 
-func (repo EntryRepository) FindAllByUserId(
-	userID int, limit int) ([]s.Entry, error) {
+func NewEntryRepository() EntryRepository {
+	return EntryRepository{
+		Db:     app.Db,
+		Mapper: mappers.EntryMapper{},
+	}
+}
 
+func (this EntryRepository) FindAllByUserId(
+	userID int, limit int,
+) ([]s.Entry, error) {
 	queryStruct := s.Entry{UserID: userID}
-	return getEntries(queryStruct, limit)
+	return this.getEntries(queryStruct, limit)
 }
 
-func (repo EntryRepository) FindAllByClassId(
+func (this EntryRepository) FindAllByClassId(
 	classID int, limit int) ([]s.Entry, error) {
 
 	queryStruct := s.Entry{ClassID: classID}
-	return getEntries(queryStruct, limit)
+	return this.getEntries(queryStruct, limit)
 }
 
-func (repo EntryRepository) FindOne(id int) (s.Entry, error) {
+func (this EntryRepository) FindOne(id int) (s.Entry, error) {
 	var entry s.Entry
-	err := app.Db.Where("id=?", id).First(&entry).Error
+	err := this.Db.Where("id=?", id).First(&entry).Error
 	return entry, err
 }
 
-func (repo EntryRepository) Create(
+func (this EntryRepository) Create(
 	entry s.Entry,
 ) (s.Entry, error) {
-	eMapped := repo.mapper.MapEntry(entry)
-	err := app.Db.Save(&eMapped).Error
+	eMapped := this.Mapper.MapEntry(entry)
+	err := this.Db.Save(&eMapped).Error
 	return eMapped, err
 }
 
-func (repo EntryRepository) Update(
+func (this EntryRepository) Update(
 	entry s.Entry,
 ) (s.Entry, error) {
-	eMapped := repo.mapper.MapEntry(entry)
-	stored, err := repo.FindOne(entry.ID)
+	eMapped := this.Mapper.MapEntry(entry)
+	stored, err := this.FindOne(entry.ID)
 	if err == nil {
-		err = app.Db.Model(&stored).Updates(eMapped).Error
+		err = this.Db.Model(&stored).Updates(eMapped).Error
 		if entry.Amount == 0 {
-			err = app.Db.Model(&stored).
+			err = this.Db.Model(&stored).
 				UpdateColumn("amount", 0).
 				Error
 		}
@@ -54,23 +64,23 @@ func (repo EntryRepository) Update(
 	return stored, err
 }
 
-func (repo EntryRepository) Delete(id int) (int, error) {
+func (this EntryRepository) Delete(id int) (int, error) {
 	var entry s.Entry
 	var err error
 
-	err = app.Db.First(&entry, id).Error
+	err = this.Db.First(&entry, id).Error
 	if err == nil {
-		err = app.Db.Delete(&entry).Error
+		err = this.Db.Delete(&entry).Error
 	}
 
 	return entry.ID, err
 }
 
-func getEntries(query s.Entry, limit int) ([]s.Entry, error) {
+func (this EntryRepository) getEntries(query s.Entry, limit int) ([]s.Entry, error) {
 	var entries []s.Entry
 	var err error
 
-	dbQuery := app.Db.Order("created_at desc")
+	dbQuery := this.Db.Order("created_at desc")
 	if limit > 0 {
 		err = dbQuery.Limit(limit).Where(query).Find(&entries).Error
 	} else {
