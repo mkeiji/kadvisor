@@ -15,7 +15,7 @@ type ForecastEntryService struct {
 
 func NewForecastEntryService() ForecastEntryService {
 	return ForecastEntryService{
-		Repository: r.ForecastEntryRepository{},
+		Repository: r.NewForecastEntryRepository(),
 	}
 }
 
