@@ -16,7 +16,7 @@ type ForecastValidator struct {
 func NewForecastValidator() ForecastValidator {
 	return ForecastValidator{
 		TagValidator: TagValidator{},
-		ForecastRepo: r.ForecastRepository{},
+		ForecastRepo: r.NewForecastRepository(),
 	}
 }
 

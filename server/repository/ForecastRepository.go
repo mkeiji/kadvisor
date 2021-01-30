@@ -2,51 +2,67 @@ package repository
 
 import (
 	"kadvisor/server/repository/mappers"
-	"kadvisor/server/repository/structs"
-	"kadvisor/server/resources/application"
+	s "kadvisor/server/repository/structs"
+	app "kadvisor/server/resources/application"
+
+	"gorm.io/gorm"
 )
 
 type ForecastRepository struct {
-	entryMapper mappers.ForecastEntryMapper
+	EntryMapper mappers.ForecastEntryMapper
+	Db          *gorm.DB
 }
 
-func (repo ForecastRepository) FindOne(
+func NewForecastRepository() ForecastRepository {
+	return ForecastRepository{
+		EntryMapper: mappers.ForecastEntryMapper{},
+		Db:          app.Db,
+	}
+}
+
+func (this ForecastRepository) FindOne(
 	userID int, year int, isPreloaded bool,
-) (structs.Forecast, error) {
-	var forecast structs.Forecast
+) (s.Forecast, error) {
+	var forecast s.Forecast
 	var err error
 
 	query := "user_id=? AND year=?"
 	if isPreloaded {
-		err = application.Db.Preload(
-			"Entries").Where(query, userID, year).First(&forecast).Error
+		err = this.Db.Preload("Entries").
+			Where(query, userID, year).
+			First(&forecast).Error
 	} else {
-		err = application.Db.Where(query, userID, year).First(&forecast).Error
+		err = this.Db.
+			Where(query, userID, year).
+			First(&forecast).Error
 	}
 
 	return forecast, err
 }
 
-func (repo ForecastRepository) Create(
-	forecast structs.Forecast,
-) (structs.Forecast, error) {
-	var mappedEntries []structs.ForecastEntry
+func (this ForecastRepository) Create(
+	forecast s.Forecast,
+) (s.Forecast, error) {
+	var mappedEntries []s.ForecastEntry
 	for _, e := range forecast.Entries {
-		mappedEntries = append(mappedEntries, repo.entryMapper.MapForecastEntry(e))
+		mappedEntries = append(
+			mappedEntries,
+			this.EntryMapper.MapForecastEntry(e),
+		)
 	}
 	forecast.Entries = mappedEntries
 
-	err := application.Db.Save(&forecast).Error
+	err := this.Db.Save(&forecast).Error
 	return forecast, err
 }
 
-func (repo ForecastRepository) Delete(id int) (structs.Forecast, error) {
-	var forecast structs.Forecast
+func (this ForecastRepository) Delete(id int) (s.Forecast, error) {
+	var forecast s.Forecast
 	var err error
 
-	err = application.Db.First(&forecast, id).Error
+	err = this.Db.First(&forecast, id).Error
 	if err == nil {
-		err = application.Db.Delete(&forecast).Error
+		err = this.Db.Delete(&forecast).Error
 	}
 
 	return forecast, err

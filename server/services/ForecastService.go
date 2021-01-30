@@ -3,7 +3,7 @@ package services
 import (
 	"errors"
 	"kadvisor/server/libs/dtos"
-	"kadvisor/server/repository"
+	r "kadvisor/server/repository"
 	s "kadvisor/server/repository/structs"
 	"net/http"
 
@@ -16,7 +16,7 @@ type ForecastService struct {
 
 func NewForecastService() ForecastService {
 	return ForecastService{
-		Repository: repository.ForecastRepository{},
+		Repository: r.NewForecastRepository(),
 	}
 }
 

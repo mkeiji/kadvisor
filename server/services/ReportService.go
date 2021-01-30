@@ -20,7 +20,7 @@ type ReportService struct {
 func NewReportService() ReportService {
 	return ReportService{
 		Repository:         r.ReportRepository{},
-		ForecastRepository: r.ForecastRepository{},
+		ForecastRepository: r.NewForecastRepository(),
 		ForecastMapper:     m.ForecastMapper{},
 	}
 }
