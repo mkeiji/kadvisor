@@ -29,12 +29,6 @@ cd client/
 npm install
 ```
 
-- Spin up the database:
-
-```bash
-make db
-```
-
 - Get `go` dependencies by running the app for the first time:
 
 ```bash

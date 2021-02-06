@@ -1,5 +1,32 @@
 # Server
 
+## Dependencies
+[resource](https://golang.org/doc/modules/managing-dependencies)
+
+### Discovering available updates
+- List all of the modules that are dependencies of your current module, along with the latest version available for each:
+```bash
+$ go list -m -u all
+```
+
+- Display the latest version available for a specific module:
+```bash
+$ go list -m -u example.com/theirmodule
+```
+
+### Getting a specific dependency version
+
+- To get a specific numbered version, append the module path with an @ sign followed by the version you want:
+```bash
+$ go get example.com/theirmodule@v1.3.4
+```
+
+- To get the latest version, append the module path with @latest:
+```bash
+$ go get example.com/theirmodule@latest
+```
+
+
 ## Unit Tests
 
 ### Unit Tests Dependencies
