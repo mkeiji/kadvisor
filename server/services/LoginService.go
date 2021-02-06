@@ -15,7 +15,7 @@ type LoginService struct {
 
 func NewLoginService() LoginService {
 	return LoginService{
-		Repository: r.LoginRepository{},
+		Repository: r.NewLoginRepository(),
 	}
 }
 

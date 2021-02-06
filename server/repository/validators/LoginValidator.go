@@ -17,7 +17,7 @@ type LoginValidator struct {
 func NewLoginValidator() LoginValidator {
 	return LoginValidator{
 		TagValidator:    TagValidator{},
-		LoginRepository: r.LoginRepository{},
+		LoginRepository: r.NewLoginRepository(),
 	}
 }
 

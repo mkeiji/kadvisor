@@ -3,55 +3,65 @@ package repository
 import (
 	s "kadvisor/server/repository/structs"
 	app "kadvisor/server/resources/application"
+
+	"gorm.io/gorm"
 )
 
-type LoginRepository struct{}
+type LoginRepository struct {
+	Db *gorm.DB
+}
 
-func (l LoginRepository) FindOneByEmail(email string) (s.Login, error) {
+func NewLoginRepository() LoginRepository {
+	return LoginRepository{
+		Db: app.Db,
+	}
+}
+
+func (this LoginRepository) FindOneByEmail(email string) (s.Login, error) {
 	var login s.Login
 
-	err := app.Db.Where("email=?", email).First(&login).Error
+	err := this.Db.Where("email=?", email).First(&login).Error
 	if err != nil {
 		return login, err
 	}
 	return login, nil
 }
 
-func (l LoginRepository) Update(
+func (this LoginRepository) Update(
 	login s.Login,
 ) (s.Login, error) {
-	stored, err := l.findOne(login.ID)
+	stored, err := this.findOne(login.ID)
 	if err == nil {
-		err = app.Db.Model(&stored).Updates(login).Error
+		err = this.Db.Model(&stored).Updates(login).Error
 	}
 
 	return stored, err
 }
 
-func (l LoginRepository) UpdateLoginStatus(
+func (this LoginRepository) UpdateLoginStatus(
 	login s.Login,
 	isLoggedIn bool,
 ) (s.Login, error) {
-	storedLogin, fErr := l.FindOneByEmail(login.Email)
+	storedLogin, fErr := this.FindOneByEmail(login.Email)
 	if fErr != nil {
 		return storedLogin, fErr
 	} else {
-		err := app.Db.
+		err := this.Db.
 			Model(&storedLogin).
 			Where("email=?", login.Email).
 			Update("IsLoggedIn", isLoggedIn).Error
 		if err != nil {
-			return storedLogin, err
+			return s.Login{}, err
 		}
 	}
 
 	return storedLogin, nil
 }
 
-func (l LoginRepository) findOne(
+func (this LoginRepository) findOne(
 	id int,
 ) (s.Login, error) {
 	var storedLogin s.Login
-	err := app.Db.Where("id=?", id).First(&storedLogin).Error
+	err := this.Db.Where("id=?", id).First(&storedLogin).Error
 	return storedLogin, err
 }
