@@ -20,7 +20,8 @@ func SetupMockDB() (*gorm.DB, *sql.DB, sqlmock.Sqlmock) {
 			Config: &mysql.Config{
 				DriverName:                "mysql",
 				Conn:                      sqlmockDB,
-				SkipInitializeWithVersion: true},
+				SkipInitializeWithVersion: true,
+			},
 		},
 		&gorm.Config{
 			Logger: logger.Default.LogMode(logger.Silent),

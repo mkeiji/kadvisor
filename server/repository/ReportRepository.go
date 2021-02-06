@@ -5,75 +5,92 @@ import (
 	"fmt"
 	"kadvisor/server/libs/dtos"
 	"kadvisor/server/repository/structs"
-	"kadvisor/server/resources/application"
+	app "kadvisor/server/resources/application"
+
+	"gorm.io/gorm"
 )
 
 type Year struct {
 	Year int `json:"year"`
 }
 
-type ReportRepository struct{}
+type ReportRepository struct {
+	Db *gorm.DB
+}
 
-func (repo ReportRepository) GetAvailableForecastYears(userID int) ([]int, error) {
+func NewReportRepository() ReportRepository {
+	return ReportRepository{
+		Db: app.Db,
+	}
+}
+
+func (this ReportRepository) GetAvailableForecastYears(userID int) ([]int, error) {
 	var forecasts []structs.Forecast
 	var result []int
 
-	err := application.Db.
+	err := this.Db.
 		Distinct("year").
 		Order("year desc").
 		Find(&forecasts).
 		Error
-
-	if len(forecasts) <= 0 {
-		err = errors.New("no available years found")
-	} else {
-		for _, f := range forecasts {
-			result = append(result, f.Year)
+	if err == nil {
+		if len(forecasts) <= 0 {
+			err = errors.New("no available years found")
+		} else {
+			for _, f := range forecasts {
+				result = append(result, f.Year)
+			}
 		}
 	}
 
 	return result, err
 }
 
-func (repo ReportRepository) GetAvailableYears(userID int) ([]int, error) {
+func (this ReportRepository) GetAvailableYears(userID int) ([]int, error) {
 	var years []Year
 	var result []int
 
 	query := fmt.Sprintf(`
-        select distinct year(date) as year
-        from entries where user_id=%v
-        union
-        select distinct year as year
-        from forecasts where user_id=%v
+        SELECT DISTINCT year(date) as year
+        FROM entries 
+		WHERE user_id=%v
+        UNION
+        SELECT DISTINCT year as year
+        FROM forecasts
+		WHERE user_id=%v
 	`, userID, userID)
 
-	err := application.Db.Raw(query).Scan(&years).Error
-	if len(years) <= 0 {
-		err = errors.New("no available years found")
-	} else {
-		for _, y := range years {
-			result = append(result, y.Year)
+	err := this.Db.Raw(query).Scan(&years).Error
+	if err == nil {
+		if len(years) <= 0 {
+			err = errors.New("no available years found")
+		} else {
+			for _, y := range years {
+				result = append(result, y.Year)
+			}
 		}
 	}
 
 	return result, err
 }
 
-func (repo ReportRepository) FindBalance(userID int) (dtos.Balance, error) {
+func (this ReportRepository) FindBalance(userID int) (dtos.Balance, error) {
 	var balance dtos.Balance
 
-	err := application.Db.Table("entries").Select(
+	err := this.Db.Table("entries").Select(
 		"user_id as user_id, sum(amount) as balance").Group(
 		"user_id").Where(
 		"user_id=?", userID).Scan(&balance).Error
-	if balance.UserID == 0 && balance.Balance == 0 {
-		err = errors.New("no balance is available")
+	if err == nil {
+		if balance.UserID == 0 && balance.Balance == 0 {
+			err = errors.New("no balance is available")
+		}
 	}
 
 	return balance, err
 }
 
-func (repo ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos.MonthReport, error) {
+func (this ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos.MonthReport, error) {
 	var mReport []dtos.MonthReport
 
 	query := fmt.Sprintf(`
@@ -81,7 +98,7 @@ func (repo ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos.
 			year(date) year,
 			month(date) month,
 			sum(income) income, 
-			sum(expense) expense, 
+			sum(expense) expense,
 			(sum(income) + sum(expense)) balance
 		from (
 			select date,
@@ -94,10 +111,11 @@ func (repo ReportRepository) FindYearToDateReport(userID int, year int) ([]dtos.
 		group by year(date), month(date);
 	`, year)
 
-	err := application.Db.Raw(query, userID).Scan(&mReport).Error
-
-	if len(mReport) <= 0 {
-		err = errors.New("no report available")
+	err := this.Db.Raw(query, userID).Scan(&mReport).Error
+	if err == nil {
+		if len(mReport) <= 0 {
+			err = errors.New("no report available")
+		}
 	}
 
 	return mReport, err
