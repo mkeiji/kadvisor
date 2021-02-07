@@ -222,7 +222,7 @@ var _ = Describe("ReportRepository", func() {
 			`, expectedYear))
 		})
 
-		It("no error - should return balance", func() {
+		It("no error - should return report", func() {
 			expectedRow = sqlmock.
 				NewRows([]string{"year", "month", "income", "expense", "balance", "type"}).
 				AddRow(expectedYear, expectedMonth, expectedIncome, expectedExpense, expectedBalance, expectedType)

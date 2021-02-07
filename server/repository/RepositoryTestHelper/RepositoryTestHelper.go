@@ -39,6 +39,10 @@ func AnySelectQuery() string {
 	return `^SELECT+`
 }
 
+func AnyInsertQuery() string {
+	return `^INSERT INTO+`
+}
+
 func GetTodayUTC() time.Time {
 	d := (60 * time.Second)
 	return time.Now().UTC().Truncate(d)
