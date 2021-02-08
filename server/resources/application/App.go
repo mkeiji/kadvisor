@@ -1,8 +1,6 @@
 package application
 
 import (
-	"bytes"
-	"fmt"
 	"kadvisor/server/repository/interfaces"
 	"kadvisor/server/resources/constants"
 	"log"
@@ -27,19 +25,30 @@ type App struct {
 	Controllers []interfaces.Controller
 }
 
-func (a App) Initialize() {
+func (this App) InitializeInTestMode() {
+	once.Do(func() {
+		gin.SetMode(gin.ReleaseMode)
+		Router = gin.New()
+		Validator = validator.New()
+	})
+}
+
+func (this App) Initialize() {
 	once.Do(func() {
 		if os.Getenv("APP_ENV") == "PROD" {
 			gin.SetMode(gin.ReleaseMode)
 		}
 
-		Db, _ = gorm.Open(mysql.Open(getDbConnection()), &gorm.Config{})
+		if Db == nil {
+			Db, _ = gorm.Open(mysql.Open(getDbConnection()), &gorm.Config{})
+		}
+
 		Router = gin.Default()
 		Validator = validator.New()
 	})
 }
 
-func (a App) SetRouter() {
+func (this App) SetRouter() {
 	if os.Getenv("APP_ENV") == "PROD" {
 		Router.Use(static.Serve("/", static.LocalFile("./client/dist/apps/kadvisor-app", true)))
 	}
@@ -56,52 +65,39 @@ func (a App) SetRouter() {
 	}
 	Router.Use(cors.New(corsConfig))
 
-	a.loadControllers()
+	this.loadControllers()
 }
 
-func (a App) Run() {
+func (this App) Run() {
 	routerErr := Router.Run(":" + os.Getenv("PORT"))
 	if routerErr != nil {
 		log.Fatalln(routerErr)
 	}
 }
 
-func (a App) DbMigrate() {
-	for _, entity := range a.EntityList {
+func (this App) DbMigrate() {
+	for _, entity := range this.EntityList {
 		entity.Migrate(Db)
 	}
-	for _, entity := range a.EntityList {
-		// TODO: move this if to the loop above, no need for 2 loops
+	// 2 loops needed to migrate all entities before initializing
+	for _, entity := range this.EntityList {
 		if entity.IsInitializable() {
 			entity.Initialize(Db)
 		}
 	}
 }
 
-func (a App) loadControllers() {
-	for _, controller := range a.Controllers {
+func (this App) loadControllers() {
+	for _, controller := range this.Controllers {
 		controller.LoadEndpoints(Router)
 	}
 }
 
 func getDbConnection() string {
-	var dbConnect bytes.Buffer
 	dbHost := os.Getenv("DB_HOST")
 	dbName := os.Getenv("DB_NAME")
 	dbUser := os.Getenv("DB_USER")
 	dbPass := os.Getenv("DB_PASS")
-	dbAddress := fmt.Sprintf(
-		"@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		dbHost,
-		dbName)
 
-	if os.Getenv("DB_TYPE") == "mysql" {
-		dbConnect.WriteString(dbUser + ":")
-		dbConnect.WriteString(dbPass)
-		dbConnect.WriteString(dbAddress)
-	} else if os.Getenv("DB_TYPE") == "sqlite3" {
-		dbConnect.WriteString(os.Getenv("DB_SQLITE_PATH"))
-	}
-
-	return dbConnect.String()
+	return BuildMysqlDbConnection(dbHost, dbName, dbUser, dbPass)
 }

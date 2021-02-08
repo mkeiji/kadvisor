@@ -18,9 +18,12 @@ serverTestSuite:
 serverMocks:
 	(cd server/repository/interfaces/ && go generate)
 
-runTestsServer:
+serverUnitTests:
 	(cd server/repository/interfaces/ && go generate)
-	ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
+	ginkgo -r -skipPackage=apiTests --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
+
+serverApiTests:
+	ginkgo --randomizeAllSpecs --failOnPending --cover --trace --race --progress server/apiTests/
 
 formatClient:
 	(cd client/ && npm run format)
@@ -45,10 +48,10 @@ dockerimg:
 	docker build -t mgkeiji/kadvisor .
 
 testdb:
-	docker run --rm -d --name test --network bridge -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
+	docker run --rm -d --name testdb --network bridge -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:latest
 
 db:
-	docker run -d --name kdb --restart unless-stopped --network bridge -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:5.7
+	docker run -d --name kdb --restart unless-stopped --network bridge -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=testdb -p 3306:3306 mysql:latest
 
 dependencies:
 	go get -u github.com/gin-gonic/gin
