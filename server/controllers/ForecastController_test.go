@@ -122,11 +122,6 @@ var _ = Describe("ForecastController", func() {
 				url = ControllerTestHelper.GetUrlWithParams(testUserID, route, queryParams)
 				request, _ = http.NewRequest("GET", url, nil)
 				testForecast := s.Forecast{Base: s.Base{ID: testID}}
-				expectedBody := gin.H{
-					"id":        float64(testID),
-					"createdAt": "0001-01-01T00:00:00Z",
-					"updatedAt": "0001-01-01T00:00:00Z",
-				}
 
 				mockUsrSvc.EXPECT().
 					GetOne(testUserID, false).
@@ -140,11 +135,11 @@ var _ = Describe("ForecastController", func() {
 				r.GET(route, controller.GetOneForecast)
 				r.ServeHTTP(c.Writer, request)
 
-				var result gin.H
+				var result s.Forecast
 				json.Unmarshal(w.Body.Bytes(), &result)
 
 				Expect(w.Code).To(Equal(http.StatusOK))
-				Expect(result).To(Equal(expectedBody))
+				Expect(result.Base.ID).To(Equal(testForecast.Base.ID))
 			})
 
 			It("Invalid User - should return error if UserService.GetOne fails", func() {

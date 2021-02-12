@@ -137,7 +137,7 @@ var _ = Describe("LoginRepository", func() {
 			mockManager.ExpectQuery(expectedFindOneQuery).
 				WillReturnRows(storedRow)
 			mockManager.ExpectExec(expectedQuery).
-				WithArgs(h.GetTodayUTC(), testObject.Email, TEST_ID).
+				WithArgs(h.GetTodayUTCUnix(), testObject.Email, TEST_ID).
 				WillReturnResult(sqlmock.NewResult(nInsertedID, nAffectedRows))
 
 			result, err := repo.Update(testObject)
@@ -185,7 +185,7 @@ var _ = Describe("LoginRepository", func() {
 			mockManager.ExpectQuery(expectedFindQuery).
 				WillReturnRows(storedRow)
 			mockManager.ExpectExec(expectedQuery).
-				WithArgs(expectedIsLoggedIn, h.GetTodayUTC(), TEST_EMAIL, TEST_ID).
+				WithArgs(expectedIsLoggedIn, h.GetTodayUTCUnix(), TEST_EMAIL, TEST_ID).
 				WillReturnResult(sqlmock.NewResult(nInsertedID, nAffectedRows))
 
 			result, err := repo.UpdateLoginStatus(testObject, expectedIsLoggedIn)
@@ -200,7 +200,7 @@ var _ = Describe("LoginRepository", func() {
 			mockManager.ExpectQuery(expectedFindQuery).
 				WillReturnRows(storedRow)
 			mockManager.ExpectExec(expectedQuery).
-				WithArgs(expectedIsLoggedIn, h.GetTodayUTC(), TEST_EMAIL, TEST_ID).
+				WithArgs(expectedIsLoggedIn, h.GetTodayUTCUnix(), TEST_EMAIL, TEST_ID).
 				WillReturnError(expectedError)
 
 			result, err := repo.UpdateLoginStatus(testObject, expectedIsLoggedIn)

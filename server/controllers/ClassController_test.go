@@ -127,14 +127,6 @@ var _ = Describe("ClassController", func() {
 					Name:        "test",
 					Description: "test",
 				}
-				expected := gin.H{
-					"description": "test",
-					"id":          float64(testID.ID),
-					"createdAt":   "0001-01-01T00:00:00Z",
-					"updatedAt":   "0001-01-01T00:00:00Z",
-					"userID":      float64(testUserID),
-					"name":        "test",
-				}
 
 				mockUsrSvc.EXPECT().
 					GetOne(testUserID, false).
@@ -148,11 +140,14 @@ var _ = Describe("ClassController", func() {
 				r.GET(route, controller.GetOneById)
 				r.ServeHTTP(c.Writer, request)
 
-				var result gin.H
+				var result s.Class
 				json.Unmarshal(w.Body.Bytes(), &result)
 
 				Expect(w.Code).To(Equal(http.StatusOK))
-				Expect(result).To(Equal(expected))
+				Expect(result.Base.ID).To(Equal(testClass.Base.ID))
+				Expect(result.UserID).To(Equal(testClass.UserID))
+				Expect(result.Name).To(Equal(testClass.Name))
+				Expect(result.Description).To(Equal(testClass.Description))
 			})
 		})
 

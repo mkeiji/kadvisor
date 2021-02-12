@@ -154,7 +154,7 @@ var _ = Describe("ForecastRepository", func() {
 					"VALUES (?,?,?,?)",
 				),
 			)
-			date := time.Now()
+			date := time.Now().Unix()
 			nInsertedID := int64(1)
 			nAffectedRows := int64(1)
 			testObject := s.Forecast{

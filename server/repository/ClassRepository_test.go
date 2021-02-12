@@ -129,7 +129,7 @@ var _ = Describe("ClassRepository", func() {
 			expectedQuery := regexp.QuoteMeta(
 				"INSERT INTO `classes` (`created_at`,`updated_at`,`user_id`,`name`,`description`) VALUES (?,?,?,?,?)",
 			)
-			date := time.Now()
+			date := time.Now().Unix()
 			nInsertedID := int64(1)
 			nAffectedRows := int64(1)
 			testClass := s.Class{
@@ -162,8 +162,8 @@ var _ = Describe("ClassRepository", func() {
 		)
 
 		It("should update one class", func() {
-			today := h.GetTodayUTC()
-			yesterday := h.GetYesterdayUTC()
+			today := h.GetTodayUTCUnix()
+			yesterday := h.GetYesterdayUTCUnix()
 			expectedQuery := regexp.QuoteMeta(
 				"UPDATE `classes` SET `id`=?,`updated_at`=?,`name`=? WHERE `id` = ?",
 			)
@@ -216,7 +216,7 @@ var _ = Describe("ClassRepository", func() {
 			expectedQuery := regexp.QuoteMeta(
 				"DELETE FROM `classes` WHERE `classes`.`id` = ?",
 			)
-			yesterday := h.GetYesterdayUTC()
+			yesterday := h.GetYesterdayUTCUnix()
 			expectedClass := s.Class{
 				Base:        s.Base{ID: classID, CreatedAt: yesterday, UpdatedAt: yesterday},
 				UserID:      userID,

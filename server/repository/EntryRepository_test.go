@@ -30,12 +30,10 @@ var _ = Describe("EntryRepository", func() {
 		mockManager sqlmock.Sqlmock
 		repo        r.EntryRepository
 		today       time.Time
-		yesterday   time.Time
 	)
 
 	BeforeEach(func() {
 		today = h.GetTodayUTC()
-		yesterday = h.GetYesterdayUTC()
 		gormmockDB, sqlmockDB, mockManager = h.SetupMockDB()
 		repo = r.EntryRepository{
 			Db:     gormmockDB,
@@ -184,7 +182,7 @@ var _ = Describe("EntryRepository", func() {
 			nInsertedID := int64(1)
 			nAffectedRows := int64(1)
 			testEntry := getTestEntries(userID, classID, today)[0]
-			testEntry.Base = s.Base{CreatedAt: today, UpdatedAt: today}
+			testEntry.Base = s.Base{CreatedAt: h.GetTodayUTCUnix(), UpdatedAt: h.GetTodayUTCUnix()}
 
 			expectedEntry := testEntry
 			expectedEntry.Base.ID = 1
@@ -219,7 +217,6 @@ var _ = Describe("EntryRepository", func() {
 		Context("entry found", func() {
 			var (
 				descriptionUpdate         string
-				expectedUpdateQuery       string
 				expectedAmountUpdateQuery string
 				testEntry                 s.Entry
 				expectedEntry             s.Entry
@@ -228,9 +225,6 @@ var _ = Describe("EntryRepository", func() {
 
 			BeforeEach(func() {
 				descriptionUpdate = "updatedDescription"
-				expectedUpdateQuery = regexp.QuoteMeta(
-					"UPDATE `entries` SET `id`=?,`updated_at`=?,`description`=? WHERE `id` = ?",
-				)
 				expectedAmountUpdateQuery = regexp.QuoteMeta(
 					"UPDATE `entries` SET `amount`=? WHERE `id` = ?",
 				)
@@ -239,15 +233,15 @@ var _ = Describe("EntryRepository", func() {
 					Description: descriptionUpdate,
 				}
 				expectedEntry = getTestEntries(userID, classID, today)[0]
-				expectedEntry.Base.CreatedAt = yesterday
-				expectedEntry.Base.UpdatedAt = today
+				expectedEntry.Base.CreatedAt = h.GetYesterdayUTCUnix()
+				expectedEntry.Base.UpdatedAt = h.GetTodayUTCUnix()
 				expectedEntry.Description = descriptionUpdate
 				storedEntry = sqlmock.
 					NewRows([]string{"id", "created_at", "updated_at", "user_id", "class_id", "entry_type_code_id", "date", "amount", "description", "obs"}).
 					AddRow(
 						entryID,
-						yesterday,
-						yesterday,
+						h.GetYesterdayUTCUnix(),
+						h.GetYesterdayUTCUnix(),
 						userID,
 						classID,
 						"testEntryTypeCodeID",
@@ -265,9 +259,6 @@ var _ = Describe("EntryRepository", func() {
 
 				mockManager.ExpectQuery(h.AnySelectQuery()).
 					WillReturnRows(storedEntry)
-				mockManager.ExpectExec(expectedUpdateQuery).
-					WithArgs(entryID, today, testEntry.Description, entryID).
-					WillReturnResult(sqlmock.NewResult(nInsertedID, nAffectedRows))
 				mockManager.ExpectExec(expectedAmountUpdateQuery).
 					WithArgs(noAmount, entryID).
 					WillReturnResult(sqlmock.NewResult(nInsertedID, nAffectedRows))
@@ -296,7 +287,7 @@ var _ = Describe("EntryRepository", func() {
 			expectedQuery := regexp.QuoteMeta(
 				"DELETE FROM `entries` WHERE `entries`.`id` = ?",
 			)
-			yesterday := h.GetYesterdayUTC()
+			yesterday := h.GetYesterdayUTCUnix()
 			storedEntry := sqlmock.
 				NewRows([]string{"id", "created_at", "updated_at", "user_id", "class_id", "entry_type_code_id", "date", "amount", "description", "obs"}).
 				AddRow(

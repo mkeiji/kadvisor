@@ -165,18 +165,6 @@ var _ = Describe("EntryController", func() {
 						Amount:          float64(10),
 					},
 				}
-				expected := []gin.H{
-					{
-						"classID":         float64(1),
-						"entryTypeCodeID": "INCOME_ENTRY_TYPE",
-						"date":            today.Format(time.RFC3339Nano),
-						"amount":          float64(10),
-						"id":              float64(1),
-						"createdAt":       "0001-01-01T00:00:00Z",
-						"updatedAt":       "0001-01-01T00:00:00Z",
-						"userID":          float64(1),
-					},
-				}
 
 				mockUsrSvc.EXPECT().
 					GetOne(testUserID, false).
@@ -190,12 +178,17 @@ var _ = Describe("EntryController", func() {
 				r.GET(route, controller.GetEntry)
 				r.ServeHTTP(c.Writer, request)
 
-				var result []gin.H
+				var result []s.Entry
 				json.Unmarshal(w.Body.Bytes(), &result)
 
 				Expect(w.Code).To(Equal(http.StatusOK))
 				Expect(len(result)).To(Equal(1))
-				Expect(result).To(Equal(expected))
+				Expect(result[0].Base.ID).To(Equal(testEntries[0].Base.ID))
+				Expect(result[0].UserID).To(Equal(testEntries[0].UserID))
+				Expect(result[0].ClassID).To(Equal(testEntries[0].ClassID))
+				Expect(result[0].EntryTypeCodeID).To(Equal(testEntries[0].EntryTypeCodeID))
+				Expect(result[0].Date.Unix()).To(Equal(testEntries[0].Date.Unix()))
+				Expect(result[0].Amount).To(Equal(testEntries[0].Amount))
 			})
 
 			It("should return error if entryService.GetManyByUserId fails", func() {
@@ -242,16 +235,6 @@ var _ = Describe("EntryController", func() {
 					Date:            today,
 					Amount:          float64(10),
 				}
-				expected := gin.H{
-					"classID":         float64(1),
-					"entryTypeCodeID": "INCOME_ENTRY_TYPE",
-					"date":            today.Format(time.RFC3339Nano),
-					"amount":          float64(10),
-					"id":              float64(1),
-					"createdAt":       "0001-01-01T00:00:00Z",
-					"updatedAt":       "0001-01-01T00:00:00Z",
-					"userID":          float64(1),
-				}
 
 				mockUsrSvc.EXPECT().
 					GetOne(testUserID, false).
@@ -265,11 +248,16 @@ var _ = Describe("EntryController", func() {
 				r.GET(route, controller.GetEntry)
 				r.ServeHTTP(c.Writer, request)
 
-				var result gin.H
+				var result s.Entry
 				json.Unmarshal(w.Body.Bytes(), &result)
 
 				Expect(w.Code).To(Equal(http.StatusOK))
-				Expect(result).To(Equal(expected))
+				Expect(result.Base.ID).To(Equal(testEntry.Base.ID))
+				Expect(result.UserID).To(Equal(testEntry.UserID))
+				Expect(result.ClassID).To(Equal(testEntry.ClassID))
+				Expect(result.EntryTypeCodeID).To(Equal(testEntry.EntryTypeCodeID))
+				Expect(result.Date.Unix()).To(Equal(testEntry.Date.Unix()))
+				Expect(result.Amount).To(Equal(testEntry.Amount))
 			})
 
 			It("should return error if EntryService fails", func() {
@@ -320,18 +308,6 @@ var _ = Describe("EntryController", func() {
 						Amount:          float64(10),
 					},
 				}
-				expected := []gin.H{
-					{
-						"classID":         float64(1),
-						"entryTypeCodeID": "INCOME_ENTRY_TYPE",
-						"date":            today.Format(time.RFC3339Nano),
-						"amount":          float64(10),
-						"id":              float64(1),
-						"createdAt":       "0001-01-01T00:00:00Z",
-						"updatedAt":       "0001-01-01T00:00:00Z",
-						"userID":          float64(1),
-					},
-				}
 
 				mockUsrSvc.EXPECT().
 					GetOne(testUserID, false).
@@ -345,12 +321,17 @@ var _ = Describe("EntryController", func() {
 				r.GET(route, controller.GetEntry)
 				r.ServeHTTP(c.Writer, request)
 
-				var result []gin.H
+				var result []s.Entry
 				json.Unmarshal(w.Body.Bytes(), &result)
 
 				Expect(w.Code).To(Equal(http.StatusOK))
 				Expect(len(result)).To(Equal(1))
-				Expect(result).To(Equal(expected))
+				Expect(result[0].Base.ID).To(Equal(testEntries[0].Base.ID))
+				Expect(result[0].UserID).To(Equal(testEntries[0].UserID))
+				Expect(result[0].ClassID).To(Equal(testEntries[0].ClassID))
+				Expect(result[0].EntryTypeCodeID).To(Equal(testEntries[0].EntryTypeCodeID))
+				Expect(result[0].Date.Unix()).To(Equal(testEntries[0].Date.Unix()))
+				Expect(result[0].Amount).To(Equal(testEntries[0].Amount))
 			})
 
 			It("should return error if entryService.GetManyByClassId fails", func() {

@@ -53,3 +53,13 @@ func GetYesterdayUTC() time.Time {
 	d := (60 * time.Second)
 	return time.Now().UTC().Add(minusADay).Truncate(d)
 }
+func GetTodayUTCUnix() int64 {
+	d := (60 * time.Second)
+	return time.Now().UTC().Truncate(d).Unix()
+}
+
+func GetYesterdayUTCUnix() int64 {
+	minusADay := -24 * time.Hour
+	d := (60 * time.Second)
+	return time.Now().UTC().Add(minusADay).Truncate(d).Unix()
+}

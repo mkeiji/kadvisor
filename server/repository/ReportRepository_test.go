@@ -26,11 +26,11 @@ var _ = Describe("ReportRepository", func() {
 		sqlmockDB   *sql.DB
 		mockManager sqlmock.Sqlmock
 		repo        r.ReportRepository
-		date        time.Time
+		date        int64
 	)
 
 	BeforeEach(func() {
-		date = h.GetTodayUTC()
+		date = h.GetTodayUTCUnix()
 		gormmockDB, sqlmockDB, mockManager = h.SetupMockDB()
 		repo = r.ReportRepository{
 			Db: gormmockDB,
@@ -63,7 +63,7 @@ var _ = Describe("ReportRepository", func() {
 		})
 
 		It("no error - should return availble forecast years", func() {
-			expectedYear := date.Year()
+			expectedYear := time.Unix(date, 0).Year()
 			expectedRow = sqlmock.
 				NewRows([]string{"user_id", "year"}).
 				AddRow(TEST_USER_ID, expectedYear)
@@ -111,7 +111,7 @@ var _ = Describe("ReportRepository", func() {
 		})
 
 		It("no error - should return available years of forecast or entries", func() {
-			expectedYear := date.Year()
+			expectedYear := time.Unix(date, 0).Year()
 			expectedRow = sqlmock.
 				NewRows([]string{"year"}).
 				AddRow(expectedYear)
@@ -197,8 +197,8 @@ var _ = Describe("ReportRepository", func() {
 		)
 
 		BeforeEach(func() {
-			expectedYear = date.Year()
-			expectedMonth = int(date.Month())
+			expectedYear = time.Unix(date, 0).Year()
+			expectedMonth = int(time.Unix(date, 0).Month())
 			expectedIncome = 10.0
 			expectedExpense = 5.0
 			expectedBalance = expectedIncome - expectedExpense
@@ -230,7 +230,7 @@ var _ = Describe("ReportRepository", func() {
 			mockManager.ExpectQuery(expectedQuery).
 				WillReturnRows(expectedRow)
 
-			result, err := repo.FindYearToDateReport(TEST_USER_ID, date.Year())
+			result, err := repo.FindYearToDateReport(TEST_USER_ID, time.Unix(date, 0).Year())
 			Expect(err).ShouldNot(HaveOccurred())
 			Expect(len(result)).Should(Equal(1))
 			Expect(result[0].Year).Should(Equal(expectedYear))
@@ -249,7 +249,7 @@ var _ = Describe("ReportRepository", func() {
 			mockManager.ExpectQuery(expectedQuery).
 				WillReturnRows(expectedRow)
 
-			_, err := repo.FindYearToDateReport(TEST_USER_ID, date.Year())
+			_, err := repo.FindYearToDateReport(TEST_USER_ID, time.Unix(date, 0).Year())
 			Expect(err).Should(Equal(expectedError))
 		})
 	})

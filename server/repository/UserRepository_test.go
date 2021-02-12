@@ -30,16 +30,16 @@ var _ = Describe("UserRepository", func() {
 		sqlmockDB     *sql.DB
 		mockManager   sqlmock.Sqlmock
 		repo          r.UserRepository
-		today         time.Time
-		yesterday     time.Time
+		today         int64
+		yesterday     int64
 		nInsertedID   int64
 		nAffectedRows int64
 		storedUser    *sqlmock.Rows
 	)
 
 	BeforeEach(func() {
-		today = h.GetTodayUTC()
-		yesterday = h.GetYesterdayUTC()
+		today = h.GetTodayUTCUnix()
+		yesterday = h.GetYesterdayUTCUnix()
 		nInsertedID = int64(1)
 		nAffectedRows = int64(1)
 		storedUser = createMockUserDbRow(TEST_ID_1, yesterday, yesterday)
@@ -251,7 +251,7 @@ var _ = Describe("UserRepository", func() {
 		})
 
 		It("no error - should create a User", func() {
-			today := h.GetTodayUTC()
+			today := h.GetTodayUTCUnix()
 			testErr := errors.New("test error")
 			testObj := s.User{}
 
@@ -282,7 +282,7 @@ var _ = Describe("UserRepository", func() {
 			expectedUpdateQuery = regexp.QuoteMeta(
 				"UPDATE `users` SET `updated_at`=?,`first_name`=? WHERE `id` = ?",
 			)
-			storedLogin = createMockLoginDbRow(TEST_ID_1, TEST_USER_ID, yesterday)
+			storedLogin = createMockLoginDbRow(TEST_ID_1, TEST_USER_ID, time.Unix(yesterday, 0))
 		})
 
 		It("no error - should update user", func() {
@@ -294,7 +294,7 @@ var _ = Describe("UserRepository", func() {
 			mockManager.ExpectQuery(expectedFindLoginQuery).
 				WillReturnRows(storedLogin)
 			mockManager.ExpectExec(expectedUpdateQuery).
-				WithArgs(h.GetTodayUTC(), updateName, TEST_ID_1).
+				WithArgs(h.GetTodayUTCUnix(), updateName, TEST_ID_1).
 				WillReturnResult(sqlmock.NewResult(nInsertedID, nAffectedRows))
 			mockManager.ExpectExec(h.AnyInsertQuery()).
 				WillReturnResult(sqlmock.NewResult(nInsertedID, nAffectedRows))
@@ -343,7 +343,7 @@ var _ = Describe("UserRepository", func() {
 })
 
 func createMockUserDbRow(
-	id int, createdAt time.Time, updatedAt time.Time,
+	id int, createdAt int64, updatedAt int64,
 ) *sqlmock.Rows {
 	return sqlmock.NewRows([]string{
 		"id", "created_at", "updated_at", "is_premium", "first_name", "last_name", "phone", "address",
