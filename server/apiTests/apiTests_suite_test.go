@@ -185,9 +185,25 @@ func makeTokenRequest(reqBody []byte) {
 	json.Unmarshal(authBodyBytes, &testAuth)
 }
 
+func kRequestWithParamAndUser(
+	reqType string, endpoint string, body io.Reader, user s.User, params map[string]string,
+) *http.Request {
+	url := strings.Replace(endpoint, ":uid", strconv.Itoa(user.Login.UserID), -1)
+	return kRequestWithParam(reqType, url, params, body)
+}
+
 func kRequestWithUser(reqType string, endpoint string, body io.Reader, user s.User) *http.Request {
 	url := strings.Replace(endpoint, ":uid", strconv.Itoa(user.Login.UserID), -1)
 	return kRequest(reqType, url, body)
+}
+
+func kRequestWithParam(
+	reqType string, endpoint string, params map[string]string, body io.Reader,
+) *http.Request {
+	if len(params) > 0 {
+		endpoint = endpoint + kRequestParams(params)
+	}
+	return kRequest(reqType, endpoint, body)
 }
 
 func kRequest(reqType string, endpoint string, body io.Reader) *http.Request {
@@ -199,6 +215,23 @@ func kRequest(reqType string, endpoint string, body io.Reader) *http.Request {
 	Expect(reqErr).ShouldNot(HaveOccurred())
 
 	return req
+}
+
+func kRequestParams(params map[string]string) string {
+	result := "?"
+	i := 0
+	for k, v := range params {
+		var ampersend string
+		if i == 0 {
+			ampersend = ""
+		} else {
+			ampersend = "&"
+		}
+
+		result = fmt.Sprintf("%s%s%s=%s", result, ampersend, k, v)
+		i++
+	}
+	return result
 }
 
 func kReqBody(v interface{}) []byte {
@@ -229,7 +262,7 @@ func kReadError(errMap map[string]interface{}) error {
 	return errors.New(errMap["error"].(string))
 }
 
-func kSendRequest(req *http.Request, expectedCode int) *http.Response {
+func kSendAndAssert(req *http.Request, expectedCode int) *http.Response {
 	client := &http.Client{}
 	resp, respErr := client.Do(req)
 	Expect(respErr).ShouldNot(HaveOccurred())

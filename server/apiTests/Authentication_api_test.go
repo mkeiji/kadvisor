@@ -20,7 +20,7 @@ var _ = Describe("Authentication", func() {
 
 		It("refresh token - should return ok response", func() {
 			req := kRequest("GET", endpoint, nil)
-			resp := kSendRequest(req, http.StatusOK)
+			resp := kSendAndAssert(req, http.StatusOK)
 			defer resp.Body.Close()
 		})
 	})
