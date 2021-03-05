@@ -66,7 +66,7 @@ var _ = Describe("ClassApi", func() {
 
 		Context("Invalid id", func() {
 			It("should return error with response 404", func() {
-				invalidID := "11"
+				invalidID := "9999"
 				expectedCode := http.StatusNotFound
 
 				params := map[string]string{"id": invalidID}

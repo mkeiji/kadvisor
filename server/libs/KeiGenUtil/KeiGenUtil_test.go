@@ -2,6 +2,8 @@ package KeiGenUtil_test
 
 import (
 	"errors"
+	"time"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -92,6 +94,51 @@ var _ = Describe("KeiGenUtil", func() {
 
 			result := KeiGenUtil.MapErrorMsg(err)
 			Expect(result).To(Equal(expected))
+		})
+	})
+
+	Describe("GetErrorList", func() {
+		It("should convert a string map to a list of errors", func() {
+			sMap := []map[string]interface{}{
+				{"error": "error1"},
+				{"error": "error2"},
+			}
+			expected := []error{
+				errors.New("error1"),
+				errors.New("error2"),
+			}
+
+			result := KeiGenUtil.GetErrorList(sMap)
+			Expect(result).To(Equal(expected))
+		})
+	})
+
+	Describe("GetError", func() {
+		It("should convert a string map to an error", func() {
+			sMap := map[string]interface{}{
+				"error": "error",
+			}
+			expected := errors.New("error")
+
+			result := KeiGenUtil.GetError(sMap)
+			Expect(result).To(Equal(expected))
+		})
+	})
+
+	Describe("GetNow", func() {
+		It("should return NOW in RFC3339 format", func() {
+			expectedDate, _ := time.Parse(time.RFC3339, time.Now().UTC().Format(time.RFC3339))
+			result := KeiGenUtil.GetNow()
+			Expect(result).To(Equal(expectedDate))
+		})
+	})
+
+	Describe("DateToUTCISO8601", func() {
+		It("should return date in UTC with RFC3339 format", func() {
+			date := time.Now()
+			expectedDate, _ := time.Parse(time.RFC3339, date.UTC().Format(time.RFC3339))
+			result := KeiGenUtil.DateToUTCISO8601(date)
+			Expect(result).To(Equal(expectedDate))
 		})
 	})
 

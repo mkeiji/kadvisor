@@ -10,6 +10,7 @@ import (
 	"io"
 	"io/ioutil"
 	"kadvisor/server/apiTests/ApiTestUtil"
+	"kadvisor/server/libs/KeiGenUtil"
 	s "kadvisor/server/repository/structs"
 	"kadvisor/server/resources/application"
 	"kadvisor/server/resources/registration"
@@ -262,10 +263,61 @@ func kReadError(errMap map[string]interface{}) error {
 	return errors.New(errMap["error"].(string))
 }
 
+// TODO: either change this to not assert the code or create a new
+// one that doesnt. because we need to get the error if is not expected
 func kSendAndAssert(req *http.Request, expectedCode int) *http.Response {
 	client := &http.Client{}
 	resp, respErr := client.Do(req)
+	if respErr != nil {
+		fmt.Printf("\nError: %v", respErr)
+	}
 	Expect(respErr).ShouldNot(HaveOccurred())
 	Expect(resp.StatusCode).Should(Equal(expectedCode))
 	return resp
+}
+
+func kSend(req *http.Request) (*http.Response, []error) {
+	var errList []error
+
+	client := &http.Client{}
+	resp, respErr := client.Do(req)
+	if respErr != nil {
+		fmt.Printf("\nError: %v", respErr)
+	}
+	Expect(respErr).ShouldNot(HaveOccurred())
+
+	if resp.StatusCode != http.StatusOK {
+		var errL []map[string]interface{}
+		kReadBody(resp, &errL)
+		errList = KeiGenUtil.GetErrorList(errL)
+	}
+
+	return resp, errList
+}
+
+func kMakeRequest(
+	reqType string,
+	endpoint string,
+	sendBody interface{},
+	returnBody interface{},
+	params map[string]string,
+) (int, []error) {
+	var req *http.Request
+
+	reqBody := kReqBody(sendBody)
+
+	if params == nil {
+		req = kRequestWithUser(reqType, endpoint, bytes.NewBuffer(reqBody), testUserAdmin)
+	} else {
+		req = kRequestWithParamAndUser(reqType, endpoint, bytes.NewBuffer(reqBody), testUserAdmin, params)
+	}
+
+	resp, err := kSend(req)
+	if err != nil {
+		return resp.StatusCode, err
+	}
+	defer resp.Body.Close()
+
+	kReadBody(resp, &returnBody)
+	return resp.StatusCode, nil
 }

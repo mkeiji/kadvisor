@@ -1,10 +1,12 @@
 package KeiGenUtil
 
 import (
+	"errors"
 	"fmt"
 	"kadvisor/server/resources/enums"
 	"math/rand"
 	"strconv"
+	"time"
 )
 
 func IntToUint(n int) uint {
@@ -65,6 +67,32 @@ func MapErrList(errList []error) []map[string]interface{} {
 
 func MapErrorMsg(err error) map[string]interface{} {
 	return map[string]interface{}{"error": err.Error()}
+}
+
+func GetErrorList(errListMap []map[string]interface{}) []error {
+	var errList []error
+	for _, m := range errListMap {
+		for _, v := range m {
+			errList = append(errList, errors.New(fmt.Sprint(v)))
+		}
+	}
+	return errList
+}
+
+func GetError(errMap map[string]interface{}) error {
+	return errors.New(fmt.Sprint(errMap["error"]))
+}
+
+func GetNow() time.Time {
+	return DateToUTCISO8601(time.Now())
+}
+
+func DateToUTCISO8601(date time.Time) time.Time {
+	result, err := time.Parse(time.RFC3339, date.UTC().Format(time.RFC3339))
+	if err != nil {
+		panic(err.Error)
+	}
+	return result
 }
 
 func IsError(interfc interface{}) bool {

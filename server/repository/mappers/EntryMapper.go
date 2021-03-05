@@ -1,28 +1,42 @@
 package mappers
 
 import (
+	"kadvisor/server/libs/KeiGenUtil"
 	s "kadvisor/server/repository/structs"
 	"kadvisor/server/resources/constants"
-	"time"
 )
 
 type EntryMapper struct{}
 
-func (e *EntryMapper) MapEntry(entry s.Entry) s.Entry {
-	entry = e.mapEntryDate(entry)
-	entry = e.mapEntryAmount(entry)
+func (this *EntryMapper) MapEntry(entry s.Entry) s.Entry {
+	entry = this.MapEntryDate(entry)
+	entry = this.mapEntryAmount(entry)
 	return entry
 }
 
-func (e *EntryMapper) mapEntryDate(
+func (this *EntryMapper) MapEntryDate(
 	entry s.Entry,
 ) s.Entry {
-	utc, _ := time.LoadLocation("UTC")
-	entry.Date = entry.Date.In(utc)
-	return entry
+	return this.MapEntriesDates([]s.Entry{entry})[0]
 }
 
-func (e *EntryMapper) mapEntryAmount(
+func (this *EntryMapper) MapEntriesDates(
+	entries []s.Entry,
+) []s.Entry {
+	if len(entries) == 0 {
+		return entries
+	}
+
+	var updatedEntries []s.Entry
+	for _, entry := range entries {
+		entry.Date = KeiGenUtil.DateToUTCISO8601(entry.Date)
+		updatedEntries = append(updatedEntries, entry)
+	}
+
+	return updatedEntries
+}
+
+func (this *EntryMapper) mapEntryAmount(
 	entry s.Entry,
 ) s.Entry {
 	if entry.EntryTypeCodeID == constants.EXPENSE_ENTRY_TYPE {

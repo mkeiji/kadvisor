@@ -37,7 +37,7 @@ func (this EntryRepository) FindAllByClassId(
 func (this EntryRepository) FindOne(id int) (s.Entry, error) {
 	var entry s.Entry
 	err := this.Db.Where("id=?", id).First(&entry).Error
-	return entry, err
+	return this.Mapper.MapEntryDate(entry), err
 }
 
 func (this EntryRepository) Create(
@@ -87,5 +87,5 @@ func (this EntryRepository) getEntries(query s.Entry, limit int) ([]s.Entry, err
 		err = dbQuery.Where(query).Find(&entries).Error
 	}
 
-	return entries, err
+	return this.Mapper.MapEntriesDates(entries), err
 }

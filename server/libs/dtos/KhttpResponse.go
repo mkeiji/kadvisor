@@ -14,7 +14,7 @@ func NewBadKresponse(err error) KhttpResponse {
 func NewKresponse(status int, body interface{}) KhttpResponse {
 	_, isError := body.(error)
 	if isError {
-		newBody := KeiGenUtil.MapErrorMsg(body.(error))
+		newBody := KeiGenUtil.MapErrList([]error{body.(error)})
 		return KhttpResponse{
 			Status: status,
 			Body:   newBody,
