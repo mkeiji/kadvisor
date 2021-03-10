@@ -263,8 +263,6 @@ func kReadError(errMap map[string]interface{}) error {
 	return errors.New(errMap["error"].(string))
 }
 
-// TODO: either change this to not assert the code or create a new
-// one that doesnt. because we need to get the error if is not expected
 func kSendAndAssert(req *http.Request, expectedCode int) *http.Response {
 	client := &http.Client{}
 	resp, respErr := client.Do(req)
@@ -301,15 +299,22 @@ func kMakeRequest(
 	sendBody interface{},
 	returnBody interface{},
 	params map[string]string,
+	user interface{},
 ) (int, []error) {
 	var req *http.Request
+	var reqUser s.User
+	if user == nil {
+		reqUser = testUserRegular
+	} else {
+		reqUser = user.(s.User)
+	}
 
 	reqBody := kReqBody(sendBody)
 
 	if params == nil {
-		req = kRequestWithUser(reqType, endpoint, bytes.NewBuffer(reqBody), testUserAdmin)
+		req = kRequestWithUser(reqType, endpoint, bytes.NewBuffer(reqBody), reqUser)
 	} else {
-		req = kRequestWithParamAndUser(reqType, endpoint, bytes.NewBuffer(reqBody), testUserAdmin, params)
+		req = kRequestWithParamAndUser(reqType, endpoint, bytes.NewBuffer(reqBody), reqUser, params)
 	}
 
 	resp, err := kSend(req)

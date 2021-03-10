@@ -47,7 +47,7 @@ var _ = Describe("EntryApi", func() {
 	}
 
 	postTestClass := func() {
-		respStatus, postClassErr := kMakeRequest("POST", CLASS_ENDPOINT, buildTestClass(), &testClass, nil)
+		respStatus, postClassErr := kMakeRequest("POST", CLASS_ENDPOINT, buildTestClass(), &testClass, nil, nil)
 		if postClassErr != nil {
 			panic(fmt.Sprintf("\nError: %v", postClassErr))
 		}
@@ -56,7 +56,7 @@ var _ = Describe("EntryApi", func() {
 	}
 
 	postTestEntry := func() {
-		respStatus, postEntryErr := kMakeRequest("POST", ENTRY_ENDPOINT, buildTestEntry(), &testEntry, nil)
+		respStatus, postEntryErr := kMakeRequest("POST", ENTRY_ENDPOINT, buildTestEntry(), &testEntry, nil, nil)
 		if postEntryErr != nil {
 			panic(fmt.Sprintf("\nError: %v", postEntryErr))
 		}
@@ -80,7 +80,7 @@ var _ = Describe("EntryApi", func() {
 
 				var savedEntry s.Entry
 				respStatus, getEntryErr := kMakeRequest(
-					"GET", ENTRY_ENDPOINT, nil, &savedEntry, params,
+					"GET", ENTRY_ENDPOINT, nil, &savedEntry, params, nil,
 				)
 
 				Expect(getEntryErr).To(BeNil())
@@ -97,7 +97,7 @@ var _ = Describe("EntryApi", func() {
 
 				var savedEntry s.Entry
 				respStatus, getEntryErr := kMakeRequest(
-					"GET", ENTRY_ENDPOINT, nil, &savedEntry, params,
+					"GET", ENTRY_ENDPOINT, nil, &savedEntry, params, nil,
 				)
 
 				Expect(respStatus).To(Equal(http.StatusBadRequest))
@@ -112,7 +112,7 @@ var _ = Describe("EntryApi", func() {
 			It("should post an entry with ok response", func() {
 				var entry s.Entry
 				respStatus, postEntryErr := kMakeRequest(
-					"POST", ENTRY_ENDPOINT, buildTestEntry(), &entry, nil,
+					"POST", ENTRY_ENDPOINT, buildTestEntry(), &entry, nil, nil,
 				)
 				Expect(postEntryErr).To(BeNil())
 				Expect(respStatus).To(Equal(http.StatusOK))
@@ -128,7 +128,7 @@ var _ = Describe("EntryApi", func() {
 
 				var entry s.Entry
 				respStatus, postEntryErr := kMakeRequest(
-					"POST", ENTRY_ENDPOINT, invalidTestEntry, &entry, nil,
+					"POST", ENTRY_ENDPOINT, invalidTestEntry, &entry, nil, nil,
 				)
 
 				Expect(respStatus).To(Equal(http.StatusBadRequest))
@@ -153,7 +153,7 @@ var _ = Describe("EntryApi", func() {
 		Context("No error", func() {
 			It("should return updated entry with ok response", func() {
 				var result s.Entry
-				respStatus, err := kMakeRequest("PUT", ENTRY_ENDPOINT, update, &result, nil)
+				respStatus, err := kMakeRequest("PUT", ENTRY_ENDPOINT, update, &result, nil, nil)
 				if err != nil {
 					panic(fmt.Sprintf("\nError: %v", err))
 				}
@@ -172,7 +172,7 @@ var _ = Describe("EntryApi", func() {
 				update.ClassID = invalidClassID
 
 				var result s.Entry
-				respStatus, err := kMakeRequest("PUT", ENTRY_ENDPOINT, update, &result, nil)
+				respStatus, err := kMakeRequest("PUT", ENTRY_ENDPOINT, update, &result, nil, nil)
 
 				Expect(respStatus).To(Equal(http.StatusBadRequest))
 				Expect(len(err)).To(Equal(1))
@@ -191,7 +191,7 @@ var _ = Describe("EntryApi", func() {
 				params := map[string]string{"id": strconv.Itoa(testEntry.Base.ID)}
 
 				var result int
-				respStatus, err := kMakeRequest("DELETE", ENTRY_ENDPOINT, nil, &result, params)
+				respStatus, err := kMakeRequest("DELETE", ENTRY_ENDPOINT, nil, &result, params, nil)
 				if err != nil {
 					panic(fmt.Sprintf("\nError: %v", err))
 				}
@@ -208,7 +208,7 @@ var _ = Describe("EntryApi", func() {
 				params := map[string]string{"id": strconv.Itoa(invalidID)}
 
 				var result int
-				respStatus, err := kMakeRequest("DELETE", ENTRY_ENDPOINT, nil, &result, params)
+				respStatus, err := kMakeRequest("DELETE", ENTRY_ENDPOINT, nil, &result, params, nil)
 
 				Expect(respStatus).To(Equal(http.StatusBadRequest))
 				Expect(len(err)).To(Equal(1))
