@@ -138,7 +138,7 @@ var _ = Describe("EntryApi", func() {
 		})
 	})
 
-	Describe("PutForecastEntry", func() {
+	Describe("PutEntry", func() {
 		const newAmount = float64(5)
 		var (
 			update s.Entry
