@@ -8,8 +8,8 @@ import (
 type User struct {
 	Base
 	IsPremium bool       `sql:"DEFAULT:FALSE" json:"isPremium,omitempty"`
-	FirstName string     `json:"firstName,omitempty" validate:"required"`
-	LastName  string     `json:"lastName,omitempty" validate:"required"`
+	FirstName string     `json:"firstName,omitempty"`
+	LastName  string     `json:"lastName,omitempty"`
 	Phone     string     `json:"phone,omitempty"`
 	Address   string     `json:"address,omitempty"`
 	Login     Login      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"login,omitempty"`
