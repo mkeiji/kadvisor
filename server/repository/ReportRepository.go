@@ -29,6 +29,7 @@ func (this ReportRepository) GetAvailableForecastYears(userID int) ([]int, error
 	var result []int
 
 	err := this.Db.
+		Where("user_id=?", userID).
 		Distinct("year").
 		Order("year desc").
 		Find(&forecasts).

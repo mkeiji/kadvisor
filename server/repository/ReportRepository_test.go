@@ -58,7 +58,7 @@ var _ = Describe("ReportRepository", func() {
 
 		BeforeEach(func() {
 			expectedQuery = regexp.QuoteMeta(
-				"SELECT DISTINCT `year` FROM `forecasts` ORDER BY year desc",
+				"SELECT DISTINCT `year` FROM `forecasts` WHERE user_id=? ORDER BY year desc",
 			)
 		})
 

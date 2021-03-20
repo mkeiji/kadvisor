@@ -34,3 +34,28 @@ func CreateTestUsers() []s.User {
 		},
 	}
 }
+
+func CreateTestForecast(
+	userID int,
+	year int,
+	defaultIncome float64,
+	defaultExpense float64,
+) s.Forecast {
+	var entries []s.ForecastEntry
+	forecast := s.Forecast{
+		UserID: userID,
+		Year:   year,
+	}
+
+	for i := 1; i < 13; i++ {
+		newEntry := s.ForecastEntry{
+			Month:   i,
+			Income:  defaultIncome,
+			Expense: defaultExpense,
+		}
+		entries = append(entries, newEntry)
+	}
+
+	forecast.Entries = entries
+	return forecast
+}
