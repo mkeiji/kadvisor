@@ -257,6 +257,7 @@ var _ = Describe("ReportApi", func() {
 			})
 
 			It("should return available years if the user has an entry and no forecast", func() {
+				postTestClass()
 				postTestEntry()
 
 				respStatus, respErr = kMakeRequest(
