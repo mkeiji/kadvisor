@@ -1,0 +1,40 @@
+name: Build-client
+
+on: [push]
+
+jobs:
+    build-client:
+        runs-on: ubuntu-latest
+
+        strategy:
+            matrix:
+                node-version: [14.15.1]
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: set-local-env
+              run: echo NX_APP_DOMAIN=${{secrets.API_HOST}} >> client/apps/kadvisor-app/.local.env
+
+            - name: instal node_modules
+              working-directory: ./client
+              run: npm install
+
+            - name: check-format
+              working-directory: ./client
+              run: npm run format:check
+
+            - name: build
+              working-directory: ./client
+              run: npm run build:prod
+
+            - name: artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  name: client-dist
+                  path: ./client/dist
+                  retention-days: 5
