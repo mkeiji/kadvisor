@@ -45,26 +45,26 @@ func (this UserController) LoadEndpoints(router *gin.Engine) {
 	userRoutes.Use(jwt.MiddlewareFunc())
 	{
 		userRoutes.GET("/user/:id", this.GetOneUser)
-		userRoutes.GET("/users", this.GetManyUsers)
+		userRoutes.GET("/users", this.GetAllUsers)
 		userRoutes.PUT("/user", this.UpdateUser)
 		userRoutes.DELETE("/user/:id", this.DeleteUser)
 	}
 }
 
 // postUser(/user)
-func (ctrl UserController) PostUser(c *gin.Context) {
+func (this UserController) PostUser(c *gin.Context) {
 	var response dtos.KhttpResponse
 	var user structs.User
 
 	c.BindJSON(&user)
-	response = ctrl.ValidationService.GetResponse(
+	response = this.ValidationService.GetResponse(
 		v.NewUserValidator(),
 		user,
 	)
 	if u.IsOKresponse(response.Status) {
 		hashedPwd, _ := KeiPassUtil.HashAndSalt(&user)
 		user.Login.Password = hashedPwd
-		response = ctrl.UserService.Post(user)
+		response = this.UserService.Post(user)
 	}
 
 	c.JSON(response.Status, response.Body)
@@ -84,7 +84,7 @@ func (this UserController) GetOneUser(context *gin.Context) {
 }
 
 // getMany(/users?preloaded)
-func (this UserController) GetManyUsers(context *gin.Context) {
+func (this UserController) GetAllUsers(context *gin.Context) {
 	isPreloaded, _ := strconv.ParseBool(
 		context.DefaultQuery("preloaded", "false"),
 	)

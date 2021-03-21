@@ -25,6 +25,9 @@ serverUnitTests:
 serverApiTests:
 	ginkgo --randomizeAllSpecs --failOnPending --cover --trace --race --progress server/apiTests/
 
+serverAllTests:
+	ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
+
 formatClient:
 	(cd client/ && npm run format)
 

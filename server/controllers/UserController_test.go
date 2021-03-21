@@ -175,7 +175,7 @@ var _ = Describe("UserController", func() {
 					Return(dtos.NewKresponse(expectedCode, expectedBody)).
 					Times(1)
 
-				r.GET(route, controller.GetManyUsers)
+				r.GET(route, controller.GetAllUsers)
 			})
 
 			It("Yes preload - should call UserService.GetOne with preloaded = true", func() {
@@ -191,7 +191,7 @@ var _ = Describe("UserController", func() {
 					Return(dtos.NewKresponse(expectedCode, expectedBody)).
 					Times(1)
 
-				r.GET(route, controller.GetManyUsers)
+				r.GET(route, controller.GetAllUsers)
 			})
 		})
 	})
