@@ -75,14 +75,13 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-
             - name: Download client artifact
               uses: actions/download-artifact@v1
               with:
                   name: 'dist'
                   path: ./client/dist
 
-            - name: 'Verify Artifact'
+            - name: Verify Artifact
               run: |
                   $file = "client/dist/apps/kadvisor-app/index.html"
                   if(!(Test-Path -path $file))
@@ -115,7 +114,6 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-
             - name: Set up Go
               uses: actions/setup-go@v2
               with:
@@ -137,7 +135,37 @@ jobs:
 
     docker:
         runs-on: ubuntu-latest
+        needs: [build-client, build-server]
         if: github.ref == 'refs/heads/master'
         steps:
-            - name: Docker
-              run: echo "ADD DEPLOYMENT JOB"
+            - uses: actions/checkout@v2
+            - name: Download server artifact
+              uses: actions/download-artifact@v1
+              with:
+                  name: 'kadvisor'
+                  path: ./kadvisor
+
+            - name: Download client artifact
+              uses: actions/download-artifact@v1
+              with:
+                  name: 'dist'
+                  path: ./client/dist
+
+            - name: Set up Docker Builder
+              uses: docker/setup-buildx-action@v1
+
+            - name: Log into GitHub Container Registry
+              uses: docker/login-action@v1
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Push to Github Container Registry
+              uses: docker/build-push-action@v2
+              with:
+                  context: .
+                  version: latest
+                  file: Dockerfile
+                  push: true
+                  tags: ghcr.io/${{ github.repository }}:latest
