@@ -1,5 +1,5 @@
 # Kadvisor
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/mkeiji/kadvisor/Kadvisor-pipeline/master?label=ci%20%2F%20cd&style=flat-square)
+![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/mkeiji/kadvisor/Build/master?style=flat-square) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/mkeiji/kadvisor/Test/master?label=test&style=flat-square)
 
 ## Setup Dependencies:
 
