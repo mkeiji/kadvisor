@@ -3,6 +3,7 @@ WORKDIR /myapp
 
 COPY kadvisor /myapp
 COPY client/dist /myapp/client/dist
+RUN chmod a+x ./kadvisor
 
 CMD ["./kadvisor"]
 
