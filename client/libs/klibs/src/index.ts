@@ -20,3 +20,4 @@ export * from './lib/k-models/redux-models';
 export * from './lib/k-models/chart-models';
 export * from './lib/k-utils/lookup/k-lookup.util';
 export * from './lib/k-utils/format/k-format-util';
+export * from './lib/k-utils/util-constants';
