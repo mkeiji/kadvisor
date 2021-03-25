@@ -1,7 +1,7 @@
 ---
 name: New story
 about: Story Description
-title: ''
+title: "[STORY]"
 labels: Story
 assignees: ''
 
