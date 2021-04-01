@@ -55,6 +55,10 @@ jobs:
               working-directory: ./client
               run: npm install
 
-            - name: Test
+            - name: Test App
               working-directory: ./client
               run: nx test kadvisor-app
+
+            - name: Test Libs
+              working-directory: ./client
+              run: nx test klibs

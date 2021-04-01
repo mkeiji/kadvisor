@@ -67,6 +67,9 @@ describe('KRxios', () => {
         it('should set interceptors', () => {
             jest.spyOn(testKRxios._httpClient.interceptors.request, 'use');
             jest.spyOn(testKRxios._httpClient.interceptors.response, 'use');
+            jest.spyOn(testKRxios._httpClient, 'get').mockReturnValue(
+                new Promise((r, _) => r('ok'))
+            );
 
             result = testKRxios._makeRequest('GET', testUrl, null, null);
 
@@ -79,7 +82,9 @@ describe('KRxios', () => {
         });
 
         it('GET - should call client.get and return an observable', () => {
-            jest.spyOn(testKRxios._httpClient, 'get');
+            jest.spyOn(testKRxios._httpClient, 'get').mockReturnValue(
+                new Promise((r, _) => r('ok'))
+            );
 
             result = testKRxios._makeRequest('GET', testUrl, testParams, null);
             expect(testKRxios._httpClient.get).toHaveBeenCalledWith(
@@ -89,7 +94,9 @@ describe('KRxios', () => {
         });
 
         it('POST - should call client.post and return an observable', () => {
-            jest.spyOn(testKRxios._httpClient, 'post');
+            jest.spyOn(testKRxios._httpClient, 'post').mockReturnValue(
+                new Promise((r, _) => r('ok'))
+            );
 
             result = testKRxios._makeRequest(
                 'POST',
@@ -105,7 +112,9 @@ describe('KRxios', () => {
         });
 
         it('PUT - should call client.put and return an observable', () => {
-            jest.spyOn(testKRxios._httpClient, 'put');
+            jest.spyOn(testKRxios._httpClient, 'put').mockReturnValue(
+                new Promise((r, _) => r('ok'))
+            );
 
             result = testKRxios._makeRequest(
                 'PUT',
@@ -121,7 +130,9 @@ describe('KRxios', () => {
         });
 
         it('PATCH - should call client.patch and return an observable', () => {
-            jest.spyOn(testKRxios._httpClient, 'patch');
+            jest.spyOn(testKRxios._httpClient, 'patch').mockReturnValue(
+                new Promise((r, _) => r('ok'))
+            );
 
             result = testKRxios._makeRequest(
                 'PATCH',
@@ -137,7 +148,9 @@ describe('KRxios', () => {
         });
 
         it('DELETE - should call client.delete and return an observable', () => {
-            jest.spyOn(testKRxios._httpClient, 'delete');
+            jest.spyOn(testKRxios._httpClient, 'delete').mockReturnValue(
+                new Promise((r, _) => r('ok'))
+            );
 
             result = testKRxios._makeRequest(
                 'DELETE',
@@ -159,7 +172,7 @@ describe('KRxios', () => {
             const fakeToken = 'fake-token';
             const expectedUrl = `${testUrl}${APP_LOGIN_ENDPOINT.auth}`;
             jest.spyOn(testKRxios._httpClient, 'post').mockReturnValue(
-                new Promise(() => fakeToken)
+                new Promise((r, _) => r(fakeToken))
             );
 
             const result = testKRxios.getToken(testLogin).then((data) => {
@@ -178,11 +191,11 @@ describe('KRxios', () => {
                 message: 'incorrect Username or Password'
             } as AuthError;
             jest.spyOn(testKRxios._httpClient, 'post').mockReturnValue(
-                new Promise(() => new Error())
+                new Promise((_, e) => e(expected))
             );
 
             const result = testKRxios.getToken(testLogin).then((data) => {
-                expect(data).toBe(expected);
+                expect(data).toEqual(expected);
             });
             expect(result instanceof Promise).toBeTruthy();
         });
@@ -195,7 +208,7 @@ describe('KRxios', () => {
 
         describe('get', () => {
             it('should call _makeRequest with baseUrl if available', () => {
-                testKRxios.get(testUrl2, testParams);
+                testKRxios.get(testUrl2, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'GET',
                     `${testUrl}${testUrl2}`,
@@ -206,7 +219,7 @@ describe('KRxios', () => {
             it('should call _makeRequest without baseUrl if not available', () => {
                 testKRxios.baseUrl = '';
 
-                testKRxios.get(testUrl2, testParams);
+                testKRxios.get(testUrl2, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'GET',
                     testUrl2,
@@ -219,7 +232,7 @@ describe('KRxios', () => {
             it('should call _makeRequest with baseUrl if abailable', () => {
                 const testBody = {};
 
-                testKRxios.post(testUrl2, testBody, testParams);
+                testKRxios.post(testUrl2, testBody, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'POST',
                     `${testUrl}${testUrl2}`,
@@ -232,7 +245,7 @@ describe('KRxios', () => {
                 const testBody = {};
                 testKRxios.baseUrl = '';
 
-                testKRxios.post(testUrl2, testBody, testParams);
+                testKRxios.post(testUrl2, testBody, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'POST',
                     testUrl2,
@@ -246,7 +259,7 @@ describe('KRxios', () => {
             it('should call _makeRequest with baseUrl if abailable', () => {
                 const testBody = {};
 
-                testKRxios.put(testUrl2, testBody, testParams);
+                testKRxios.put(testUrl2, testBody, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'PUT',
                     `${testUrl}${testUrl2}`,
@@ -259,7 +272,7 @@ describe('KRxios', () => {
                 const testBody = {};
                 testKRxios.baseUrl = '';
 
-                testKRxios.put(testUrl2, testBody, testParams);
+                testKRxios.put(testUrl2, testBody, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'PUT',
                     testUrl2,
@@ -273,7 +286,7 @@ describe('KRxios', () => {
             it('should call _makeRequest with baseUrl if abailable', () => {
                 const testBody = {};
 
-                testKRxios.patch(testUrl2, testBody, testParams);
+                testKRxios.patch(testUrl2, testBody, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'PATCH',
                     `${testUrl}${testUrl2}`,
@@ -286,7 +299,7 @@ describe('KRxios', () => {
                 const testBody = {};
                 testKRxios.baseUrl = '';
 
-                testKRxios.patch(testUrl2, testBody, testParams);
+                testKRxios.patch(testUrl2, testBody, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'PATCH',
                     testUrl2,
@@ -298,7 +311,7 @@ describe('KRxios', () => {
 
         describe('delete', () => {
             it('should call _makeRequest with baseUrl if available', () => {
-                testKRxios.delete(testUrl2, testParams);
+                testKRxios.delete(testUrl2, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'DELETE',
                     `${testUrl}${testUrl2}`,
@@ -309,7 +322,7 @@ describe('KRxios', () => {
             it('should call _makeRequest without baseUrl if not available', () => {
                 testKRxios.baseUrl = '';
 
-                testKRxios.delete(testUrl2, testParams);
+                testKRxios.delete(testUrl2, testParams).subscribe();
                 expect(testKRxios._makeRequest).toHaveBeenCalledWith(
                     'DELETE',
                     testUrl2,

@@ -1,15 +1,14 @@
 {
-    "npmScope": "client",
     "implicitDependencies": {
         "workspace.json": "*",
-        "package.json": {
-            "dependencies": "*",
-            "devDependencies": "*"
-        },
-        "tsconfig.json": "*",
+        "package.json": { "dependencies": "*", "devDependencies": "*" },
+        "tsconfig.base.json": "*",
         "tslint.json": "*",
+        ".eslintrc.json": "*",
         "nx.json": "*"
     },
+    "affected": { "defaultBase": "master" },
+    "npmScope": "client",
     "tasksRunnerOptions": {
         "default": {
             "runner": "@nrwl/workspace/tasks-runners/default",
@@ -19,15 +18,11 @@
         }
     },
     "projects": {
-        "kadvisor-app": {
-            "tags": []
-        },
+        "kadvisor-app": { "tags": [] },
         "kadvisor-app-e2e": {
             "tags": [],
             "implicitDependencies": ["kadvisor-app"]
         },
-        "klibs": {
-            "tags": []
-        }
+        "klibs": { "tags": [] }
     }
 }
