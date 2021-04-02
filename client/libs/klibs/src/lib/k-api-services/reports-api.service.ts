@@ -8,9 +8,10 @@ import {
 import { MonthReport } from '../k-models/chart-models';
 
 export class ReportsApiService {
-    private krxios: KRxios;
-    constructor(userID: number) {
-        this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));
+    constructor(userID: number, private readonly krxios?: KRxios) {
+        if (!this.krxios) {
+            this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));
+        }
     }
 
     getYtdWithForecastReport(year: number): Observable<MonthReport[]> {
