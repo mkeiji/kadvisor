@@ -3,10 +3,6 @@ import { shallow } from 'enzyme';
 import { KSelect } from './k-select.component';
 import { KSelectItem } from '../../k-models/gerneric-models';
 import { FormControl, InputLabel, MenuItem, Select } from '@material-ui/core';
-// import { configure } from 'enzyme';
-// import Adapter from 'enzyme-adapter-react-16';
-
-// configure({ adapter: new Adapter() });
 
 describe('KSelect', () => {
     const testItems = [
