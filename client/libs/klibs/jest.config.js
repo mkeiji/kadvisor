@@ -1,12 +1,9 @@
 module.exports = {
-    name: 'klibs',
-    preset: '../../jest.config.js',
+    displayName: 'klibs',
+    preset: '../../jest.preset.js',
     transform: {
-        '^.+\\.[tj]sx?$': [
-            'babel-jest',
-            { cwd: __dirname, configFile: './babel-jest.config.json' }
-        ]
+        '^.+\\.[tj]sx?$': 'babel-jest'
     },
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
     coverageDirectory: '../../coverage/libs/klibs'
 };

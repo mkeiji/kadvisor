@@ -1,13 +1,10 @@
 module.exports = {
-    name: 'kadvisor-app',
-    preset: '../../jest.config.js',
+    displayName: 'kadvisor-app',
+    preset: '../../jest.preset.js',
     transform: {
         '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nrwl/react/plugins/jest',
-        '^.+\\.[tj]sx?$': [
-            'babel-jest',
-            { cwd: __dirname, configFile: './babel-jest.config.json' }
-        ]
+        '^.+\\.[tj]sx?$': 'babel-jest'
     },
-    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],
+    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
     coverageDirectory: '../../coverage/apps/kadvisor-app'
 };
