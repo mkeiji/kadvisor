@@ -6,5 +6,6 @@ module.exports = {
         '^.+\\.[tj]sx?$': 'babel-jest'
     },
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-    coverageDirectory: '../../coverage/apps/kadvisor-app'
+    coverageDirectory: '../../coverage/apps/kadvisor-app',
+    setupFilesAfterEnv: ['<rootDir>/enzyme.setup.js']
 };
