@@ -30,7 +30,12 @@ function MainNavBar(props: MainNavBarPropTypes) {
     return (
         <div>
             <Navbar fixed="top" bg="dark" variant="dark" style={navBarStyle}>
-                <img src={klogo} style={kLogoStyle} alt="logo" />
+                <img
+                    id="navBarKLogo"
+                    src={klogo}
+                    style={kLogoStyle}
+                    alt="logo"
+                />
                 <Navbar.Brand href="#home">Kadvisor</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
