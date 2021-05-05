@@ -4,9 +4,10 @@
 ## Setup Dependencies:
 
 1. [Nodejs && npm](https://nodejs.org/en/)
-2. [Go lang](https://golang.org/)
-3. [Docker](https://www.docker.com/)
-4. [Make](https://www.gnu.org/software/make/)
+2. [Nx](https://nx.dev/)
+3. [Go lang](https://golang.org/)
+4. [Docker](https://www.docker.com/)
+5. [Make](https://www.gnu.org/software/make/)
 
 ## Setup
 
@@ -21,6 +22,9 @@ make dependencies
 ### Manually
 
 - Get `client` dependencies:
+```bash
+npm install -g nx
+```
 
 ```bash
 cd client/

@@ -61,5 +61,8 @@ dependencies:
 	go get -u gorm.io/gorm
 	go get -u gorm.io/driver/mysql
 	go get
+	npm install -g nx
 	(cd client/ && npm install)
+	echo 
 	echo "** DON'T FORGET THE .ENV FILE **"
+	echo
