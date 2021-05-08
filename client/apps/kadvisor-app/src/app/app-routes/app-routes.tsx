@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import ReactPlaceholder from '../react-placeholder/react-placeholder';
 import './app-routes.css';
 import MainNavBar from '../main-nav-bar/main-nav-bar.component';
-import UserPage from '../user-page/user-page';
+import UserPage from '../user-page/user-page.component';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { APP_ROUTES } from '@client/klibs';
 

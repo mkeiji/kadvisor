@@ -7,5 +7,6 @@ module.exports = {
     },
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
     coverageDirectory: '../../coverage/apps/kadvisor-app',
+    setupFiles: ['./../../node_modules/jest-canvas-mock/lib/index.js'],
     setupFilesAfterEnv: ['<rootDir>/enzyme.setup.js']
 };
