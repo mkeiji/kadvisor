@@ -1,5 +1,5 @@
 import React, { Component, CSSProperties } from 'react';
-import { KLoginPropTypes, KLoginState } from './view-models';
+import { KLoginFormType, KLoginPropTypes, KLoginState } from './view-models';
 import * as Yup from 'yup';
 import {
     Toast,
@@ -22,36 +22,53 @@ import {
 } from '@client/klibs';
 
 class KLogin extends Component<KLoginPropTypes, KLoginState> {
-    /* @input */ loginObj = this.props.loginObj;
-    /* @output */ onLoginEmitter = (event: Login) => {
+    private readonly TOKEN_KEY = 'token';
+
+    /* @input */
+    loginObj = this.props.loginObj;
+
+    /* @output */
+    onLoginEmitter = (event: Login) => {
         this.props.onLogin(event);
     };
-    /* @output */ onLogoutEmitter = (event: Login) => {
+
+    /* @output */
+    onLogoutEmitter = (event: Login) => {
         this.props.onLogout(event);
     };
 
-    TOKEN_KEY = 'token';
-    service = new KLoginService();
-    unsubscribe$ = new Subject<void>();
-
-    formInitialValues = { email: '', password: '' };
-    formValidationSchema = Yup.object({
-        email: Yup.string().email('Invalid email address').required('Required'),
-        password: Yup.string()
-            .min(3, 'Must be more than 3 char')
-            .required('Required')
-    });
+    service: KLoginService;
+    unsubscribe$: Subject<void>;
+    formInitialValues: KLoginFormType;
+    formValidationSchema: Yup.ObjectSchema;
 
     constructor(readonly props: KLoginPropTypes) {
         super(props);
+        const isLoggedIn = this.loginObj.isLoggedIn
+            ? this.loginObj.isLoggedIn
+            : false;
+        this.service = props.service ? props.service : new KLoginService();
+        this.unsubscribe$ = new Subject<void>();
         this.state = {
             login: {
                 email: this.loginObj.email,
                 password: this.loginObj.password
             },
-            isLoggedIn: this.loginObj.isLoggedIn,
+            isLoggedIn: isLoggedIn,
             hasWarning: false
         } as KLoginState;
+    }
+
+    componentWillMount(): void {
+        this.formInitialValues = { email: '', password: '' };
+        this.formValidationSchema = Yup.object({
+            email: Yup.string()
+                .email('Invalid email address')
+                .required('Required'),
+            password: Yup.string()
+                .min(3, 'Must be more than 3 char')
+                .required('Required')
+        });
     }
 
     componentWillUnmount(): void {

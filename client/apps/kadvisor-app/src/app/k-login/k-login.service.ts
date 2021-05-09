@@ -8,7 +8,9 @@ import {
 } from '@client/klibs';
 
 class KLoginService {
-    krxios = new KRxios(APP_BACKEND);
+    constructor(private readonly krxios?: KRxios) {
+        this.krxios = krxios ? krxios : new KRxios(APP_BACKEND);
+    }
 
     login(user: Partial<Login>): Observable<Login> {
         return this.krxios.post(APP_LOGIN_ENDPOINT.login, JSON.stringify(user));
