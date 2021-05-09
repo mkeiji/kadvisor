@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import UserPageStore from './user-page.store';
 import { connect } from 'react-redux';
 import UserPageMenu from './user-page-menu/user-page-menu.component';
@@ -14,15 +14,16 @@ function UserPage(props: UserHomePropTypes) {
     const userID = Number(props.match.params.id);
     const paramPage = props.match.params.page;
     const login = props.getLoginStore ? props.getLoginStore : ({} as Login);
-
     const [idMatch, setIdMatch] = useState(false);
-    useEffect(() => {
+
+    // using 'React.' for mock purposes in test
+    React.useEffect(() => {
         handleIdChange(userID);
 
         function handleIdChange(newID: number) {
             setIdMatch(newID === login.userID);
         }
-    });
+    }, []);
 
     function getPage(idMatch: boolean, page: string): JSX.Element {
         if (idMatch) {
