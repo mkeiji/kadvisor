@@ -10,8 +10,7 @@ import {
     Form,
     FormControl,
     Button,
-    Toast,
-    ToastHeader
+    Toast
 } from 'react-bootstrap';
 import { FormikErrors } from 'formik';
 import React from 'react';
