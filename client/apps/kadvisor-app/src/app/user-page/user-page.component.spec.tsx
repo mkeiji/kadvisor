@@ -4,7 +4,7 @@ import UserPage from './user-page.component';
 import UserPageMenu from './user-page-menu/user-page-menu.component';
 import { APP_PAGES, Login, Match } from '@client/klibs';
 import Dashboard from './user-page-menu/dashboard/dashboard.component';
-import EntryTable from './user-page-menu/entry/entry.component';
+import EntryComponent from './user-page-menu/entry/entry.component';
 import Settings from './user-page-menu/settings/settings.component';
 import Reports from './user-page-menu/reports/reports.component';
 
@@ -72,7 +72,7 @@ describe('UserPage', () => {
             it('should render EntryTable component', () => {
                 testMatchProp.params.page = APP_PAGES.entries;
                 setWrapper();
-                expect(wrapper.find(EntryTable)).toHaveLength(1);
+                expect(wrapper.find(EntryComponent)).toHaveLength(1);
             });
 
             it('should render Settings component', () => {

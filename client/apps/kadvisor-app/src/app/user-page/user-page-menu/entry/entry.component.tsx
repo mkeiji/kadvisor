@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import MaterialTable from 'material-table';
 import { RowData, TableState } from './view-model';
 import { ClassNameMap } from '@material-ui/core/styles/withStyles';
@@ -16,7 +16,7 @@ import {
     KSelect
 } from '@client/klibs';
 
-export default function EntryTable(props: EntryComponentPropsType) {
+export default function EntryComponent(props: EntryComponentPropsType) {
     const destroy$ = new Subject<boolean>();
     const service = new EntryService(props.userID);
     const viewModelService = new EntryViewModelService();
@@ -32,7 +32,7 @@ export default function EntryTable(props: EntryComponentPropsType) {
     const [nEntries, setNEntries] = useState<number>(10);
     const [lookups, setLookups] = useState<LookupEntry[]>([]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         combineLatest([
             service.getEntryLookups(),
             service.getClasses(),
