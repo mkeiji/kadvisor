@@ -11,9 +11,10 @@ import {
 import { Observable } from 'rxjs';
 
 class EntryService {
-    private krxios: KRxios;
-    constructor(userID: number) {
-        this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));
+    constructor(userID: number, private krxios?: KRxios) {
+        this.krxios = krxios
+            ? krxios
+            : new KRxios(KEndpointUtil.getUserBaseUrl(userID));
     }
 
     getEntries(nEntries?: number): Observable<Entry[]> {

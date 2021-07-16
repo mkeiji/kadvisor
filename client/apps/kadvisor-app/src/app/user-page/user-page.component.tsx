@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import UserPageMenu from './user-page-menu/user-page-menu.component';
 import { useStyles } from './user-page-menu/user-page-menu.style.hook';
 import Dashboard from './user-page-menu/dashboard/dashboard.component';
-import EntryTable from './user-page-menu/entry/entry.component';
+import EntryComponent from './user-page-menu/entry/entry.component';
 import { APP_PAGES, Login, Match } from '@client/klibs';
 import Settings from './user-page-menu/settings/settings.component';
 import Reports from './user-page-menu/reports/reports.component';
@@ -33,7 +33,10 @@ function UserPage(props: UserHomePropTypes) {
 
                 case APP_PAGES.entries:
                     return (
-                        <EntryTable userID={userID} classes={styleClasses} />
+                        <EntryComponent
+                            userID={userID}
+                            classes={styleClasses}
+                        />
                     );
 
                 case APP_PAGES.settings:
