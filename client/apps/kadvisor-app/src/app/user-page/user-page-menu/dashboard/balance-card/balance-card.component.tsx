@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Link from '@material-ui/core/Link';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
@@ -15,7 +15,7 @@ export default function BalanceCard(props: BalanceCardPropType) {
     const classes = useStyles();
     const [userBalance, setBalance] = useState<UserBalance>({} as UserBalance);
 
-    useEffect(() => {
+    React.useEffect(() => {
         service.getUserBalance().subscribe(
             (u: UserBalance) => setBalance(u),
             () => setBalance({ userID: props.userID, balance: 0 })
@@ -30,6 +30,7 @@ export default function BalanceCard(props: BalanceCardPropType) {
         <React.Fragment>
             <Title>Balance Card</Title>
             <Typography
+                id="balanceCard"
                 component="p"
                 variant="h4"
                 style={{ paddingTop: '30px' }}
@@ -37,6 +38,7 @@ export default function BalanceCard(props: BalanceCardPropType) {
                 {KFormatUtil.toCurrency(getBalanceAsNumber())}
             </Typography>
             <Typography
+                id="balanceDate"
                 color="textSecondary"
                 className={classes.depositContext}
             >

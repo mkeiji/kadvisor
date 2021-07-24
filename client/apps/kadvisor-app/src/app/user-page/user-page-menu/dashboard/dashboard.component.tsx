@@ -1,32 +1,45 @@
+import React, { Component } from 'react';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import KComposedChartComponent from './charts/k-composed-chart.component';
 import BalanceCard from './balance-card/balance-card.component';
-import DashboardEntries from './entries/dash-entries.component';
-import React, { useState, useEffect } from 'react';
-import { ClassNameMap } from '@material-ui/core/styles/withStyles';
+import DashboardEntriesComponent from './entries/dash-entries.component';
 import clsx from 'clsx';
 import PageSpacer from '../page-spacer/page-spacer.component';
-import { KSelect, KSelectItem, ReportsApiService } from '@client/klibs';
+import { KSelect, ReportsApiService } from '@client/klibs';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { DashboardPropsType, DashboardState } from './dashboard.models';
 
-export default function Dashboard(props: DashboardPropsType) {
-    const destroy$ = new Subject<boolean>();
-    const service = new ReportsApiService(props.userID);
-    const currentYear = new Date().getFullYear();
-    const [graphYear, setGraphYear] = useState<number>(currentYear);
-    const [showYearDropdown, setShowYearDropdown] = useState<boolean>(false);
-    const [yearMenuItems, setYearMenuItems] = useState<KSelectItem[]>([]);
-    const fixedHeightPaper = clsx(
-        props.classes.paper,
-        props.classes.fixedHeight
+export default class Dashboard extends Component<
+    DashboardPropsType,
+    DashboardState
+> {
+    service: ReportsApiService;
+    destroy$ = new Subject<boolean>();
+    currentYear = new Date().getFullYear();
+    fixedHeightPaper = clsx(
+        this.props.classes.paper,
+        this.props.classes.fixedHeight
     );
 
-    useEffect(() => {
-        service
+    constructor(readonly props: DashboardPropsType) {
+        super(props);
+        this.service = this.props.reportsApiService
+            ? this.props.reportsApiService
+            : new ReportsApiService(this.props.userID);
+
+        this.state = {
+            graphYear: this.currentYear,
+            showYearDropdown: false,
+            yearMenuItems: []
+        };
+    }
+
+    componentDidMount() {
+        this.service
             .getAvailableReportYears()
-            .pipe(takeUntil(destroy$))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((years: number[]) => {
                 const selectMenuItems = [];
                 if (years) {
@@ -36,66 +49,69 @@ export default function Dashboard(props: DashboardPropsType) {
                             displayValue: year.toString()
                         });
                     });
-                    setYearMenuItems(selectMenuItems);
-                    setShowYearDropdown(true);
+
+                    this.setState({
+                        yearMenuItems: selectMenuItems,
+                        showYearDropdown: true
+                    });
                 }
-                setGraphYear(
-                    years.includes(currentYear)
-                        ? currentYear
+
+                this.setState({
+                    graphYear: years.includes(this.currentYear)
+                        ? this.currentYear
                         : years[years.length - 1]
-                );
+                });
             });
+    }
 
-        return () => {
-            destroy$.next(true);
-            destroy$.unsubscribe();
-        };
-    }, []);
+    componentWillUnmount() {
+        this.destroy$.next(true);
+        this.destroy$.unsubscribe();
+    }
 
-    function renderDropdown(): JSX.Element {
-        return showYearDropdown ? (
+    renderDropdown(): JSX.Element {
+        return this.state.showYearDropdown ? (
             <KSelect
                 label={'Year'}
-                items={yearMenuItems}
-                onValueChange={setGraphYear}
-                value={graphYear}
+                items={this.state.yearMenuItems}
+                onValueChange={(v: number) => this.setState({ graphYear: v })}
+                value={this.state.graphYear}
             />
         ) : null;
     }
 
-    return (
-        <PageSpacer classes={props.classes}>
-            <Grid container item xs={12} alignContent={'flex-start'}>
-                {renderDropdown()}
-            </Grid>
-            <Grid container spacing={3}>
-                {/* KComposedChartComponent */}
-                <Grid item xs={12} md={8} lg={9}>
-                    <Paper className={fixedHeightPaper}>
-                        <KComposedChartComponent
-                            userID={props.userID}
-                            year={graphYear}
-                        />
-                    </Paper>
+    render() {
+        return (
+            <PageSpacer classes={this.props.classes}>
+                <Grid container item xs={12} alignContent={'flex-start'}>
+                    {this.renderDropdown()}
                 </Grid>
-                {/* Recent BalanceCardComponent */}
-                <Grid item xs={12} md={4} lg={3}>
-                    <Paper className={fixedHeightPaper}>
-                        <BalanceCard userID={props.userID} />
-                    </Paper>
+                <Grid container spacing={3}>
+                    {/* KComposedChartComponent */}
+                    <Grid item xs={12} md={8} lg={9}>
+                        <Paper className={this.fixedHeightPaper}>
+                            <KComposedChartComponent
+                                userID={this.props.userID}
+                                year={this.state.graphYear}
+                            />
+                        </Paper>
+                    </Grid>
+                    {/* Recent BalanceCardComponent */}
+                    <Grid item xs={12} md={4} lg={3}>
+                        <Paper className={this.fixedHeightPaper}>
+                            <BalanceCard userID={this.props.userID} />
+                        </Paper>
+                    </Grid>
+                    {/* Recent EntriesComponent */}
+                    <Grid item xs={12}>
+                        <Paper className={this.props.classes.paper}>
+                            <DashboardEntriesComponent
+                                userID={this.props.userID}
+                            />
+                        </Paper>
+                    </Grid>
                 </Grid>
-                {/* Recent EntriesComponent */}
-                <Grid item xs={12}>
-                    <Paper className={props.classes.paper}>
-                        <DashboardEntries userID={props.userID} />
-                    </Paper>
-                </Grid>
-            </Grid>
-        </PageSpacer>
-    );
-}
-
-interface DashboardPropsType {
-    userID: number;
-    classes: ClassNameMap<any>;
+            </PageSpacer>
+        );
+    }
 }
