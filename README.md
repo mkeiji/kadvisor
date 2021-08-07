@@ -96,8 +96,16 @@ make testdb
 make db
 ```
 
-#### Just a table example
+#### Environment Variables
 
-| Option            | Usage                             |
-| ----------------- | --------------------------------- |
-| -a=APP, --app=APP | Add some comments in this section |
+| Option            | Description                               |
+| ----------------- | ----------------------------------------- |
+| APP_ENV           | server run mode (options: DEV, PROD, STG) |
+| PORT              | server run port                           |
+| DB_TYPE           | database (eg: mysql)                      |
+| DB_HOST           | database address (eg: localhost:3306)     |
+| DB_NAME           | database name                             |
+| DB_USER           | database user                             |
+| DB_PASS           | database password                         |
+| DB_SQLITE         | sqlite ver if type is sqlite (eg: sqlite3)|
+| DB_SQLITE_PATH    | sqlite path (if applicable)               |
