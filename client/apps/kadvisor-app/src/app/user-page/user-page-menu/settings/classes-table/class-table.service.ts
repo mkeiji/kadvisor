@@ -8,8 +8,10 @@ import { Observable } from 'rxjs';
 
 class ClassTableService {
     private krxios: KRxios;
-    constructor(userID: number) {
-        this.krxios = new KRxios(KEndpointUtil.getUserBaseUrl(userID));
+    constructor(userID: number, krxios?: KRxios) {
+        this.krxios = krxios
+            ? krxios
+            : new KRxios(KEndpointUtil.getUserBaseUrl(userID));
     }
 
     getClasses(): Observable<Class[]> {
