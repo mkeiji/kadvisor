@@ -1,110 +1,150 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
-import { ClassTableState } from './view-model';
+import React, { Component, CSSProperties } from 'react';
+import {
+    ClassesTableComponentState,
+    ClassesTablePropsType,
+    ClassTableState
+} from './view-model';
 import { Class, KSpinner, MATERIAL_TABLE_ICONS } from '@client/klibs';
 import MaterialTable from 'material-table';
-import { ClassNameMap } from '@material-ui/core/styles/withStyles';
 import ClassTableService from './class-table.service';
-import { take } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import ClassTableViewModelService from './class-table-view-model.service';
+import { Subject } from 'rxjs';
 
-export default function ClassesTable(props: ClassesTablePropsType) {
-    const service = new ClassTableService(props.userID);
-    const viewModelService = new ClassTableViewModelService();
-    const [loading, setLoading] = useState(true);
-    const [table, setTable] = useState<ClassTableState>({} as ClassTableState);
+export default class ClassesTable extends Component<
+    ClassesTablePropsType,
+    ClassesTableComponentState
+> {
+    service: ClassTableService;
+    viewModelService: ClassTableViewModelService;
 
-    useEffect(() => {
-        service
+    unsubscribe$ = new Subject<boolean>();
+    headerStyles = {
+        backgroundColor: 'darkgrey',
+        color: 'white'
+    } as CSSProperties;
+
+    constructor(props: ClassesTablePropsType) {
+        super(props);
+        this.service = this.props.service
+            ? this.props.service
+            : new ClassTableService(this.props.userID);
+        this.viewModelService = this.props.viewModelService
+            ? this.props.viewModelService
+            : new ClassTableViewModelService();
+
+        this.state = {
+            loading: true,
+            table: {} as ClassTableState
+        };
+    }
+
+    componentDidMount() {
+        this.service
             .getClasses()
-            .pipe(take(1))
+            .pipe(takeUntil(this.unsubscribe$))
             .subscribe((classes: Class[]) => {
-                setTable(viewModelService.formatTableState(classes));
-                setLoading(false);
+                this.setState({
+                    table: this.viewModelService.mapClassesToClassTableState(
+                        classes
+                    ),
+                    loading: false
+                });
             });
-    }, []);
+    }
 
-    function onAdd(newClass: Class) {
-        newClass.userID = props.userID;
-        return service
+    componentWillUnmount() {
+        this.unsubscribe$.next(true);
+        this.unsubscribe$.unsubscribe();
+    }
+
+    async onAdd(newClass: Class) {
+        newClass.userID = this.props.userID;
+        await this.service
             .postClass(newClass)
-            .pipe(take(1))
+            .pipe(takeUntil(this.unsubscribe$))
             .toPromise()
             .then((c: Class) => {
-                setTable((prevState: ClassTableState) => {
-                    const data = [...prevState.data];
+                this.setState((prevState: ClassesTableComponentState) => {
+                    const data = prevState.table
+                        ? [...prevState.table.data]
+                        : [];
                     data.unshift(c);
-                    return { ...prevState, data };
+                    return this.handleTableStateClassUpdate(prevState, data);
                 });
             });
     }
 
-    function onEdit(newClass: Class, oldClass: Class | undefined) {
-        return service
+    async onEdit(newClass: Class, oldClass: Class | undefined) {
+        await this.service
             .putClass(newClass)
-            .pipe(take(1))
+            .pipe(takeUntil(this.unsubscribe$))
             .toPromise()
             .then((c: Class) => {
-                setTable((prevState: ClassTableState) => {
-                    const data = [...prevState.data];
+                this.setState((prevState: ClassesTableComponentState) => {
+                    const data = prevState.table
+                        ? [...prevState.table.data]
+                        : [];
                     data[data.indexOf(oldClass)] = c;
-                    return { ...prevState, data };
+                    return this.handleTableStateClassUpdate(prevState, data);
                 });
             });
     }
 
-    function onDelete(oldClass: Class) {
-        return service
+    async onDelete(oldClass: Class) {
+        await this.service
             .deleteClass(oldClass.id)
-            .pipe(take(1))
+            .pipe(takeUntil(this.unsubscribe$))
             .toPromise()
             .then(() => {
-                setTable((prevState: ClassTableState) => {
-                    const data = [...prevState.data];
+                this.setState((prevState: ClassesTableComponentState) => {
+                    const data = prevState.table
+                        ? [...prevState.table.data]
+                        : [];
                     data.splice(data.indexOf(oldClass), 1);
-                    return { ...prevState, data };
+                    return this.handleTableStateClassUpdate(prevState, data);
                 });
             });
     }
 
-    function renderTable(): JSX.Element {
-        if (loading) {
+    render(): JSX.Element {
+        if (this.state.loading) {
             return <KSpinner />;
         } else {
             return (
                 <MaterialTable
                     title={'Classes'}
                     icons={MATERIAL_TABLE_ICONS}
-                    columns={table.columns}
-                    data={table.data}
+                    columns={this.state.table ? this.state.table.columns : []}
+                    data={this.state.table ? this.state.table.data : []}
                     options={{
-                        headerStyle: headerStyles,
+                        headerStyle: this.headerStyles,
                         actionsColumnIndex: -1,
                         pageSize: 10,
                         addRowPosition: 'first',
                         search: false
                     }}
                     editable={{
-                        onRowAdd: (e: Class) => onAdd(e),
+                        onRowAdd: (e: Class) => this.onAdd(e),
                         onRowUpdate: (
                             newData: Class,
                             oldData: Class | undefined
-                        ) => onEdit(newData, oldData),
-                        onRowDelete: (oldData: Class) => onDelete(oldData)
+                        ) => this.onEdit(newData, oldData),
+                        onRowDelete: (oldData: Class) => this.onDelete(oldData)
                     }}
                 />
             );
         }
     }
 
-    return renderTable();
+    private handleTableStateClassUpdate(
+        prevState: ClassesTableComponentState,
+        data: Class[]
+    ): ClassesTableComponentState {
+        const updatedTable = {
+            ...prevState.table,
+            data: data
+        };
+        return { ...prevState, table: updatedTable };
+    }
 }
-
-interface ClassesTablePropsType {
-    userID: number;
-    classes: ClassNameMap<any>;
-}
-
-const headerStyles = {
-    backgroundColor: 'darkgrey',
-    color: 'white'
-} as CSSProperties;

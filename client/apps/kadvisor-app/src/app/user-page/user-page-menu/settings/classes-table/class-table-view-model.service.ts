@@ -3,7 +3,7 @@ import { ClassTableState } from './view-model';
 import { orderBy } from 'lodash';
 
 class ClassTableViewModelService {
-    formatTableState(classes: Class[]): ClassTableState {
+    mapClassesToClassTableState(classes: Class[]): ClassTableState {
         return {
             columns: [
                 { title: 'Classname', field: 'name' },
