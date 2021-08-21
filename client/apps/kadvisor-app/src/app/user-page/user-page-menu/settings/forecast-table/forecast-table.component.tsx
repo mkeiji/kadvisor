@@ -1,78 +1,124 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
-import { ClassNameMap } from '@material-ui/core/styles/withStyles';
+import React, { Component, CSSProperties } from 'react';
 import MaterialTable from 'material-table';
 import {
     Forecast,
     ForecastEntry,
-    KSpinner,
     MATERIAL_TABLE_ICONS,
     ReportsApiService,
     KSelect,
-    KSelectItem
+    ForecastTableState,
+    KSpinner
 } from '@client/klibs';
 import ForecastTableService from './forecast-table.service';
-import ForecastTableViewModelService, {
-    ForecastTableState
-} from './forecast-table-view-model.service';
+import ForecastTableViewModelService from './forecast-table-view-model.service';
 import { takeUntil } from 'rxjs/operators';
 import { Button, TextField, Container } from '@material-ui/core';
 import { Subject } from 'rxjs';
 import { Row, Col } from 'react-bootstrap';
+import {
+    ForecastTableComponentState,
+    ForecastTablePropsType
+} from './view-model';
 
-export default function ForecastTable(props: ForecastTablePropsType) {
-    const destroy$ = new Subject<boolean>();
-    const currentYear = new Date().getFullYear();
-    const forecastService = new ForecastTableService(props.userID);
-    const reportsService = new ReportsApiService(props.userID);
-    const viewModelService = new ForecastTableViewModelService();
-    const [yearMenuItems, setYearMenuItems] = useState<KSelectItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [hasForecast, setHasForecast] = useState(true);
-    const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-    const [forecastYear, setForecastYear] = useState<number | string>('');
-    const [table, setTable] = useState<ForecastTableState>(
-        {} as ForecastTableState
-    );
+export default class ForecastTable extends Component<
+    ForecastTablePropsType,
+    ForecastTableComponentState
+> {
+    service: ForecastTableService;
+    reportsService: ReportsApiService;
+    viewModelService: ForecastTableViewModelService;
 
-    useEffect(() => {
-        getForecast();
-        getAvailableReportYears();
+    destroy$ = new Subject<boolean>();
+    currentYear = new Date().getFullYear();
+    headerStyles = {
+        backgroundColor: 'darkgrey',
+        color: 'white'
+    } as CSSProperties;
+    yearFieldStyles = {
+        width: '55px',
+        paddingRight: '10px'
+    } as CSSProperties;
 
-        return () => {
-            destroy$.next(true);
-            destroy$.unsubscribe();
+    constructor(props: ForecastTablePropsType) {
+        super(props);
+        this.service = props.service
+            ? props.service
+            : new ForecastTableService(props.userID);
+        this.reportsService = props.reportsService
+            ? props.reportsService
+            : new ReportsApiService(props.userID);
+        this.viewModelService = props.viewModelService
+            ? props.viewModelService
+            : new ForecastTableViewModelService();
+
+        this.state = {
+            yearMenuItems: [],
+            loading: true,
+            hasForecast: true,
+            selectedYear: this.currentYear,
+            forecastYear: '',
+            table: {} as ForecastTableState
         };
-    }, [hasForecast, selectedYear]);
 
-    async function getForecast() {
-        forecastService
-            .getForecast(selectedYear)
-            .pipe(takeUntil(destroy$))
+        this.createForecast = this.createForecast.bind(this);
+    }
+
+    componentDidMount() {
+        this.getForecast();
+        this.getAvailableReportYears();
+    }
+
+    componentDidUpdate(
+        _: ForecastTablePropsType,
+        prevState: ForecastTableComponentState
+    ) {
+        if (
+            this.state.hasForecast !== prevState.hasForecast ||
+            this.state.selectedYear !== prevState.selectedYear
+        ) {
+            this.getForecast();
+            this.getAvailableReportYears();
+        }
+    }
+
+    componentWillUnmount() {
+        this.destroy$.next(true);
+        this.destroy$.unsubscribe();
+    }
+
+    private getForecast() {
+        this.service
+            .getForecast(this.state.selectedYear)
+            .pipe(takeUntil(this.destroy$))
             .subscribe(
                 (f: Forecast) => {
                     if (f) {
-                        setSelectedYear(f.year);
-                        setTable(viewModelService.formatTableState(f));
-                        setLoading(false);
+                        this.setState({
+                            selectedYear: f.year,
+                            table: this.viewModelService.formatTableState(f),
+                            loading: false
+                        });
                     }
                 },
                 () => {
-                    setHasForecast(false);
-                    setLoading(false);
+                    this.setState({
+                        hasForecast: false,
+                        loading: false
+                    });
                 }
             );
     }
 
-    async function getAvailableReportYears() {
-        reportsService
+    private getAvailableReportYears() {
+        this.reportsService
             .getAvailableReportYears(true)
-            .pipe(takeUntil(destroy$))
+            .pipe(takeUntil(this.destroy$))
             .subscribe((years: number[]) => {
-                mapYearMenuItems(years);
+                this.mapYearMenuItems(years);
             });
     }
 
-    function mapYearMenuItems(years: number[]) {
+    private mapYearMenuItems(years: number[]) {
         const selectMenuItems = [];
         if (years) {
             years.map((year: number) => {
@@ -81,104 +127,109 @@ export default function ForecastTable(props: ForecastTablePropsType) {
                     displayValue: year.toString()
                 });
             });
-            setYearMenuItems(selectMenuItems);
+            this.setState({ yearMenuItems: selectMenuItems });
         }
     }
 
-    async function onEdit(
+    private async onEdit(
         newEntry: ForecastEntry,
         oldEntry: ForecastEntry | undefined
     ) {
-        return forecastService
-            .putForecastEntry(viewModelService.parseAmounts(newEntry))
-            .pipe(takeUntil(destroy$))
+        return this.service
+            .putForecastEntry(this.viewModelService.parseAmounts(newEntry))
+            .pipe(takeUntil(this.destroy$))
             .toPromise()
             .then((e: ForecastEntry) => {
-                setTable((prevState: ForecastTableState) => {
-                    const data = [...prevState.data];
-                    data[data.indexOf(oldEntry)] = e;
-                    return { ...prevState, data };
-                });
+                this.setState((prevState: ForecastTableComponentState) =>
+                    this.viewModelService.handleTableStateUpdate(
+                        prevState,
+                        oldEntry,
+                        e
+                    )
+                );
             });
     }
 
-    async function createForecast() {
-        if (isValidYear()) {
-            const newForecast = viewModelService.createNewForecast(
-                props.userID,
-                forecastYear as number
+    private createForecast() {
+        if (this.isValidYear()) {
+            const newForecast = this.viewModelService.createNewForecast(
+                this.props.userID,
+                this.state.forecastYear as number
             );
-            forecastService
+            this.service
                 .postForecast(newForecast)
-                .pipe(takeUntil(destroy$))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe(
                     (f: Forecast) => {
-                        yearMenuItems.push({
-                            value: f.year,
-                            displayValue: f.year.toString()
-                        });
-                        setTextFieldDisplayValue();
-                        setHasForecast(true);
-                        setSelectedYear(f.year);
+                        this.setState(
+                            (prevState: ForecastTableComponentState) =>
+                                this.viewModelService.handleYearMenuItemsStateUpdate(
+                                    prevState,
+                                    f
+                                )
+                        );
                     },
-                    () => setTextFieldDisplayValue()
+                    () => this.setTextFieldDisplayValue()
                 );
         }
     }
 
-    function isValidYear(): boolean {
-        const len = forecastYear.toString().length;
-        return !isNaN(forecastYear as number) && len === 4;
+    private isValidYear(): boolean {
+        const len = this.state.forecastYear.toString().length;
+        return !isNaN(this.state.forecastYear as number) && len === 4;
     }
 
-    function setTextFieldDisplayValue(value?: number | string) {
+    private setTextFieldDisplayValue(value?: number | string) {
         if (!isNaN(value as number) && value !== 0) {
-            setForecastYear(value);
+            this.setState({ forecastYear: value });
         } else {
-            setForecastYear('');
+            this.setState({ forecastYear: '' });
         }
     }
 
-    function renderYearSelectionDropDown(): JSX.Element {
+    private renderYearSelectionDropDown(): JSX.Element {
         return (
             <Col>
                 <KSelect
-                    items={yearMenuItems}
-                    onValueChange={setSelectedYear}
-                    value={selectedYear}
+                    items={this.state.yearMenuItems}
+                    onValueChange={(value: number) =>
+                        this.setState({ selectedYear: value })
+                    }
+                    value={this.state.selectedYear}
                     formVariant="outlined"
                 />
             </Col>
         );
     }
 
-    function renderCreateForecast(): JSX.Element {
+    private renderCreateForecast(): JSX.Element {
         return (
             <form>
                 <Container>
                     <Row style={{ display: 'flex', alignItems: 'center' }}>
-                        {yearMenuItems.length > 0
-                            ? renderYearSelectionDropDown()
+                        {this.state.yearMenuItems.length > 0
+                            ? this.renderYearSelectionDropDown()
                             : null}
                         <Col className="align-self-center">
                             <TextField
                                 placeholder="year"
-                                style={yearFieldStyles}
-                                value={forecastYear}
+                                style={this.yearFieldStyles}
+                                value={this.state.forecastYear}
                                 onChange={(val) =>
-                                    setTextFieldDisplayValue(
+                                    this.setTextFieldDisplayValue(
                                         Number(val.target.value.trim())
                                     )
                                 }
                             />
                             <Button
                                 color={
-                                    isValidYear() || forecastYear === ''
+                                    this.isValidYear() ||
+                                    this.state.forecastYear === ''
                                         ? 'primary'
                                         : 'secondary'
                                 }
                                 variant="contained"
-                                onClick={createForecast}
+                                onClick={this.createForecast}
                             >
                                 + forecast
                             </Button>
@@ -189,18 +240,18 @@ export default function ForecastTable(props: ForecastTablePropsType) {
         );
     }
 
-    function renderForecast(): JSX.Element {
-        if (hasForecast) {
+    private renderForecast(): JSX.Element {
+        if (this.state.hasForecast) {
             return (
                 <div>
-                    {renderCreateForecast()}
+                    {this.renderCreateForecast()}
                     <MaterialTable
                         title={'Forecast'}
                         icons={MATERIAL_TABLE_ICONS}
-                        columns={table.columns}
-                        data={table.data}
+                        columns={this.state.table.columns}
+                        data={this.state.table.data}
                         options={{
-                            headerStyle: headerStyles,
+                            headerStyle: this.headerStyles,
                             actionsColumnIndex: -1,
                             pageSize: 12,
                             paging: false,
@@ -210,30 +261,17 @@ export default function ForecastTable(props: ForecastTablePropsType) {
                             onRowUpdate: (
                                 newData: ForecastEntry,
                                 oldData: ForecastEntry
-                            ) => onEdit(newData, oldData)
+                            ) => this.onEdit(newData, oldData)
                         }}
                     />
                 </div>
             );
         } else {
-            return renderCreateForecast();
+            return this.renderCreateForecast();
         }
     }
 
-    return loading ? <KSpinner /> : renderForecast();
+    render(): JSX.Element {
+        return this.state.loading ? <KSpinner /> : this.renderForecast();
+    }
 }
-
-interface ForecastTablePropsType {
-    userID: number;
-    classes: ClassNameMap<any>;
-}
-
-const headerStyles = {
-    backgroundColor: 'darkgrey',
-    color: 'white'
-} as CSSProperties;
-
-const yearFieldStyles = {
-    width: '55px',
-    paddingRight: '10px'
-} as CSSProperties;

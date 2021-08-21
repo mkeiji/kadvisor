@@ -1,11 +1,11 @@
-import { Forecast, ForecastEntry, KFormatUtil } from '@client/klibs';
-import { Column } from 'material-table';
+import {
+    Forecast,
+    ForecastEntry,
+    ForecastTableState,
+    KFormatUtil
+} from '@client/klibs';
 import { orderBy } from 'lodash';
-
-export interface ForecastTableState {
-    columns: Array<Column<ForecastEntry>>;
-    data: ForecastEntry[];
-}
+import { ForecastTableComponentState } from './view-model';
 
 class ForecastTableViewModelService {
     formatTableState(forecast: Forecast): ForecastTableState {
@@ -57,6 +57,38 @@ class ForecastTableViewModelService {
             year: year,
             entries: entries
         } as Forecast;
+    }
+
+    handleTableStateUpdate(
+        prevState: ForecastTableComponentState,
+        oldEntry: ForecastEntry,
+        newEntry: ForecastEntry
+    ): ForecastTableComponentState {
+        const data = prevState.table ? [...prevState.table.data] : [];
+        data[data.indexOf(oldEntry)] = newEntry;
+        const updatedTable = {
+            ...prevState.table,
+            data: data
+        };
+        return { ...prevState, table: updatedTable };
+    }
+
+    handleYearMenuItemsStateUpdate(
+        prevState: ForecastTableComponentState,
+        forecast: Forecast
+    ): ForecastTableComponentState {
+        const updatedMenuItems = prevState.yearMenuItems;
+        updatedMenuItems.push({
+            value: forecast.year,
+            displayValue: forecast.year.toString()
+        });
+        return {
+            ...prevState,
+            yearMenuItems: updatedMenuItems,
+            hasForecast: true,
+            selectedYear: forecast.year,
+            forecastYear: ''
+        };
     }
 }
 

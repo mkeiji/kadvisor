@@ -1,4 +1,5 @@
 import { BaseModel } from './base-model';
+import { Column } from 'material-table';
 
 export interface Forecast extends BaseModel {
     userID: number;
@@ -11,4 +12,9 @@ export interface ForecastEntry extends BaseModel {
     month: number;
     income: number;
     expense: number;
+}
+
+export interface ForecastTableState {
+    columns: Array<Column<ForecastEntry>>;
+    data: ForecastEntry[];
 }
