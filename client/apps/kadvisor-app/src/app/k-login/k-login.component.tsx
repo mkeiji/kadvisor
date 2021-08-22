@@ -57,9 +57,16 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
             isLoggedIn: isLoggedIn,
             hasWarning: false
         } as KLoginState;
+
+        this.initialize();
     }
 
-    componentWillMount(): void {
+    componentWillUnmount(): void {
+        this.unsubscribe$.next();
+        this.unsubscribe$.complete();
+    }
+
+    initialize(): void {
         this.formInitialValues = { email: '', password: '' };
         this.formValidationSchema = Yup.object({
             email: Yup.string()
@@ -69,11 +76,6 @@ class KLogin extends Component<KLoginPropTypes, KLoginState> {
                 .min(3, 'Must be more than 3 char')
                 .required('Required')
         });
-    }
-
-    componentWillUnmount(): void {
-        this.unsubscribe$.next();
-        this.unsubscribe$.complete();
     }
 
     responseIsError(res: Auth): res is AuthError {
