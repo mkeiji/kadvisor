@@ -64,19 +64,6 @@ describe('KLogin', () => {
         });
     });
 
-    describe('componentWillMount', () => {
-        it('should set form initial values', () => {
-            const expected = { email: '', password: '' };
-            component.componentWillMount();
-            expect(component.formInitialValues).toEqual(expected);
-        });
-
-        it('should set form validation schema', () => {
-            component.componentWillMount();
-            expect(component.formValidationSchema).not.toBeNull();
-        });
-    });
-
     describe('componentWillUnmount', () => {
         it('should call subject next and complete', () => {
             component.unsubscribe$ = ({
@@ -88,6 +75,19 @@ describe('KLogin', () => {
 
             expect(component.unsubscribe$.next).toHaveBeenCalled();
             expect(component.unsubscribe$.complete).toHaveBeenCalled();
+        });
+    });
+
+    describe('initialize', () => {
+        it('should set form initial values', () => {
+            const expected = { email: '', password: '' };
+            component.initialize();
+            expect(component.formInitialValues).toEqual(expected);
+        });
+
+        it('should set form validation schema', () => {
+            component.initialize();
+            expect(component.formValidationSchema).not.toBeNull();
         });
     });
 
