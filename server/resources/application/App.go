@@ -76,10 +76,10 @@ func (this App) Run() {
 }
 
 func (this App) DbMigrate() {
+	// 2 separated loops needed to migrate all entities before initializing
 	for _, entity := range this.EntityList {
 		entity.Migrate(Db)
 	}
-	// 2 loops needed to migrate all entities before initializing
 	for _, entity := range this.EntityList {
 		if entity.IsInitializable() {
 			entity.Initialize(Db)
