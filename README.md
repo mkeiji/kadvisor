@@ -1,5 +1,5 @@
 # Kadvisor
-![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/mkeiji/kadvisor/Build/master?style=flat-square) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/mkeiji/kadvisor/Test/master?label=test&style=flat-square) ![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/mkeiji/kadvisor/Deployment/master?label=deploy)
+[![Build](https://github.com/mkeiji/kadvisor/actions/workflows/ci-build.yml/badge.svg)](https://github.com/mkeiji/kadvisor/actions/workflows/ci-build.yml) [![Test](https://github.com/mkeiji/kadvisor/actions/workflows/ci-test.yml/badge.svg)](https://github.com/mkeiji/kadvisor/actions/workflows/ci-test.yml) [![Deployment](https://github.com/mkeiji/kadvisor/actions/workflows/cd-deployment.yml/badge.svg)](https://github.com/mkeiji/kadvisor/actions/workflows/cd-deployment.yml)
 
 ## Setup Dependencies:
 
